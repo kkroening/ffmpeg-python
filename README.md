@@ -1,4 +1,4 @@
-# ffmpeg-python: Python bindings for FFmpeg with complex filtering support
+# ffmpeg-python: Python bindings for FFmpeg
 
 ## Overview
 
