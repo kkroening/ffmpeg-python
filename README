@@ -1,8 +1,8 @@
-# ffmpeg-python: FFmpeg Python wrapper with support for complex filtering
+# ffmpeg-python: Python bindings for FFmpeg with complex filtering support
 
 ## Overview
 
-There are tons of Python FFmpeg wrappers out there but they seem to lack complex filter support.  `ffmpeg-python` works well for simple as well as complicated signal graphs.
+There are tons of Python FFmpeg wrappers out there but they seem to lack complex filter support.  `ffmpeg-python` works well for simple as well as complex signal graphs.
 
 ## Quickstart
 
