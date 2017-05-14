@@ -1,4 +1,4 @@
-# ffmpeg-python: Powerfully simple A/V routing with Python
+# ffmpeg-python: FFmpeg Python wrapper with support for complex filtering
 
 ## Overview
 
@@ -59,4 +59,3 @@ ffmpeg.concat(
 `ffmpeg-python` takes care of running `ffmpeg` with the command-line arguments that correspond to the above filter diagram, and it's easy to what's going on and make changes as needed.
 
 Real-world signal graphs can get a heck of a lot more complex, but `ffmpeg-python` handles them with ease.
-

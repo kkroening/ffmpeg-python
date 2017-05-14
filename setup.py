@@ -1,0 +1,27 @@
+from distutils.core import setup
+setup(
+    name = 'ffmpeg-python',
+    packages = ['ffmpeg'],
+    version = '0.1',
+    description = 'FFmpeg Python wrapper with support for complex filtering',
+    author = 'Karl Kroening',
+    author_email = 'karlk@kralnet.us',
+    url = 'https://github.com/kkroening/ffmpeg-python',
+    download_url = 'https://github.com/peterldowns/mypackage/archive/0.1.tar.gz',
+    keywords = [
+        'a/v',
+        'audio',
+        'dsp',
+        'FFmpeg',
+        'ffmpeg',
+        'ffprobe',
+        'filtering',
+        'render',
+        'signals',
+        'streaming',
+        'streams',
+        'video',
+        'wrapper',
+    ],
+    classifiers = [],
+)
