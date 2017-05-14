@@ -30,7 +30,7 @@ FFmpeg is extremely powerful, but it's command-line interface gets really compli
 
 Take for example a signal graph that looks like this:
 
-<img src="https://raw.githubusercontent.com/kkroening/ffmpeg-python/master/doc/graph1.png" alt="Signal graph" align="middle" width="80%" />
+![Signal graph]("https://raw.githubusercontent.com/kkroening/ffmpeg-python/master/doc/graph1.png")
 
 The corresponding command-line arguments are pretty gnarly:
 ```
