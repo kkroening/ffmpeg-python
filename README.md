@@ -26,7 +26,7 @@ ffmpeg.run(out)
 FFmpeg is extremely powerful, but it's command-line interface gets really complicated really quickly - especially when working with signal graphs and doing anything more than trivial.
 
 Take for example a signal graph that looks like this:
-<img src="https://raw.githubusercontent.com/kkroening/ffmpeg-python/master/doc/graph1.png" alt="Signal graph" width="50%" />
+<img src="https://raw.githubusercontent.com/kkroening/ffmpeg-python/master/doc/graph1.png" alt="Signal graph" align="middle" width="50%" />
 
 The corresponding command-line arguments are pretty gnarly:
 ```
