@@ -51,8 +51,8 @@ If you're like me and find Python to be powerful and readable, it's easy with `f
 ```
 import ffmpeg
 
-in_file = ffmpeg.file_input(TEST_INPUT_FILE)
-overlay_file = ffmpeg.file_input(TEST_OVERLAY_FILE)
+in_file = ffmpeg.file_input('input.mp4')
+overlay_file = ffmpeg.file_input('overlay.png')
 ffmpeg \
     .concat(
         in_file.trim(10, 20),
