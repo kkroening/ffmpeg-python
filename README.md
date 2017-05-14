@@ -66,6 +66,6 @@ ffmpeg \
 
 `ffmpeg-python` takes care of running `ffmpeg` with the command-line arguments that correspond to the above filter diagram, and it's easy to what's going on and make changes as needed.
 
-![Screenshot](https://raw.githubusercontent.com/kkroening/ffmpeg-python/master/doc/screenshot.png)
+<img src="https://raw.githubusercontent.com/kkroening/ffmpeg-python/master/doc/screenshot.png" alt="Screenshot" align="middle" width="60%" />
 
 Real-world signal graphs can get a heck of a lot more complex, but `ffmpeg-python` handles them with ease.
