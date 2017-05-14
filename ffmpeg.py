@@ -5,6 +5,7 @@ import hashlib
 import json
 import operator
 import subprocess
+import sys
 
 
 def _create_root_node(node_class, *args, **kwargs):
@@ -27,13 +28,13 @@ class _Node(object):
 
     @classmethod
     def _add_operator(cls, node_class):
-        if getattr(node_class, 'STATIC', False):
+        if not getattr(node_class, 'STATIC', False):
+            def func(self, *args, **kwargs):
+                return _create_child_node(node_class, self, *args, **kwargs)
+        else:
             @classmethod
             def func(cls2, *args, **kwargs):
                 return _create_root_node(node_class, *args, **kwargs)
-        else:
-            def func(self, *args, **kwargs):
-                return _create_child_node(node_class, self, *args, **kwargs)
         setattr(cls, node_class.NAME, func)
 
     @classmethod
@@ -233,13 +234,14 @@ NODE_CLASSES = [
 
 _Node._add_operators(NODE_CLASSES)
 
-
-for node_class in NODE_CLASSES:
-    if getattr(node_class, 'STATIC', False):
+_module = sys.modules[__name__]
+for _node_class in NODE_CLASSES:
+    if getattr(_node_class, 'STATIC', False):
         func = _create_root_node
     else:
         func = _create_child_node
-    globals()[node_class.NAME] = partial(func, node_class)
+    func = partial(func, _node_class)
+    setattr(_module, _node_class.NAME, func)
 
 
 def get_args(node):
