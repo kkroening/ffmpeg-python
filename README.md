@@ -57,5 +57,5 @@ ffmpeg.concat(
 
 `ffmpeg-python` takes care of running `ffmpeg` with the command-line arguments that correspond to the above filter diagram, and it's easy to what's going on and make changes as needed.
 
-Real-world signal graphs can get a heck of a lot more complex, and `ffmpeg-python` doesn't care.
+Real-world signal graphs can get a heck of a lot more complex, but `ffmpeg-python` handles them with ease.
 
