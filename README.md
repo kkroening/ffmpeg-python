@@ -45,14 +45,14 @@ If you're like me and find Python to be powerful and readable, it's easy with `f
 ```
 import ffmpeg
 
-in_file = ffmpeg.file_input('input.mp4')
-joined = ffmpeg.concat(
-    ffmpeg.trim(in_file, start_frame=10, end_frame=20),
-    ffmpeg.trim(in_file, start_frame=30, end_frame=40),
-    ffmpeg.trim(in_file, start_frame=50, end_frame=60)
-)
-out = ffmpeg.file_output(joined, 'output.mp4')
-out.run()
+in_file = ffmpeg.file_input('input.mp4') \
+ffmpeg.concat(
+        in_file.trim(start_frame=10, end_frame=20),
+        in_file.trim(start_frame=30, end_frame=40),
+        in_file.trim(start_frame=50, end_frame=60)
+    ) \
+    .file_output('output.mp4') \
+    .run()
 ```
 
 `ffmpeg-python` takes care of running `ffmpeg` with the command-line arguments that correspond to the above filter diagram, and it's easy to what's going on and make changes as needed.
