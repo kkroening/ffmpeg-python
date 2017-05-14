@@ -1,9 +1,32 @@
 # ffmpeg-python: Powerfully simple A/V routing with Python
 
-FFmpeg is extremely powerful, but its command-line interface gets really complicated really quickly - especially when working with signal graphs and doing anything more than trivial.
+## Overview
+
+There are tons of Python FFmpeg wrappers out there but they seem to lack complex filter support - useless for anything but trivial examples.  `ffmpeg-python` works well for simple as well as complicated signal graphs.
+
+## Quickstart
+
+```
+import ffmpeg
+ffmpeg \
+    .file_input('input.mp4') \
+    .file_output('output.mp4') \
+    .run()
+```
+
+Or if you dislike fluent-style APIs:
+```
+import ffmpeg
+in = ffmpeg.file_input('input.mp4')
+out = ffmpeg.file_output(in)
+ffmpeg.run(out)
+```
+
+## Complex filter graphs
+FFmpeg is extremely powerful, but it's command-line interface gets really complicated really quickly - especially when working with signal graphs and doing anything more than trivial.
 
 Take for example a signal graph that looks like this:
-![Signal graph](https://raw.githubusercontent.com/kkroening/ffmpeg-python/master/doc/graph1.png|width=300)
+<img src="https://raw.githubusercontent.com/kkroening/ffmpeg-python/master/doc/graph1.png" alt="Signal graph" width="50%" />
 
 The corresponding command-line arguments are pretty gnarly:
 ```
