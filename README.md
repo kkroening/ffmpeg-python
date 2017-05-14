@@ -26,7 +26,7 @@ ffmpeg.run(out)
 ```
 
 ## Complex filter graphs
-FFmpeg is extremely powerful, but it's command-line interface gets really complicated really quickly - especially when working with signal graphs and doing anything more than trivial.
+FFmpeg is extremely powerful, but its command-line interface gets really complicated really quickly - especially when working with signal graphs and doing anything more than trivial.
 
 Take for example a signal graph that looks like this:
 
