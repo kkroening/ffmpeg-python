@@ -2,7 +2,7 @@
 
 ## Overview
 
-There are tons of Python FFmpeg wrappers out there but they seem to lack complex filter support - useless for anything but trivial examples.  `ffmpeg-python` works well for simple as well as complicated signal graphs.
+There are tons of Python FFmpeg wrappers out there but they seem to lack complex filter support.  `ffmpeg-python` works well for simple as well as complicated signal graphs.
 
 ## Quickstart
 
