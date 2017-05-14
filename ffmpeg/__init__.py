@@ -15,7 +15,7 @@ def _create_root_node(node_class, *args, **kwargs):
 
 
 def _create_child_node(node_class, parent, *args, **kwargs):
-    child = node_class([parent], *args, **kwargs)
+    child = node_class(parent, *args, **kwargs)
     child._update_hash()
     return child
 
@@ -31,11 +31,7 @@ class _Node(object):
         if not getattr(node_class, 'STATIC', False):
             def func(self, *args, **kwargs):
                 return _create_child_node(node_class, self, *args, **kwargs)
-        else:
-            @classmethod
-            def func(cls2, *args, **kwargs):
-                return _create_root_node(node_class, *args, **kwargs)
-        setattr(cls, node_class.NAME, func)
+            setattr(cls, node_class.NAME, func)
 
     @classmethod
     def _add_operators(cls, node_classes):
@@ -75,17 +71,58 @@ class _FileInputNode(_InputNode):
 
 
 class _FilterNode(_Node):
-    pass
+    def _get_filter(self):
+        raise NotImplementedError()
 
 
-class _TrimFilterNode(_FilterNode):
+class _TrimNode(_FilterNode):
     NAME = 'trim'
 
-    def __init__(self, parents, start_frame, end_frame, setpts='PTS-STARTPTS'):
-        super(_TrimFilterNode, self).__init__(parents)
+    def __init__(self, parent, start_frame, end_frame, setpts='PTS-STARTPTS'):
+        super(_TrimNode, self).__init__([parent])
         self.start_frame = start_frame
         self.end_frame = end_frame
         self.setpts = setpts
+
+    def _get_filter(self):
+        return 'trim=start_frame={}:end_frame={},setpts={}'.format(self.start_frame, self.end_frame, self.setpts)
+
+
+class _OverlayNode(_FilterNode):
+    NAME = 'overlay'
+
+    def __init__(self, main_parent, overlay_parent, eof_action='repeat'):
+        super(_OverlayNode, self).__init__([main_parent, overlay_parent])
+        self.eof_action = eof_action
+
+    def _get_filter(self):
+        return 'overlay=eof_action={}'.format(self.eof_action)
+
+
+class _HFlipNode(_FilterNode):
+    NAME = 'hflip'
+
+    def __init__(self, parent):
+        super(_HFlipNode, self).__init__([parent])
+
+    def _get_filter(self):
+        return 'hflip'
+
+
+class _DrawBoxNode(_FilterNode):
+    NAME = 'drawbox'
+
+    def __init__(self, parent, x, y, width, height, color, thickness=1):
+        super(_DrawBoxNode, self).__init__([parent])
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.color = color
+        self.thickness = thickness
+
+    def _get_filter(self):
+        return 'drawbox={}:{}:{}:{}:{}:t={}'.format(self.x, self.y, self.width, self.height, self.color, self.thickness)
 
 
 class _ConcatNode(_Node):
@@ -94,6 +131,9 @@ class _ConcatNode(_Node):
 
     def __init__(self, *parents):
         super(_ConcatNode, self).__init__(parents)
+
+    def _get_filter(self):
+        return 'concat=n={}'.format(len(self.parents))
 
 
 class _OutputNode(_Node):
@@ -131,21 +171,11 @@ class _OutputNode(_Node):
         return sorted_nodes, child_map
 
     @classmethod
-    def _get_filter(cls, node):
-        # TODO: find a better way to do this instead of ugly if/elifs.
-        if isinstance(node, _TrimFilterNode):
-            return 'trim=start_frame={}:end_frame={},setpts={}'.format(node.start_frame, node.end_frame, node.setpts)
-        elif isinstance(node, _ConcatNode):
-            return 'concat=n={}'.format(len(node.parents))
-        else:
-            assert False, 'Unsupported filter node: {}'.format(node)
-
-    @classmethod
     def _get_filter_spec(cls, i, node, stream_name_map):
         stream_name = cls._get_stream_name('v{}'.format(i))
         stream_name_map[node] = stream_name
         inputs = [stream_name_map[parent] for parent in node.parents]
-        filter_spec = '{}{}{}'.format(''.join(inputs), cls._get_filter(node), stream_name)
+        filter_spec = '{}{}{}'.format(''.join(inputs), node._get_filter(), stream_name)
         return filter_spec
 
     @classmethod
@@ -197,19 +227,18 @@ class _OutputNode(_Node):
 
 
 class _GlobalNode(_OutputNode):
-    def __init__(self, parents):
-        assert len(parents) == 1
-        assert isinstance(parents[0], _OutputNode), 'Global nodes can only be attached after output nodes'
-        super(_GlobalNode, self).__init__(parents)
+    def __init__(self, parent):
+        assert isinstance(parent, _OutputNode), 'Global nodes can only be attached after output nodes'
+        super(_GlobalNode, self).__init__([parent])
 
 
 class _OverwriteOutputNode(_GlobalNode):
     NAME = 'overwrite_output'
 
 
-
 class _MergeOutputsNode(_OutputNode):
     NAME = 'merge_outputs'
+    STATIC = True
 
     def __init__(self, *parents):
         assert not any([not isinstance(parent, _OutputNode) for parent in parents]), 'Can only merge output streams'
@@ -219,17 +248,20 @@ class _MergeOutputsNode(_OutputNode):
 class _FileOutputNode(_OutputNode):
     NAME = 'file_output'
 
-    def __init__(self, parents, filename):
-        super(_FileOutputNode, self).__init__(parents)
+    def __init__(self, parent, filename):
+        super(_FileOutputNode, self).__init__([parent])
         self.filename = filename
 
 
 NODE_CLASSES = [
+    _HFlipNode,
+    _DrawBoxNode,
     _ConcatNode,
     _FileInputNode,
     _FileOutputNode,
+    _OverlayNode,
     _OverwriteOutputNode,
-    _TrimFilterNode,
+    _TrimNode,
 ]
 
 _Node._add_operators(NODE_CLASSES)

@@ -1,4 +1,4 @@
 .cache
 dist/
-ffmpeg/tests/dummy2.mp4
+ffmpeg/tests/sample_data/dummy2.mp4
 venv

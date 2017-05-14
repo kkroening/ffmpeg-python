@@ -3,8 +3,10 @@ import os
 
 
 TEST_DIR = os.path.dirname(__file__)
-TEST_INPUT_FILE = os.path.join(TEST_DIR, 'dummy.mp4')
-TEST_OUTPUT_FILE = os.path.join(TEST_DIR, 'dummy2.mp4')
+SAMPLE_DATA_DIR = os.path.join(TEST_DIR, 'sample_data')
+TEST_INPUT_FILE = os.path.join(SAMPLE_DATA_DIR, 'dummy.mp4')
+TEST_OVERLAY_FILE = os.path.join(SAMPLE_DATA_DIR, 'overlay.png')
+TEST_OUTPUT_FILE = os.path.join(SAMPLE_DATA_DIR, 'dummy2.mp4')
 
 
 def test_fluent_equality():
@@ -77,26 +79,33 @@ def test_get_args_simple():
 
 def _get_complex_filter_example():
     in_file = ffmpeg.file_input(TEST_INPUT_FILE)
-    concatted = ffmpeg.concat(
-        ffmpeg.trim(in_file, 10, 20),
-        ffmpeg.trim(in_file, 30, 40),
-        ffmpeg.trim(in_file, 50, 60),
-    )
-    out = ffmpeg.file_output(concatted, TEST_OUTPUT_FILE)
-    return ffmpeg.overwrite_output(out)
+    overlay_file = ffmpeg.file_input(TEST_OVERLAY_FILE)
+    return ffmpeg \
+        .concat(
+            in_file.trim(10, 20),
+            in_file.trim(30, 40),
+        ) \
+        .overlay(overlay_file.hflip()) \
+        .drawbox(50, 50, 120, 120, color='red', thickness=5) \
+        .file_output(TEST_OUTPUT_FILE) \
+        .overwrite_output()
 
 
 def test_get_args_complex_filter():
     out = _get_complex_filter_example()
-    assert ffmpeg.get_args(out) == [
+    args = ffmpeg.get_args(out)
+    assert args == [
         '-i', TEST_INPUT_FILE,
-        '-filter_complex', 
+        '-i', TEST_OVERLAY_FILE,
+        '-filter_complex',
             '[0]trim=start_frame=10:end_frame=20,setpts=PTS-STARTPTS[v0];' \
             '[0]trim=start_frame=30:end_frame=40,setpts=PTS-STARTPTS[v1];' \
-            '[0]trim=start_frame=50:end_frame=60,setpts=PTS-STARTPTS[v2];' \
-            '[v0][v1][v2]concat=n=3[v3]',
-        '-map', '[v3]', TEST_OUTPUT_FILE,
-        '-y',
+            '[v0][v1]concat=n=2[v2];' \
+            '[1]hflip[v3];' \
+            '[v2][v3]overlay=eof_action=repeat[v4];' \
+            '[v4]drawbox=50:50:120:120:red:t=5[v5]',
+        '-map', '[v5]', '/Users/karlk/src/ffmpeg_wrapper/ffmpeg/tests/sample_data/dummy2.mp4',
+        '-y'
     ]
 
 
