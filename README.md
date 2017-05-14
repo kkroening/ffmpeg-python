@@ -39,7 +39,7 @@ ffmpeg -i input.mp4 \
      -map [v3] output.mp4
 ```
 
-Maybe this looks great to you, but if you haven't worked with FFmpeg before, this probably looks pretty alien.
+Maybe this looks great to you, but if you haven't worked with FFmpeg before, it probably looks pretty alien.
 
 If you're like me and find Python to be powerful and readable, it's easy with `ffmpeg-python`:
 ```
