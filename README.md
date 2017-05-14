@@ -14,7 +14,7 @@ ffmpeg \
     .run()
 ```
 
-Or if you dislike fluent-style APIs:
+Or if you prefer a non-fluent interface:
 ```
 import ffmpeg
 in = ffmpeg.file_input('input.mp4')
