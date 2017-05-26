@@ -1,6 +1,7 @@
 language: python
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y ffmpeg
 install:
-  - sudo add-apt-repository ppa:mc3man/trusty-media -y
-  - sudo apt-get install ffmpeg
   - pip install -r requirements.txt
 script: py.test
