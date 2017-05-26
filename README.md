@@ -69,3 +69,4 @@ ffmpeg \
 <img src="https://raw.githubusercontent.com/kkroening/ffmpeg-python/master/doc/screenshot.png" alt="Screenshot" align="middle" width="60%" />
 
 Real-world signal graphs can get a heck of a lot more complex, but `ffmpeg-python` handles them with ease.
+
