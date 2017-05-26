@@ -1,11 +1,7 @@
 language: python
 before_install:
-  - sudo add-apt-repository -y ppa:pavlyshko/precise
-  - sudo apt-get update
-  - apt-cache madison ffmpeg
-  - apt-cache policy ffmpeg
-  - apt-cache policy
-  - sudo apt-get install -y ffmpeg
+  - curl -O https://johnvansickle.com/ffmpeg/releases/ffmpeg-3.3.1-64bit-static.tar.xz
+  - tar Jxf ffmpeg-3.3.1-64bit-static.tar.xz
 install:
   - pip install -r requirements.txt
-script: py.test
+script: PATH=$(readlink -f ffmpeg-3.3.1-64bit-static):$PATH py.test
