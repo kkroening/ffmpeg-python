@@ -1,2 +1,5 @@
 language: python
+install:
+  - sudo apt-get install ffmpeg
+  - pip install -r requirements.txt
 script: py.test
