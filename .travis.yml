@@ -5,7 +5,8 @@ before_install:
   - apt-cache madison ffmpeg
   - ls /etc/apt/preferences.d/
   - cat /etc/apt/preferences.d/priority-ubuntu
-  - sudo apt-get install -y pavlyshko/precise/ffmpeg
+  - apt-cache policy
+  - sudo apt-get install -y ffmpeg
 install:
   - pip install -r requirements.txt
 script: py.test
