@@ -4,4 +4,6 @@ before_install:
   - tar Jxf ffmpeg-3.3.1-64bit-static.tar.xz
 install:
   - pip install -r requirements.txt
-script: PATH=$(readlink -f ffmpeg-3.3.1-64bit-static):$PATH py.test
+script:
+  - export PATH=$(readlink -f ffmpeg-3.3.1-64bit-static):$PATH
+  - py.test
