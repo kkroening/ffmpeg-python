@@ -220,9 +220,11 @@ class _OutputNode(_Node):
         args += reduce(operator.add, [self._get_output_args(node, stream_name_map) for node in output_nodes])
         args += reduce(operator.add, [self._get_global_args(node) for node in global_nodes], [])
         return args
-
-    def run(self):
-        args = ['ffmpeg'] + self.get_args()
+    
+    def run(self, cmd='ffmpeg'):
+        if type(cmd) == str:
+            cmd = [cmd]
+        args = cmd + self.get_args()
         subprocess.check_call(args)
 
 
