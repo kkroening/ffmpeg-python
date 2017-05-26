@@ -1,2 +1,3 @@
 language: python
-script: ${VIRTUAL_ENV}/bin/pytest
+install: pip install pytest
+script: pytest
