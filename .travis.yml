@@ -5,6 +5,7 @@ before_install:
   - apt-cache madison ffmpeg
   - ls /etc/apt/preferences.d/
   - cat /etc/apt/preferences.d/priority-ubuntu
+  - apt-cache policy ffmpeg
   - apt-cache policy
   - sudo apt-get install -y ffmpeg
 install:
