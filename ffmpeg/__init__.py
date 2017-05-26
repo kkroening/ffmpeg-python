@@ -230,5 +230,9 @@ def get_args(parent):
 
 @operator(node_classes={OutputNode, GlobalNode})
 def run(parent, cmd='ffmpeg'):
-    args = [cmd] + parent.get_args()
+    if type(cmd) == str:
+        cmd = [cmd]
+    elif type(cmd) != list:
+        cmd = list(cmd)
+    args = cmd + parent.get_args()
     subprocess.check_call(args)
