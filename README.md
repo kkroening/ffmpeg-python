@@ -38,7 +38,7 @@ Take for example a signal graph that looks like this:
 The corresponding command-line arguments are pretty gnarly:
 ```
 ffmpeg -i input.mp4 \
-    -filter_complex "\
+    -vf "\
         [0]trim=start_frame=10:end_frame=20,setpts=PTS-STARTPTS[v0];\
         [0]trim=start_frame=30:end_frame=40,setpts=PTS-STARTPTS[v1];\
         [v0][v1]concat=n=2[v2];\
