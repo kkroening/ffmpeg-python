@@ -1,2 +1,2 @@
 language: python
-script: ${VIRTUAL_ENV}/pytest
+script: ${VIRTUAL_ENV}/bin/pytest
