@@ -2,7 +2,7 @@ language: python
 before_install:
   - sudo add-apt-repository -y ppa:pavlyshko/precise
   - sudo apt-get update
-  - apt-cache madison ffmpeg
+  - apt-cache madison pavlyshko/ffmpeg
   - sudo apt-get install -y ffmpeg
 install:
   - pip install -r requirements.txt
