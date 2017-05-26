@@ -3,11 +3,11 @@ setup(
     name = 'ffmpeg-python',
     packages = ['ffmpeg'],
     version = '0.1.1',
-    description = 'FFmpeg Python wrapper with support for complex filtering',
+    description = 'Python bindings for FFmpeg - with support for complex filtering',
     author = 'Karl Kroening',
     author_email = 'karlk@kralnet.us',
     url = 'https://github.com/kkroening/ffmpeg-python',
-    download_url = 'https://github.com/peterldowns/mypackage/archive/0.1.tar.gz',
+    download_url = 'https://github.com/kkroening/ffmpeg-python/archive/0.1.tar.gz',
     keywords = [
         'a/v',
         'audio',
