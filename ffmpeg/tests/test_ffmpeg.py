@@ -102,7 +102,7 @@ def test_get_args_complex_filter():
     assert args == [
         '-i', TEST_INPUT_FILE,
         '-i', TEST_OVERLAY_FILE,
-        '-vf',
+        '-filter_complex',
             '[0]trim=start_frame=10:end_frame=20,setpts=PTS-STARTPTS[v0];' \
             '[0]trim=start_frame=30:end_frame=40,setpts=PTS-STARTPTS[v1];' \
             '[v0][v1]concat=n=2[v2];' \

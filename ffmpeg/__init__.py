@@ -216,7 +216,7 @@ class _OutputNode(_Node):
         filter_arg = self._get_filter_arg(filter_nodes, stream_name_map)
         args += reduce(operator.add, [self._get_input_args(node) for node in input_nodes])
         if filter_arg:
-            args += ['-vf', filter_arg]
+            args += ['-filter_complex', filter_arg]
         args += reduce(operator.add, [self._get_output_args(node, stream_name_map) for node in output_nodes])
         args += reduce(operator.add, [self._get_global_args(node) for node in global_nodes], [])
         return args
