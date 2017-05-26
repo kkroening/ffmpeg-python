@@ -11,7 +11,7 @@ TEST_OVERLAY_FILE = os.path.join(SAMPLE_DATA_DIR, 'overlay.png')
 TEST_OUTPUT_FILE = os.path.join(SAMPLE_DATA_DIR, 'dummy2.mp4')
 
 
-print(subprocess.check_call(['-version']))
+subprocess.check_call(['ffmpeg', '-version'])
 
 
 def test_fluent_equality():
