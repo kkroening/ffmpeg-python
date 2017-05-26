@@ -1,5 +1,7 @@
+
 import ffmpeg
 import os
+import subprocess
 
 
 TEST_DIR = os.path.dirname(__file__)
@@ -7,6 +9,9 @@ SAMPLE_DATA_DIR = os.path.join(TEST_DIR, 'sample_data')
 TEST_INPUT_FILE = os.path.join(SAMPLE_DATA_DIR, 'dummy.mp4')
 TEST_OVERLAY_FILE = os.path.join(SAMPLE_DATA_DIR, 'overlay.png')
 TEST_OUTPUT_FILE = os.path.join(SAMPLE_DATA_DIR, 'dummy2.mp4')
+
+
+subprocess.check_call(['ffmpeg', '-version'])
 
 
 def test_fluent_equality():
@@ -104,9 +109,13 @@ def test_get_args_complex_filter():
             '[1]hflip[v3];' \
             '[v2][v3]overlay=eof_action=repeat[v4];' \
             '[v4]drawbox=50:50:120:120:red:t=5[v5]',
-        '-map', '[v5]', '/Users/karlk/src/ffmpeg_wrapper/ffmpeg/tests/sample_data/dummy2.mp4',
+        '-map', '[v5]', os.path.join(SAMPLE_DATA_DIR, 'dummy2.mp4'),
         '-y'
     ]
+
+
+#def test_version():
+#    subprocess.check_call(['ffmpeg', '-version'])
 
 
 def test_run():
