@@ -74,29 +74,60 @@ class _FilterNode(_Node):
     def _get_filter(self):
         raise NotImplementedError()
 
+    def _get_params_from_dict(self, d):
+        params = ""
+        for k in self.kwargs:
+            params += k + "={}:".format(self.kwargs[k])
+        if len(params) > 0:
+            params = params[:-1]
+        return params
+
+    def _get_params_from_list(self, l):
+        return ":".join(["{}".format(i) for i in l])
+
+    def _get_filter_from_dict(self, d):
+        p = self._get_params_from_dict(d)
+        if len(p) > 0:
+            return self.NAME + "=" + p
+        return self.NAME
+
+
 
 class _TrimNode(_FilterNode):
     NAME = 'trim'
 
-    def __init__(self, parent, start_frame, end_frame, setpts='PTS-STARTPTS'):
+    def __init__(self, parent, **kwargs):
         super(_TrimNode, self).__init__([parent])
-        self.start_frame = start_frame
-        self.end_frame = end_frame
-        self.setpts = setpts
+        # if "setpts" not in kwargs:
+        #     kwargs["setpts"] = 'PTS-STARTPTS'
+        self.kwargs = kwargs
 
     def _get_filter(self):
-        return 'trim=start_frame={}:end_frame={},setpts={}'.format(self.start_frame, self.end_frame, self.setpts)
+        params = ""
+        for k in self.kwargs:
+            if k == "setpts":
+                continue
+            params += k
+            params += "={}:".format(self.kwargs[k])
+        if len(params) > 0:
+            params = params[:-1]
+
+        if "setpts" in self.kwargs:
+            params += "setpts={}".format(self.kwargs["setpts"])
+
+        return self.NAME + '=' + params
 
 
 class _OverlayNode(_FilterNode):
     NAME = 'overlay'
 
-    def __init__(self, main_parent, overlay_parent, eof_action='repeat'):
+    def __init__(self, main_parent, overlay_parent, **kwargs):
         super(_OverlayNode, self).__init__([main_parent, overlay_parent])
         self.eof_action = eof_action
+        self.kwargs = kwargs
 
     def _get_filter(self):
-        return 'overlay=eof_action={}'.format(self.eof_action)
+        return self._get_filter_from_dict(self.kwargs)
 
 
 class _HFlipNode(_FilterNode):
@@ -106,23 +137,38 @@ class _HFlipNode(_FilterNode):
         super(_HFlipNode, self).__init__([parent])
 
     def _get_filter(self):
-        return 'hflip'
+        return self.NAME
+
+
+class _VFlipNode(_FilterNode):
+    NAME = 'vflip'
+
+    def __init__(self, parent):
+        super(_VFlipNode, self).__init__([parent])
+
+    def _get_filter(self):
+        return self.NAME
+
 
 
 class _DrawBoxNode(_FilterNode):
     NAME = 'drawbox'
 
-    def __init__(self, parent, x, y, width, height, color, thickness=1):
+    def __init__(self, parent, x, y, width, height, color, **kwargs):
         super(_DrawBoxNode, self).__init__([parent])
         self.x = x
         self.y = y
         self.width = width
         self.height = height
         self.color = color
-        self.thickness = thickness
+        self.kwargs = kwargs
 
     def _get_filter(self):
-        return 'drawbox={}:{}:{}:{}:{}:t={}'.format(self.x, self.y, self.width, self.height, self.color, self.thickness)
+        f = 'drawbox={}:{}:{}:{}:{}'.format(self.x, self.y, self.width, self.height, self.color)
+        p = self._get_params_from_dict(self.kwargs)
+        if len(p) > 0:
+            return f + ":" + p
+        return f
 
 
 class _ConcatNode(_Node):
@@ -135,7 +181,45 @@ class _ConcatNode(_Node):
     def _get_filter(self):
         return 'concat=n={}'.format(len(self.parents))
 
+class _ZoomPanNode(_FilterNode):
+    NAME = 'zoompan'
 
+    def __init__(self, parent, **kwargs):
+        super(_ZoomPanNode, self).__init__([parent])
+        self.kwargs = kwargs
+
+    def _get_filter(self):
+        return self._get_filter_from_dict(self.kwargs)
+
+class _HueNode(_FilterNode):
+    NAME = 'hue'
+
+    def __init__(self, parent, **kwargs):
+        super(_HueNode, self).__init__([parent])
+        self.kwargs = kwargs
+
+    def _get_filter(self):
+        return self._get_filter_from_dict(self.kwargs)
+
+class _ColorChannelMixerNode(_FilterNode):
+    NAME = 'colorchannelmixer'
+
+    def __init__(self, parent, *args, **kwargs):
+        super(_ColorChannelMixerNode, self).__init__([parent])
+        self.args = args
+        self.kwargs = kwargs
+
+    def _get_filter(self):
+        f = self.NAME + "="
+        if self.args:
+            f += self._get_params_from_list(self.args)
+            if self.kwargs:
+                f += ":"
+        if self.kwargs:
+            f += self._get_params_from_dict(self.kwargs)
+        return f
+
+    
 class _OutputNode(_Node):
     @classmethod
     def _get_stream_name(cls, name):
