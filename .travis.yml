@@ -3,6 +3,8 @@ before_install:
   - sudo add-apt-repository -y ppa:pavlyshko/precise
   - sudo apt-get update
   - apt-cache madison ffmpeg
+  - ls /etc/apt/preferences.d/
+  - cat /etc/apt/preferences.d/priority-ubuntu
   - sudo apt-get install -y pavlyshko/precise/ffmpeg
 install:
   - pip install -r requirements.txt
