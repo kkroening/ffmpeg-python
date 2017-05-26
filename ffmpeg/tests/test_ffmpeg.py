@@ -104,7 +104,7 @@ def test_get_args_complex_filter():
             '[1]hflip[v3];' \
             '[v2][v3]overlay=eof_action=repeat[v4];' \
             '[v4]drawbox=50:50:120:120:red:t=5[v5]',
-        '-map', '[v5]', '/Users/karlk/src/ffmpeg_wrapper/ffmpeg/tests/sample_data/dummy2.mp4',
+        '-map', '[v5]', os.path.join(SAMPLE_DATA_DIR, 'dummy2.mp4'),
         '-y'
     ]
 
