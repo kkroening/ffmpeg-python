@@ -114,9 +114,9 @@ def test_get_args_complex_filter():
     ]
 
 
-def test_version():
-    subprocess.check_call(['ffmpeg', '-version'])
-    assert 0
+#def test_version():
+#    subprocess.check_call(['ffmpeg', '-version'])
+
 
 def test_run():
     ffmpeg.run(_get_complex_filter_example())
