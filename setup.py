@@ -66,7 +66,7 @@ keywords = misc_keywords + file_formats + filter_names
 setup(
     name = 'ffmpeg-python',
     packages = ['ffmpeg'],
-    version = '0.1.4',
+    version = '0.1.5',
     description = 'Python bindings for FFmpeg - with support for complex filtering',
     author = 'Karl Kroening',
     author_email = 'karlk@kralnet.us',
