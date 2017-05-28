@@ -9,6 +9,7 @@ fi
 
 cd gh-pages
 rm -rf *
+touch .nojekyll
 cp -r ../html/* .
 git add -A
 git commit -m 'Update docs'

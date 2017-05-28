@@ -20,5 +20,5 @@ help:
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
 
-gh-pages:
+update-gh-pages:
 	@./update-gh-pages.sh
