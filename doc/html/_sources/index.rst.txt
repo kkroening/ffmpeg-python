@@ -1,9 +1,4 @@
-.. ffmpeg-python documentation master file, created by
-   sphinx-quickstart on Sat May 27 14:30:53 2017.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
-Welcome to ffmpeg-python's documentation!
+ffmpeg-python: Python bindings for FFmpeg
 =========================================
 
 .. toctree::
