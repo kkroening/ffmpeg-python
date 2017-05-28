@@ -1,6 +1,9 @@
 ffmpeg-python: Python bindings for FFmpeg
 =========================================
 
+:Github: https://github.com/kkroening/ffmpeg-python
+-----------------------------------------------------------
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
