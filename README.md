@@ -74,5 +74,5 @@ ffmpeg \
 Real-world signal graphs can get a heck of a lot more complex, but `ffmpeg-python` handles them with ease.
 
 
-### [API Reference](https://kkroening.github.io/ffmpeg-python/)
+## [API Reference](https://kkroening.github.io/ffmpeg-python/)
 
