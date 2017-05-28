@@ -5,9 +5,8 @@ import subprocess
 
 
 def get_current_commit_hash():
-    p = subprocess.Popen(['git', 'rev-parse', 'HEAD'], stdout=subprocess.PIPE)
+    p = subprocess.Popen(['git', 'rev-parse', 'HEAD'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     commit_hash = p.communicate()[0].strip()
-    assert p.returncode == 0, '`git rev-parse HEAD` failed'
     return commit_hash
 
 
@@ -67,7 +66,7 @@ keywords = misc_keywords + file_formats + filter_names
 setup(
     name = 'ffmpeg-python',
     packages = ['ffmpeg'],
-    version = '0.1.3',
+    version = '0.1.4',
     description = 'Python bindings for FFmpeg - with support for complex filtering',
     author = 'Karl Kroening',
     author_email = 'karlk@kralnet.us',

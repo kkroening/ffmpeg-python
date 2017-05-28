@@ -58,8 +58,8 @@ in_file = ffmpeg.input('input.mp4')
 overlay_file = ffmpeg.input('overlay.png')
 ffmpeg \
     .concat(
-        in_file.trim(10, 20),
-        in_file.trim(30, 40),
+        in_file.trim(start_frame=10, end_frame=20),
+        in_file.trim(start_frame=30, end_frame=40),
     ) \
     .overlay(overlay_file.hflip()) \
     .drawbox(50, 50, 120, 120, color='red', thickness=5) \
@@ -74,5 +74,54 @@ ffmpeg \
 Real-world signal graphs can get a heck of a lot more complex, but `ffmpeg-python` handles them with ease.
 
 
-# [API Reference](https://kkroening.github.io/ffmpeg-python/)
+## Installation
 
+The easiest way to acquire the latest version of `ffmpeg-python` is through pip:
+
+```
+pip install ffmpeg-python
+```
+
+It's also possible to clone the source and make sure it's on your python path (e.g. `$PYTHONPATH`, `sys.path`, etc.):
+```
+> git clone git@github.com:kkroening/ffmpeg-python.git
+> export PYTHONPATH=${PYTHONPATH}:ffmpeg-python
+> python
+>>> import ffmpeg
+```
+
+## API Reference
+
+API documentation is automatically generated from python docstrings and hosted on github pages: https://kkroening.github.io/ffmpeg-python/
+
+Alternatively, standard python help is available, such as at the python REPL prompt as follows:
+```
+import ffmpeg
+help(ffmpeg)
+```
+
+## Custom filters
+
+Don't see the filter you're looking for?  `ffmpeg-python` is a work in progress, but it's easy to use any arbitrary ffmpeg filter:
+```
+node = ffmpeg.input('dummy.mp4')
+node = FilterNode([node], 'custom_filter', 'a', 'b', kwarg1='c')
+node = ffmpeg.output(node, 'dummy2.mp4')
+```
+
+## Contributing
+
+Please feel free to report any bugs or feature requests.
+
+It should be fairly easy to use filters that aren't explicitly built into `ffmpeg-python` but if there's a filter you'd really like to see included in the library, don't hesitate to open a feature request in GitHub.
+
+Pull requests are welcome as well.
+
+## Additional resources
+
+[FFmpeg Homepage](https://ffmpeg.org/)
+[FFmpeg Documentation](https://ffmpeg.org/ffmpeg.html)
+[FFmpeg Filters Documentation](https://ffmpeg.org/ffmpeg-filters.html)
+[ffmpeg-python API Reference](https://github.com/kkroening/ffmpeg-python/blob/master/ffmpeg/tests/test_ffmpeg.py)
+[ffmpeg-python Filters](https://github.com/kkroening/ffmpeg-python/blob/master/ffmpeg/_filters.py)
+[ffmpeg-python Tests](https://github.com/kkroening/ffmpeg-python/blob/master/ffmpeg/tests/test_ffmpeg.py)

@@ -1,3 +1,4 @@
+from ffmpeg.nodes import operator, FilterNode
 import ffmpeg
 import os
 import pytest
@@ -137,3 +138,32 @@ def test_run_failing_cmd():
     node = _get_complex_filter_example()
     with pytest.raises(subprocess.CalledProcessError):
         ffmpeg.run(node, cmd='false')
+
+
+def test_custom_filter():
+    node = ffmpeg.input('dummy.mp4')
+    node = FilterNode([node], 'custom_filter', 'a', 'b', kwarg1='c')
+    node = ffmpeg.output(node, 'dummy2.mp4')
+    assert node.get_args() == [
+        '-i', 'dummy.mp4',
+        '-filter_complex', '[0]custom_filter=a:b:kwarg1=c[v0]',
+        '-map', '[v0]',
+        'dummy2.mp4'
+    ]
+
+
+def test_custom_filter_fluent():
+    @operator()
+    def custom_filter(parent_node, arg1, arg2, kwarg1):
+        return FilterNode([parent_node], 'custom_filter', arg1, arg2, kwarg1=kwarg1)
+
+    node = ffmpeg \
+        .input('dummy.mp4') \
+        .custom_filter('a', 'b', kwarg1='c') \
+        .output('dummy2.mp4')
+    assert node.get_args() == [
+        '-i', 'dummy.mp4',
+        '-filter_complex', '[0]custom_filter=a:b:kwarg1=c[v0]',
+        '-map', '[v0]',
+        'dummy2.mp4'
+    ]
