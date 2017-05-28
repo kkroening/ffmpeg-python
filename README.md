@@ -115,7 +115,7 @@ When in doubt, refer to the [existing filters](https://github.com/kkroening/ffmp
 
 Please feel free to report any bugs or feature requests.
 
-It should be fairly easy to use filters that aren't explicitly built into `ffmpeg-python` but if there's a filter you'd really like to see included in the library, don't hesitate to open a feature request in GitHub.
+It should be fairly easy to use filters that aren't explicitly built into `ffmpeg-python` but if there's a feature or filter you'd really like to see included in the library, don't hesitate to open a feature request in GitHub.
 
 Pull requests are welcome as well.
 
