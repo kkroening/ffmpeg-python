@@ -81,10 +81,11 @@ def _get_output_args(node, stream_name_map):
 
 
 @operator(node_classes={OutputNode, GlobalNode})
-def get_args(parent):
+def get_args(node):
+    """Get command-line arguments for ffmpeg."""
     args = []
     # TODO: group nodes together, e.g. `-i somefile -r somerate`.
-    sorted_nodes, child_map = _topo_sort(parent)
+    sorted_nodes, child_map = _topo_sort(node)
     input_nodes = [node for node in sorted_nodes if isinstance(node, InputNode)]
     output_nodes = [node for node in sorted_nodes if isinstance(node, OutputNode) and not
         isinstance(node, GlobalNode)]
@@ -101,8 +102,9 @@ def get_args(parent):
 
 
 @operator(node_classes={OutputNode, GlobalNode})
-def run(parent, cmd='ffmpeg'):
-    args = [cmd] + parent.get_args()
+def run(node, cmd='ffmpeg'):
+    """Run ffmpeg on node graph."""
+    args = [cmd] + node.get_args()
     _subprocess.check_call(args)
 
 

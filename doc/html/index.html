@@ -47,85 +47,278 @@
 </div>
 <span class="target" id="module-ffmpeg"></span><dl class="function">
 <dt id="ffmpeg.colorchannelmixer">
-<code class="descclassname">ffmpeg.</code><code class="descname">colorchannelmixer</code><span class="sig-paren">(</span><em>parent</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.colorchannelmixer" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">ffmpeg.</code><code class="descname">colorchannelmixer</code><span class="sig-paren">(</span><em>parent_node</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.colorchannelmixer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adjust video input frames by re-mixing color channels.</p>
-<p><a class="reference external" href="https://ffmpeg.org/ffmpeg-filters.html#toc-colorchannelmixer">FFmpeg colorchannelmixer filter</a></p>
+<p>Official documentation: <a class="reference external" href="https://ffmpeg.org/ffmpeg-filters.html#colorchannelmixer">colorchannelmixer</a></p>
 </dd></dl>
 
 <dl class="function">
 <dt id="ffmpeg.concat">
-<code class="descclassname">ffmpeg.</code><code class="descname">concat</code><span class="sig-paren">(</span><em>*parents</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.concat" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">ffmpeg.</code><code class="descname">concat</code><span class="sig-paren">(</span><em>*parent_nodes</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.concat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Concatenate audio and video streams, joining them together one after the other.</p>
+<p>The filter works on segments of synchronized video and audio streams. All segments must have the same number of
+streams of each type, and that will also be the number of streams at output.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>unsafe</strong> – Activate unsafe mode: do not fail if segments have a different format.</td>
+</tr>
+</tbody>
+</table>
+<p>Related streams do not always have exactly the same duration, for various reasons including codec frame size or
+sloppy authoring. For that reason, related synchronized streams (e.g. a video and its audio track) should be
+concatenated at once. The concat filter will use the duration of the longest stream in each segment (except the
+last one), and if necessary pad shorter audio streams with silence.</p>
+<p>For this filter to work correctly, all segments must start at timestamp 0.</p>
+<p>All corresponding streams must have the same parameters in all segments; the filtering system will automatically
+select a common pixel format for video streams, and a common sample format, sample rate and channel layout for
+audio streams, but other settings, such as resolution, must be converted explicitly by the user.</p>
+<p>Different frame rates are acceptable but will result in variable frame rate at output; be sure to configure the
+output file to handle it.</p>
+<p>Official documentation: <a class="reference external" href="https://ffmpeg.org/ffmpeg-filters.html#concat">concat</a></p>
+</dd></dl>
 
 <dl class="function">
 <dt id="ffmpeg.drawbox">
-<code class="descclassname">ffmpeg.</code><code class="descname">drawbox</code><span class="sig-paren">(</span><em>parent</em>, <em>x</em>, <em>y</em>, <em>width</em>, <em>height</em>, <em>color</em>, <em>thickness=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.drawbox" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">ffmpeg.</code><code class="descname">drawbox</code><span class="sig-paren">(</span><em>parent_node</em>, <em>x</em>, <em>y</em>, <em>width</em>, <em>height</em>, <em>color</em>, <em>thickness=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.drawbox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw a colored box on the input image.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>x</strong> – The expression which specifies the top left corner x coordinate of the box. It defaults to 0.</li>
+<li><strong>y</strong> – The expression which specifies the top left corner y coordinate of the box. It defaults to 0.</li>
+<li><strong>width</strong> – Specify the width of the box; if 0 interpreted as the input width. It defaults to 0.</li>
+<li><strong>heigth</strong> – Specify the height of the box; if 0 interpreted as the input height. It defaults to 0.</li>
+<li><strong>color</strong> – Specify the color of the box to write. For the general syntax of this option, check the “Color” section
+in the ffmpeg-utils manual. If the special value invert is used, the box edge color is the same as the
+video with inverted luma.</li>
+<li><strong>thickness</strong> – The expression which sets the thickness of the box edge. Default value is 3.</li>
+<li><strong>w</strong> – Alias for <code class="docutils literal"><span class="pre">width</span></code>.</li>
+<li><strong>h</strong> – Alias for <code class="docutils literal"><span class="pre">height</span></code>.</li>
+<li><strong>c</strong> – Alias for <code class="docutils literal"><span class="pre">color</span></code>.</li>
+<li><strong>t</strong> – Alias for <code class="docutils literal"><span class="pre">thickness</span></code>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Official documentation: <a class="reference external" href="https://ffmpeg.org/ffmpeg-filters.html#drawbox">drawbox</a></p>
+</dd></dl>
 
 <dl class="function">
 <dt id="ffmpeg.hflip">
-<code class="descclassname">ffmpeg.</code><code class="descname">hflip</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.hflip" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">ffmpeg.</code><code class="descname">hflip</code><span class="sig-paren">(</span><em>parent_node</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.hflip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flip the input video horizontally.</p>
+<p>Official documentation: <a class="reference external" href="https://ffmpeg.org/ffmpeg-filters.html#hflip">hflip</a></p>
+</dd></dl>
 
 <dl class="function">
 <dt id="ffmpeg.hue">
-<code class="descclassname">ffmpeg.</code><code class="descname">hue</code><span class="sig-paren">(</span><em>parent</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.hue" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">ffmpeg.</code><code class="descname">hue</code><span class="sig-paren">(</span><em>parent_node</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.hue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Modify the hue and/or the saturation of the input.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>h</strong> – Specify the hue angle as a number of degrees. It accepts an expression, and defaults to “0”.</li>
+<li><strong>s</strong> – Specify the saturation in the [-10,10] range. It accepts an expression and defaults to “1”.</li>
+<li><strong>H</strong> – Specify the hue angle as a number of radians. It accepts an expression, and defaults to “0”.</li>
+<li><strong>b</strong> – Specify the brightness in the [-10,10] range. It accepts an expression and defaults to “0”.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Official documentation: <a class="reference external" href="https://ffmpeg.org/ffmpeg-filters.html#hue">hue</a></p>
+</dd></dl>
 
 <dl class="function">
 <dt id="ffmpeg.overlay">
-<code class="descclassname">ffmpeg.</code><code class="descname">overlay</code><span class="sig-paren">(</span><em>main_parent</em>, <em>overlay_parent</em>, <em>eof_action=’repeat’</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.overlay" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">ffmpeg.</code><code class="descname">overlay</code><span class="sig-paren">(</span><em>main_parent_node</em>, <em>overlay_parent_node</em>, <em>eof_action=’repeat’</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.overlay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overlay one video on top of another.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>x</strong> – Set the expression for the x coordinates of the overlaid video on the main video. Default value is 0. In
+case the expression is invalid, it is set to a huge value (meaning that the overlay will not be displayed
+within the output visible area).</li>
+<li><strong>y</strong> – Set the expression for the y coordinates of the overlaid video on the main video. Default value is 0. In
+case the expression is invalid, it is set to a huge value (meaning that the overlay will not be displayed
+within the output visible area).</li>
+<li><strong>eof_action</strong> – <p>The action to take when EOF is encountered on the secondary input; it accepts one of the following
+values:</p>
+<ul>
+<li><code class="docutils literal"><span class="pre">repeat</span></code>: Repeat the last frame (the default).</li>
+<li><code class="docutils literal"><span class="pre">endall</span></code>: End both streams.</li>
+<li><code class="docutils literal"><span class="pre">pass</span></code>: Pass the main input through.</li>
+</ul>
+</li>
+<li><strong>eval</strong> – <p>Set when the expressions for x, and y are evaluated.
+It accepts the following values:</p>
+<ul>
+<li><dl class="first docutils">
+<dt><code class="docutils literal"><span class="pre">init</span></code>: only evaluate expressions once during the filter initialization or when a command is</dt>
+<dd>processed</dd>
+</dl>
+</li>
+<li><code class="docutils literal"><span class="pre">frame</span></code>: evaluate expressions for each incoming frame</li>
+</ul>
+<p>Default value is <code class="docutils literal"><span class="pre">frame</span></code>.</p>
+</li>
+<li><strong>shortest</strong> – If set to 1, force the output to terminate when the shortest input terminates. Default value is 0.</li>
+<li><strong>format</strong> – <p>Set the format for the output video.
+It accepts the following values:</p>
+<ul>
+<li><code class="docutils literal"><span class="pre">yuv420</span></code>: force YUV420 output</li>
+<li><code class="docutils literal"><span class="pre">yuv422</span></code>: force YUV422 output</li>
+<li><code class="docutils literal"><span class="pre">yuv444</span></code>: force YUV444 output</li>
+<li><code class="docutils literal"><span class="pre">rgb</span></code>: force packed RGB output</li>
+<li><code class="docutils literal"><span class="pre">gbrp</span></code>: force planar RGB output</li>
+</ul>
+<p>Default value is <code class="docutils literal"><span class="pre">yuv420</span></code>.</p>
+</li>
+<li><strong>rgb</strong> (<em>deprecated</em>) – If set to 1, force the filter to accept inputs in the RGB color space. Default value is 0.
+This option is deprecated, use format instead.</li>
+<li><strong>repeatlast</strong> – If set to 1, force the filter to draw the last overlay frame over the main input until the end of
+the stream. A value of 0 disables this behavior. Default value is 1.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Official documentation: <a class="reference external" href="https://ffmpeg.org/ffmpeg-filters.html#overlay-1">overlay</a></p>
+</dd></dl>
 
 <dl class="function">
 <dt id="ffmpeg.setpts">
-<code class="descclassname">ffmpeg.</code><code class="descname">setpts</code><span class="sig-paren">(</span><em>parent</em>, <em>expr</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.setpts" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">ffmpeg.</code><code class="descname">setpts</code><span class="sig-paren">(</span><em>parent_node</em>, <em>expr</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.setpts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change the PTS (presentation timestamp) of the input frames.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>expr</strong> – The expression which is evaluated for each frame to construct its timestamp.</td>
+</tr>
+</tbody>
+</table>
+<p>Official documentation: <a class="reference external" href="https://ffmpeg.org/ffmpeg-filters.html#setpts_002c-asetpts">setpts, asetpts</a></p>
+</dd></dl>
 
 <dl class="function">
 <dt id="ffmpeg.trim">
-<code class="descclassname">ffmpeg.</code><code class="descname">trim</code><span class="sig-paren">(</span><em>parent</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.trim" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">ffmpeg.</code><code class="descname">trim</code><span class="sig-paren">(</span><em>parent_node</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.trim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Trim the input so that the output contains one continuous subpart of the input.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>start</strong> – Specify the time of the start of the kept section, i.e. the frame with the timestamp start will be the
+first frame in the output.</li>
+<li><strong>end</strong> – Specify the time of the first frame that will be dropped, i.e. the frame immediately preceding the one
+with the timestamp end will be the last frame in the output.</li>
+<li><strong>start_pts</strong> – This is the same as start, except this option sets the start timestamp in timebase units instead of
+seconds.</li>
+<li><strong>end_pts</strong> – This is the same as end, except this option sets the end timestamp in timebase units instead of
+seconds.</li>
+<li><strong>duration</strong> – The maximum duration of the output in seconds.</li>
+<li><strong>start_frame</strong> – The number of the first frame that should be passed to the output.</li>
+<li><strong>end_frame</strong> – The number of the first frame that should be dropped.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Official documentation: <a class="reference external" href="https://ffmpeg.org/ffmpeg-filters.html#trim">trim</a></p>
+</dd></dl>
 
 <dl class="function">
 <dt id="ffmpeg.vflip">
-<code class="descclassname">ffmpeg.</code><code class="descname">vflip</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.vflip" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">ffmpeg.</code><code class="descname">vflip</code><span class="sig-paren">(</span><em>parent_node</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.vflip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flip the input video vertically.</p>
+<p>Official documentation: <a class="reference external" href="https://ffmpeg.org/ffmpeg-filters.html#vflip">vflip</a></p>
+</dd></dl>
 
 <dl class="function">
 <dt id="ffmpeg.zoompan">
-<code class="descclassname">ffmpeg.</code><code class="descname">zoompan</code><span class="sig-paren">(</span><em>parent</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.zoompan" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">ffmpeg.</code><code class="descname">zoompan</code><span class="sig-paren">(</span><em>parent_node</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.zoompan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply Zoom &amp; Pan effect.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>zoom</strong> – Set the zoom expression. Default is 1.</li>
+<li><strong>x</strong> – Set the x expression. Default is 0.</li>
+<li><strong>y</strong> – Set the y expression. Default is 0.</li>
+<li><strong>d</strong> – Set the duration expression in number of frames. This sets for how many number of frames effect will last
+for single input image.</li>
+<li><strong>s</strong> – Set the output image size, default is <code class="docutils literal"><span class="pre">hd720</span></code>.</li>
+<li><strong>fps</strong> – Set the output frame rate, default is 25.</li>
+<li><strong>z</strong> – Alias for <code class="docutils literal"><span class="pre">zoom</span></code>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Official documentation: <a class="reference external" href="https://ffmpeg.org/ffmpeg-filters.html#zoompan">zoompan</a></p>
+</dd></dl>
 
 <dl class="function">
 <dt id="ffmpeg.file_input">
 <code class="descclassname">ffmpeg.</code><code class="descname">file_input</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.file_input" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Input file URL (ffmpeg <code class="docutils literal"><span class="pre">-i</span></code> option)</p>
+<p>Official documentation: <a class="reference external" href="https://ffmpeg.org/ffmpeg.html#Main-options">Main options</a></p>
+</dd></dl>
 
 <dl class="function">
 <dt id="ffmpeg.file_output">
-<code class="descclassname">ffmpeg.</code><code class="descname">file_output</code><span class="sig-paren">(</span><em>parent</em>, <em>filename</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.file_output" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">ffmpeg.</code><code class="descname">file_output</code><span class="sig-paren">(</span><em>parent_node</em>, <em>filename</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.file_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Output file URL</p>
+<p>Official documentation: <a class="reference external" href="https://ffmpeg.org/ffmpeg.html#Synopsis">Synopsis</a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ffmpeg.input">
+<code class="descclassname">ffmpeg.</code><code class="descname">input</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shorthand for <code class="docutils literal"><span class="pre">file_input</span></code></p>
+</dd></dl>
 
 <dl class="function">
 <dt id="ffmpeg.merge_outputs">
-<code class="descclassname">ffmpeg.</code><code class="descname">merge_outputs</code><span class="sig-paren">(</span><em>*parents</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.merge_outputs" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">ffmpeg.</code><code class="descname">merge_outputs</code><span class="sig-paren">(</span><em>*parent_nodes</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.merge_outputs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="function">
+<dt id="ffmpeg.output">
+<code class="descclassname">ffmpeg.</code><code class="descname">output</code><span class="sig-paren">(</span><em>parent_node</em>, <em>filename</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shorthand for <code class="docutils literal"><span class="pre">file_output</span></code></p>
+</dd></dl>
 
 <dl class="function">
 <dt id="ffmpeg.overwrite_output">
-<code class="descclassname">ffmpeg.</code><code class="descname">overwrite_output</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.overwrite_output" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">ffmpeg.</code><code class="descname">overwrite_output</code><span class="sig-paren">(</span><em>parent_node</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.overwrite_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overwrite output files without asking (ffmpeg <code class="docutils literal"><span class="pre">-y</span></code> option)</p>
+<p>Official documentation: <a class="reference external" href="https://ffmpeg.org/ffmpeg.html#Main-options">Main options</a></p>
+</dd></dl>
 
 <dl class="function">
 <dt id="ffmpeg.get_args">
-<code class="descclassname">ffmpeg.</code><code class="descname">get_args</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.get_args" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">ffmpeg.</code><code class="descname">get_args</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.get_args" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get command-line arguments for ffmpeg.</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="ffmpeg.run">
-<code class="descclassname">ffmpeg.</code><code class="descname">run</code><span class="sig-paren">(</span><em>parent</em>, <em>cmd=’ffmpeg’</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.run" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">ffmpeg.</code><code class="descname">run</code><span class="sig-paren">(</span><em>node</em>, <em>cmd=’ffmpeg’</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run ffmpeg on node graph.</p>
+</dd></dl>
 
 </div>
 <div class="section" id="indices-and-tables">
