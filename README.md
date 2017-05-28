@@ -131,9 +131,9 @@ Pull requests are welcome as well.
 
 ## Additional Resources
 
+- [API Reference](https://github.com/kkroening/ffmpeg-python/blob/master/ffmpeg/tests/test_ffmpeg.py)
+- [Filters](https://github.com/kkroening/ffmpeg-python/blob/master/ffmpeg/_filters.py)
+- [Tests](https://github.com/kkroening/ffmpeg-python/blob/master/ffmpeg/tests/test_ffmpeg.py)
 - [FFmpeg Homepage](https://ffmpeg.org/)
 - [FFmpeg Documentation](https://ffmpeg.org/ffmpeg.html)
 - [FFmpeg Filters Documentation](https://ffmpeg.org/ffmpeg-filters.html)
-- [ffmpeg-python API Reference](https://github.com/kkroening/ffmpeg-python/blob/master/ffmpeg/tests/test_ffmpeg.py)
-- [ffmpeg-python Filters](https://github.com/kkroening/ffmpeg-python/blob/master/ffmpeg/_filters.py)
-- [ffmpeg-python Tests](https://github.com/kkroening/ffmpeg-python/blob/master/ffmpeg/tests/test_ffmpeg.py)
