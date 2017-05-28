@@ -1,5 +1,6 @@
 import ffmpeg
 import os
+import pytest
 import subprocess
 
 
@@ -118,4 +119,21 @@ def test_get_args_complex_filter():
 
 
 def test_run():
-    ffmpeg.run(_get_complex_filter_example())
+    node = _get_complex_filter_example()
+    ffmpeg.run(node)
+
+
+def test_run_dummy_cmd():
+    node = _get_complex_filter_example()
+    ffmpeg.run(node, cmd='true')
+
+
+def test_run_dummy_cmd_list():
+    node = _get_complex_filter_example()
+    ffmpeg.run(node, cmd=['true', 'ignored'])
+
+
+def test_run_failing_cmd():
+    node = _get_complex_filter_example()
+    with pytest.raises(subprocess.CalledProcessError):
+        ffmpeg.run(node, cmd='false')
