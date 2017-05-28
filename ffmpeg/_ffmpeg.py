@@ -7,17 +7,12 @@ from .nodes import (
 )
 
 
-def file_input(filename):
+def input(filename):
     """Input file URL (ffmpeg ``-i`` option)
 
     Official documentation: `Main options <https://ffmpeg.org/ffmpeg.html#Main-options>`__
     """
-    return InputNode(file_input.__name__, filename=filename)
-
-
-def input(filename):
-    """Shorthand for ``file_input``"""
-    return file_input(filename)
+    return InputNode(input.__name__, filename=filename)
 
 
 @operator(node_classes={OutputNode, GlobalNode})
@@ -35,24 +30,16 @@ def merge_outputs(*parent_nodes):
 
 
 @operator(node_classes={InputNode, FilterNode})
-def file_output(parent_node, filename):
+def output(parent_node, filename):
     """Output file URL
 
     Official documentation: `Synopsis <https://ffmpeg.org/ffmpeg.html#Synopsis>`__
     """
-    return OutputNode([parent_node], file_output.__name__, filename=filename)
-
-
-@operator(node_classes={InputNode, FilterNode})
-def output(parent_node, filename):
-    """Shorthand for ``file_output``"""
-    return file_output(parent_node, filename)
+    return OutputNode([parent_node], output.__name__, filename=filename)
 
 
 
 __all__ = [
-    'file_input',
-    'file_output',
     'input',
     'merge_outputs',
     'output',

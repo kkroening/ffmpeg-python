@@ -13,18 +13,18 @@ Flip a video horizontally:
 ```
 import ffmpeg
 ffmpeg \
-    .file_input('input.mp4') \
+    .input('input.mp4') \
     .hflip() \
-    .file_output('output.mp4') \
+    .output('output.mp4') \
     .run()
 ```
 
 Or if you prefer a non-fluent interface:
 ```
 import ffmpeg
-in = ffmpeg.file_input('input.mp4')
+in = ffmpeg.input('input.mp4')
 flipped = ffmpeg.hflip(in)
-out = ffmpeg.file_output(flipped)
+out = ffmpeg.output(flipped)
 ffmpeg.run(out)
 ```
 
@@ -54,8 +54,8 @@ If you're like me and find Python to be powerful and readable, it's easy with `f
 ```
 import ffmpeg
 
-in_file = ffmpeg.file_input('input.mp4')
-overlay_file = ffmpeg.file_input('overlay.png')
+in_file = ffmpeg.input('input.mp4')
+overlay_file = ffmpeg.input('overlay.png')
 ffmpeg \
     .concat(
         in_file.trim(10, 20),
@@ -63,7 +63,7 @@ ffmpeg \
     ) \
     .overlay(overlay_file.hflip()) \
     .drawbox(50, 50, 120, 120, color='red', thickness=5) \
-    .file_output(TEST_OUTPUT_FILE) \
+    .output(TEST_OUTPUT_FILE) \
     .run()
 ```
 

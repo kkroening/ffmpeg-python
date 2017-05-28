@@ -2,9 +2,9 @@ import operator as _operator
 import subprocess as _subprocess
 
 from ._ffmpeg import (
-    file_input,
-    file_output,
+    input,
     merge_outputs,
+    output,
     overwrite_output,
 )
 from .nodes import (
@@ -19,7 +19,7 @@ def _get_stream_name(name):
 
 
 def _get_input_args(input_node):
-    if input_node._name == file_input.__name__:
+    if input_node._name == input.__name__:
         args = ['-i', input_node._kwargs['filename']]
     else:
         assert False, 'Unsupported input node: {}'.format(input_node)
@@ -73,7 +73,7 @@ def _get_output_args(node, stream_name_map):
         stream_name = stream_name_map[node._parents[0]]
         if stream_name != '[0]':
             args += ['-map', stream_name]
-        if node._name == file_output.__name__:
+        if node._name == output.__name__:
             args += [node._kwargs['filename']]
         else:
             assert False, 'Unsupported output node: {}'.format(node)
