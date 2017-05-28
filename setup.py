@@ -1,6 +1,28 @@
-from ffmpeg._filters import __all__ as filter_names
 from distutils.core import setup
+from ffmpeg._filters import __all__ as filter_names
+from textwrap import dedent
+import subprocess
 
+
+def get_current_commit_hash():
+    p = subprocess.Popen(['git', 'rev-parse', 'HEAD'], stdout=subprocess.PIPE)
+    commit_hash = p.communicate()[0].strip()
+    assert p.returncode == 0, '`git rev-parse HEAD` failed'
+    return commit_hash
+
+
+long_description = dedent("""
+    ffmpeg-python: Python bindings for FFmpeg
+    =========================================
+
+    :Github: https://github.com/kkroening/ffmpeg-python
+    :API Reference: https://kkroening.github.io/ffmpeg-python/
+""")
+
+
+
+commit_hash = get_current_commit_hash()
+download_url = 'https://github.com/kkroening/ffmpeg-python/archive/{}.zip'.format(commit_hash)
 
 file_formats = [
     'aac',
@@ -45,12 +67,13 @@ keywords = misc_keywords + file_formats + filter_names
 setup(
     name = 'ffmpeg-python',
     packages = ['ffmpeg'],
-    version = '0.1.1',
+    version = '0.1.2',
     description = 'Python bindings for FFmpeg - with support for complex filtering',
     author = 'Karl Kroening',
     author_email = 'karlk@kralnet.us',
     url = 'https://github.com/kkroening/ffmpeg-python',
-    download_url = 'https://github.com/kkroening/ffmpeg-python/archive/0.1.1.tar.gz',
+    download_url = download_url,
     classifiers = [],
     keywords = keywords,
+    long_description = long_description,
 )
