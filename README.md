@@ -82,7 +82,7 @@ The easiest way to acquire the latest version of `ffmpeg-python` is through pip:
 pip install ffmpeg-python
 ```
 
-It's also possible to clone the source and make sure it's on your python path (e.g. `$PYTHONPATH`, `sys.path`, etc.):
+It's also possible to clone the source and put it on your python path (`$PYTHONPATH`, `sys.path`, etc.):
 ```
 > git clone git@github.com:kkroening/ffmpeg-python.git
 > export PYTHONPATH=${PYTHONPATH}:ffmpeg-python
@@ -107,13 +107,23 @@ Don't see the filter you're looking for?  `ffmpeg-python` is a work in progress,
 stream = ffmpeg.input('dummy.mp4')
 stream = ffmpeg.filter_(stream, 'fps', fps=25, round='up')
 stream = ffmpeg.output(stream, 'dummy2.mp4')
+ffmpeg.run(stream)
+```
+
+Or fluently:
+```
+ffmpeg \
+    .input('dummy.mp4') \
+    .filter_('fps', fps=25, round='up') \
+    .output('dummy2.mp4') \
+    .run()
 ```
 
 When in doubt, refer to the [existing filters](https://github.com/kkroening/ffmpeg-python/blob/master/ffmpeg/_filters.py) and/or the [official ffmpeg documentation](https://ffmpeg.org/ffmpeg-filters.html).
 
 ## Contributing
 
-Please feel free to report any bugs or feature requests.
+Feel free to report any bugs or feature requests.
 
 It should be fairly easy to use filters that aren't explicitly built into `ffmpeg-python` but if there's a feature or filter you'd really like to see included in the library, don't hesitate to open a feature request in GitHub.
 
