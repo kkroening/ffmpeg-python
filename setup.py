@@ -11,7 +11,7 @@ def get_current_commit_hash():
     return commit_hash
 
 
-long_description = dedent("""
+long_description = dedent("""\
     ffmpeg-python: Python bindings for FFmpeg
     =========================================
 
