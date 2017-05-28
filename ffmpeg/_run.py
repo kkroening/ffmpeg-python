@@ -86,6 +86,7 @@ def get_args(node):
     args = []
     # TODO: group nodes together, e.g. `-i somefile -r somerate`.
     sorted_nodes, child_map = _topo_sort(node)
+    del(node)
     input_nodes = [node for node in sorted_nodes if isinstance(node, InputNode)]
     output_nodes = [node for node in sorted_nodes if isinstance(node, OutputNode) and not
         isinstance(node, GlobalNode)]
