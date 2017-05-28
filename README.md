@@ -22,10 +22,10 @@ ffmpeg \
 Or if you prefer a non-fluent interface:
 ```
 import ffmpeg
-in = ffmpeg.input('input.mp4')
-flipped = ffmpeg.hflip(in)
-out = ffmpeg.output(flipped)
-ffmpeg.run(out)
+node = ffmpeg.input('input.mp4')
+node = ffmpeg.hflip(node)
+node = ffmpeg.output(node)
+ffmpeg.run(node)
 ```
 
 ## Complex filter graphs
@@ -90,7 +90,7 @@ It's also possible to clone the source and make sure it's on your python path (e
 >>> import ffmpeg
 ```
 
-## API Reference
+## [API Reference](https://kkroening.github.io/ffmpeg-python/)
 
 API documentation is automatically generated from python docstrings and hosted on github pages: https://kkroening.github.io/ffmpeg-python/
 
@@ -100,12 +100,12 @@ import ffmpeg
 help(ffmpeg)
 ```
 
-## Custom filters
+## Custom Filters
 
 Don't see the filter you're looking for?  `ffmpeg-python` is a work in progress, but it's easy to use any arbitrary ffmpeg filter:
 ```
 node = ffmpeg.input('dummy.mp4')
-node = FilterNode([node], 'custom_filter', 'a', 'b', kwarg1='c')
+node = ffmpeg.filter_(node, 'custom_filter', 'a', 'b', kwarg1='c')
 node = ffmpeg.output(node, 'dummy2.mp4')
 ```
 
@@ -117,7 +117,7 @@ It should be fairly easy to use filters that aren't explicitly built into `ffmpe
 
 Pull requests are welcome as well.
 
-## Additional resources
+## Additional Resources
 
 - [FFmpeg Homepage](https://ffmpeg.org/)
 - [FFmpeg Documentation](https://ffmpeg.org/ffmpeg.html)
