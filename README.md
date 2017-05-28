@@ -15,7 +15,7 @@ import ffmpeg
 stream = ffmpeg.input('input.mp4')
 stream = ffmpeg.hflip(stream)
 stream = ffmpeg.output(stream, 'output.mp4')
-ffmpeg.run(v)
+ffmpeg.run(stream)
 ```
 
 Or if you prefer a fluent interface:
@@ -48,7 +48,7 @@ ffmpeg -i input.mp4 \
      -map [v5] output.mp4
 ```
 
-Maybe this looks great to you, but if you're not an FFmpeg command-line expert, it probably looks pretty alien.
+Maybe this looks great to you, but if you're not an FFmpeg command-line expert, it probably looks alien.
 
 If you're like me and find Python to be powerful and readable, it's easy with `ffmpeg-python`:
 ```
@@ -125,7 +125,7 @@ When in doubt, refer to the [existing filters](https://github.com/kkroening/ffmp
 
 Feel free to report any bugs or feature requests.
 
-It should be fairly easy to use filters that aren't explicitly built into `ffmpeg-python` but if there's a feature or filter you'd really like to see included in the library, don't hesitate to open a feature request in GitHub.
+It should be fairly easy to use filters that aren't explicitly built into `ffmpeg-python` but if there's a feature or filter you'd really like to see included in the library, don't hesitate to open a feature request.
 
 Pull requests are welcome as well.
 
