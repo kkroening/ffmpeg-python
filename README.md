@@ -109,6 +109,8 @@ node = ffmpeg.filter_(node, 'fps', fps=25, round='up')
 node = ffmpeg.output(node, 'dummy2.mp4')
 ```
 
+When in doubt, look at the [existing filter implementations](https://github.com/kkroening/ffmpeg-python/blob/master/ffmpeg/_filters.py) and/or the [official ffmpeg filter documentation](https://ffmpeg.org/ffmpeg-filters.html).
+
 ## Contributing
 
 Please feel free to report any bugs or feature requests.
