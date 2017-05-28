@@ -39,8 +39,8 @@ The corresponding command-line arguments are pretty gnarly:
 ```
 ffmpeg -i input.mp4 \
     -filter_complex "\
-        [0]trim=start_frame=10:end_frame=20,setpts=PTS-STARTPTS[v0];\
-        [0]trim=start_frame=30:end_frame=40,setpts=PTS-STARTPTS[v1];\
+        [0]trim=start_frame=10:end_frame=20[v0];\
+        [0]trim=start_frame=30:end_frame=40[v1];\
         [v0][v1]concat=n=2[v2];\
         [1]hflip[v3];\
         [v2][v3]overlay=eof_action=repeat[v4];\
