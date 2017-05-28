@@ -105,7 +105,7 @@ help(ffmpeg)
 Don't see the filter you're looking for?  `ffmpeg-python` is a work in progress, but it's easy to use any arbitrary ffmpeg filter:
 ```
 node = ffmpeg.input('dummy.mp4')
-node = ffmpeg.filter_(node, 'custom_filter', 'a', 'b', kwarg1='c')
+node = ffmpeg.filter_(node, 'fps', fps=25, round='up')
 node = ffmpeg.output(node, 'dummy2.mp4')
 ```
 
