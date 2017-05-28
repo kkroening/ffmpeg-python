@@ -12,9 +12,9 @@ There are tons of Python FFmpeg wrappers out there but they seem to lack complex
 Flip a video horizontally:
 ```
 import ffmpeg
-v = ffmpeg.input('input.mp4')
-v = ffmpeg.hflip(v)
-v = ffmpeg.output(v)
+stream = ffmpeg.input('input.mp4')
+stream = ffmpeg.hflip(stream)
+stream = ffmpeg.output(stream)
 ffmpeg.run(v)
 ```
 
@@ -104,9 +104,9 @@ help(ffmpeg)
 
 Don't see the filter you're looking for?  `ffmpeg-python` is a work in progress, but it's easy to use any arbitrary ffmpeg filter:
 ```
-v = ffmpeg.input('dummy.mp4')
-v = ffmpeg.filter_(v, 'fps', fps=25, round='up')
-v = ffmpeg.output(v, 'dummy2.mp4')
+stream = ffmpeg.input('dummy.mp4')
+stream = ffmpeg.filter_(stream, 'fps', fps=25, round='up')
+stream = ffmpeg.output(stream, 'dummy2.mp4')
 ```
 
 When in doubt, refer to the [existing filters](https://github.com/kkroening/ffmpeg-python/blob/master/ffmpeg/_filters.py) and/or the [official ffmpeg documentation](https://ffmpeg.org/ffmpeg-filters.html).
