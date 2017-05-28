@@ -122,6 +122,62 @@ video with inverted luma.</li>
 </dd></dl>
 
 <dl class="function">
+<dt id="ffmpeg.filter_">
+<code class="descclassname">ffmpeg.</code><code class="descname">filter_</code><span class="sig-paren">(</span><em>parent_node</em>, <em>filter_name</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.filter_" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply custom single-source filter.</p>
+<p><code class="docutils literal"><span class="pre">filter_</span></code> is normally used by higher-level filter functions such as <code class="docutils literal"><span class="pre">hflip</span></code>, but if a filter implementation
+is missing from <code class="docutils literal"><span class="pre">fmpeg-python</span></code>, you can call <code class="docutils literal"><span class="pre">filter_</span></code> directly to have <code class="docutils literal"><span class="pre">fmpeg-python</span></code> pass the filter name
+and arguments to ffmpeg verbatim.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>parent_node</strong> – Source stream to apply filter to.</li>
+<li><strong>filter_name</strong> – ffmpeg filter name, e.g. <cite>colorchannelmixer</cite></li>
+<li><strong>*args</strong> – list of args to pass to ffmpeg verbatim</li>
+<li><strong>**kwargs</strong> – list of keyword-args to pass to ffmpeg verbatim</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>This function is used internally by all of the other single-source filters (e.g. <code class="docutils literal"><span class="pre">hflip</span></code>, <code class="docutils literal"><span class="pre">crop</span></code>, etc.).
+For custom multi-source filters, see <code class="docutils literal"><span class="pre">filter_multi</span></code> instead.</p>
+<p>The function name is suffixed with <code class="docutils literal"><span class="pre">_</span></code> in order avoid confusion with the standard python <code class="docutils literal"><span class="pre">filter</span></code> function.</p>
+<p class="rubric">Example</p>
+<p><code class="docutils literal"><span class="pre">ffmpeg.input('in.mp4').filter_('hflip').output('out.mp4').run()</span></code></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ffmpeg.filter_multi">
+<code class="descclassname">ffmpeg.</code><code class="descname">filter_multi</code><span class="sig-paren">(</span><em>parent_nodes</em>, <em>filter_name</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.filter_multi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply custom multi-source filter.</p>
+<p>This is nearly identical to the <code class="docutils literal"><span class="pre">filter</span></code> function except that it allows filters to be applied to multiple
+streams.  It’s normally used by higher-level filter functions such as <code class="docutils literal"><span class="pre">concat</span></code>, but if a filter implementation
+is missing from <code class="docutils literal"><span class="pre">fmpeg-python</span></code>, you can call <code class="docutils literal"><span class="pre">filter_multi</span></code> directly.</p>
+<p>Note that because it applies to multiple streams, it can’t be used as an operator, unlike the <code class="docutils literal"><span class="pre">filter</span></code> function
+(e.g. <code class="docutils literal"><span class="pre">ffmpeg.input('in.mp4').filter_('hflip')</span></code>)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>parent_nodes</strong> – List of source streams to apply filter to.</li>
+<li><strong>filter_name</strong> – ffmpeg filter name, e.g. <cite>concat</cite></li>
+<li><strong>*args</strong> – list of args to pass to ffmpeg verbatim</li>
+<li><strong>**kwargs</strong> – list of keyword-args to pass to ffmpeg verbatim</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>For custom single-source filters, see <code class="docutils literal"><span class="pre">filter_multi</span></code> instead.</p>
+<p class="rubric">Example</p>
+<p><code class="docutils literal"><span class="pre">ffmpeg.filter_multi(ffmpeg.input('in1.mp4'),</span> <span class="pre">ffmpeg.input('in2.mp4'),</span> <span class="pre">'concat',</span> <span class="pre">n=2).output('out.mp4').run()</span></code></p>
+</dd></dl>
+
+<dl class="function">
 <dt id="ffmpeg.hflip">
 <code class="descclassname">ffmpeg.</code><code class="descname">hflip</code><span class="sig-paren">(</span><em>parent_node</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.hflip" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flip the input video horizontally.</p>

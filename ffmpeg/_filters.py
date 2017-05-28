@@ -5,6 +5,58 @@ from .nodes import (
 
 
 @operator()
+def filter_(parent_node, filter_name, *args, **kwargs):
+    """Apply custom single-source filter.
+
+    ``filter_`` is normally used by higher-level filter functions such as ``hflip``, but if a filter implementation
+    is missing from ``fmpeg-python``, you can call ``filter_`` directly to have ``fmpeg-python`` pass the filter name
+    and arguments to ffmpeg verbatim.
+
+    Args:
+        parent_node: Source stream to apply filter to.
+        filter_name: ffmpeg filter name, e.g. `colorchannelmixer`
+        *args: list of args to pass to ffmpeg verbatim
+        **kwargs: list of keyword-args to pass to ffmpeg verbatim
+
+    This function is used internally by all of the other single-source filters (e.g. ``hflip``, ``crop``, etc.).
+    For custom multi-source filters, see ``filter_multi`` instead.
+
+    The function name is suffixed with ``_`` in order avoid confusion with the standard python ``filter`` function.
+
+    Example:
+
+        ``ffmpeg.input('in.mp4').filter_('hflip').output('out.mp4').run()``
+    """
+    return FilterNode([parent_node], filter_name, *args, **kwargs)
+
+
+def filter_multi(parent_nodes, filter_name, *args, **kwargs):
+    """Apply custom multi-source filter.
+
+    This is nearly identical to the ``filter`` function except that it allows filters to be applied to multiple
+    streams.  It's normally used by higher-level filter functions such as ``concat``, but if a filter implementation
+    is missing from ``fmpeg-python``, you can call ``filter_multi`` directly.
+
+    Note that because it applies to multiple streams, it can't be used as an operator, unlike the ``filter`` function
+    (e.g. ``ffmpeg.input('in.mp4').filter_('hflip')``)
+
+    Args:
+        parent_nodes: List of source streams to apply filter to.
+        filter_name: ffmpeg filter name, e.g. `concat`
+        *args: list of args to pass to ffmpeg verbatim
+        **kwargs: list of keyword-args to pass to ffmpeg verbatim
+
+    For custom single-source filters, see ``filter_multi`` instead.
+
+    Example:
+
+        ``ffmpeg.filter_multi(ffmpeg.input('in1.mp4'), ffmpeg.input('in2.mp4'), 'concat', n=2).output('out.mp4').run()``
+    """
+    return FilterNode(parent_nodes, filter_name, *args, **kwargs)
+
+
+
+@operator()
 def setpts(parent_node, expr):
     """Change the PTS (presentation timestamp) of the input frames.
 
@@ -13,7 +65,7 @@ def setpts(parent_node, expr):
 
     Official documentation: `setpts, asetpts <https://ffmpeg.org/ffmpeg-filters.html#setpts_002c-asetpts>`__
     """
-    return FilterNode([parent_node], setpts.__name__, expr)
+    return filter_(parent_node, setpts.__name__, expr)
 
 
 @operator()
@@ -35,7 +87,7 @@ def trim(parent_node, **kwargs):
 
     Official documentation: `trim <https://ffmpeg.org/ffmpeg-filters.html#trim>`__
     """
-    return FilterNode([parent_node], trim.__name__, **kwargs)
+    return filter_(parent_node, trim.__name__, **kwargs)
 
 
 @operator()
@@ -83,7 +135,7 @@ def overlay(main_parent_node, overlay_parent_node, eof_action='repeat', **kwargs
     Official documentation: `overlay <https://ffmpeg.org/ffmpeg-filters.html#overlay-1>`__
     """
     kwargs['eof_action'] = eof_action
-    return FilterNode([main_parent_node, overlay_parent_node], overlay.__name__, **kwargs)
+    return filter_multi([main_parent_node, overlay_parent_node], overlay.__name__, **kwargs)
 
 
 @operator()
@@ -92,7 +144,7 @@ def hflip(parent_node):
 
     Official documentation: `hflip <https://ffmpeg.org/ffmpeg-filters.html#hflip>`__
     """
-    return FilterNode([parent_node], hflip.__name__)
+    return filter_(parent_node, hflip.__name__)
 
 
 @operator()
@@ -101,7 +153,7 @@ def vflip(parent_node):
 
     Official documentation: `vflip <https://ffmpeg.org/ffmpeg-filters.html#vflip>`__
     """
-    return FilterNode([parent_node], vflip.__name__)
+    return filter_(parent_node, vflip.__name__)
 
 
 @operator()
@@ -126,7 +178,7 @@ def drawbox(parent_node, x, y, width, height, color, thickness=None, **kwargs):
     """
     if thickness:
         kwargs['t'] = thickness
-    return FilterNode([parent_node], drawbox.__name__, x, y, width, height, color, **kwargs)
+    return filter_(parent_node, drawbox.__name__, x, y, width, height, color, **kwargs)
 
 
 @operator()
@@ -156,7 +208,7 @@ def concat(*parent_nodes, **kwargs):
     Official documentation: `concat <https://ffmpeg.org/ffmpeg-filters.html#concat>`__
     """
     kwargs['n'] = len(parent_nodes)
-    return FilterNode(parent_nodes, concat.__name__, **kwargs)
+    return filter_multi(parent_nodes, concat.__name__, **kwargs)
 
 
 @operator()
@@ -175,7 +227,7 @@ def zoompan(parent_node, **kwargs):
 
     Official documentation: `zoompan <https://ffmpeg.org/ffmpeg-filters.html#zoompan>`__
     """
-    return FilterNode([parent_node], zoompan.__name__, **kwargs)
+    return filter_(parent_node, zoompan.__name__, **kwargs)
 
 
 @operator()
@@ -190,7 +242,7 @@ def hue(parent_node, **kwargs):
 
     Official documentation: `hue <https://ffmpeg.org/ffmpeg-filters.html#hue>`__
     """
-    return FilterNode([parent_node], hue.__name__, **kwargs)
+    return filter_(parent_node, hue.__name__, **kwargs)
 
 
 @operator()
@@ -199,13 +251,15 @@ def colorchannelmixer(parent_node, *args, **kwargs):
 
     Official documentation: `colorchannelmixer <https://ffmpeg.org/ffmpeg-filters.html#colorchannelmixer>`__
     """
-    return FilterNode([parent_node], colorchannelmixer.__name__, **kwargs)
+    return filter_(parent_node, colorchannelmixer.__name__, **kwargs)
 
 
 __all__ = [
     'colorchannelmixer',
     'concat',
     'drawbox',
+    'filter_',
+    'filter_multi',
     'hflip',
     'hue',
     'overlay',
