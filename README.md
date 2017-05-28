@@ -12,20 +12,20 @@ There are tons of Python FFmpeg wrappers out there but they seem to lack complex
 Flip a video horizontally:
 ```
 import ffmpeg
+node = ffmpeg.input('input.mp4')
+node = ffmpeg.hflip(node)
+node = ffmpeg.output(node)
+ffmpeg.run(node)
+```
+
+Or if you prefer a fluent interface:
+```
+import ffmpeg
 ffmpeg \
     .input('input.mp4') \
     .hflip() \
     .output('output.mp4') \
     .run()
-```
-
-Or if you prefer a non-fluent interface:
-```
-import ffmpeg
-node = ffmpeg.input('input.mp4')
-node = ffmpeg.hflip(node)
-node = ffmpeg.output(node)
-ffmpeg.run(node)
 ```
 
 ## Complex filter graphs
