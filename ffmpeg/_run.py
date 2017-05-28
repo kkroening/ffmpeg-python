@@ -105,7 +105,11 @@ def get_args(node):
 @operator(node_classes={OutputNode, GlobalNode})
 def run(node, cmd='ffmpeg'):
     """Run ffmpeg on node graph."""
-    args = [cmd] + node.get_args()
+    if isinstance(cmd, basestring):
+        args = [cmd]
+    elif type(cmd) != list:
+        args = list(cmd)
+    args += node.get_args()
     _subprocess.check_call(args)
 
 
