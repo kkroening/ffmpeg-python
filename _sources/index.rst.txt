@@ -1,13 +1,13 @@
-ffmpeg-python: Python bindings for FFmpeg
+procgraph: graphs of concurrent processes
 =========================================
 
-:Github: https://github.com/kkroening/ffmpeg-python
+:Github: https://github.com/kkroening/procgraph
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-.. automodule:: ffmpeg
+.. automodule:: procgraph
    :members:
    :undoc-members:
    :show-inheritance:
