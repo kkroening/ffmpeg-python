@@ -46,21 +46,23 @@ def test_fluent_concat():
 
 
 def test_fluent_output():
-    ffmpeg \
-        .input('dummy.mp4') \
-        .trim(start_frame=10, end_frame=20) \
+    (ffmpeg
+        .input('dummy.mp4')
+        .trim(start_frame=10, end_frame=20)
         .output('dummy2.mp4')
+    )
 
 
 def test_fluent_complex_filter():
     in_file = ffmpeg.input('dummy.mp4')
-    return ffmpeg \
+    return (ffmpeg
         .concat(
             in_file.trim(start_frame=10, end_frame=20),
             in_file.trim(start_frame=30, end_frame=40),
             in_file.trim(start_frame=50, end_frame=60)
-        ) \
+        )
         .output('dummy2.mp4')
+    )
 
 
 def test_repr():
@@ -86,15 +88,16 @@ def test_get_args_simple():
 def _get_complex_filter_example():
     in_file = ffmpeg.input(TEST_INPUT_FILE)
     overlay_file = ffmpeg.input(TEST_OVERLAY_FILE)
-    return ffmpeg \
+    return (ffmpeg
         .concat(
             in_file.trim(start_frame=10, end_frame=20),
             in_file.trim(start_frame=30, end_frame=40),
-        ) \
-        .overlay(overlay_file.hflip()) \
-        .drawbox(50, 50, 120, 120, color='red', thickness=5) \
-        .output(TEST_OUTPUT_FILE) \
+        )
+        .overlay(overlay_file.hflip())
+        .drawbox(50, 50, 120, 120, color='red', thickness=5)
+        .output(TEST_OUTPUT_FILE)
         .overwrite_output()
+    )
 
 
 def test_get_args_complex_filter():
@@ -153,10 +156,11 @@ def test_custom_filter():
 
 
 def test_custom_filter_fluent():
-    node = ffmpeg \
-        .input('dummy.mp4') \
-        .filter_('custom_filter', 'a', 'b', kwarg1='c') \
+    node = (ffmpeg
+        .input('dummy.mp4')
+        .filter_('custom_filter', 'a', 'b', kwarg1='c')
         .output('dummy2.mp4')
+    )
     assert node.get_args() == [
         '-i', 'dummy.mp4',
         '-filter_complex', '[0]custom_filter=a:b:kwarg1=c[v0]',

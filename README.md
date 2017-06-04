@@ -21,11 +21,12 @@ ffmpeg.run(stream)
 Or if you prefer a fluent interface:
 ```
 import ffmpeg
-ffmpeg \
-    .input('input.mp4') \
-    .hflip() \
-    .output('output.mp4') \
+(ffmpeg
+    .input('input.mp4')
+    .hflip()
+    .output('output.mp4')
     .run()
+)
 ```
 
 ## Complex filter graphs
@@ -56,15 +57,16 @@ import ffmpeg
 
 in_file = ffmpeg.input('input.mp4')
 overlay_file = ffmpeg.input('overlay.png')
-ffmpeg \
+(ffmpeg
     .concat(
         in_file.trim(start_frame=10, end_frame=20),
         in_file.trim(start_frame=30, end_frame=40),
-    ) \
-    .overlay(overlay_file.hflip()) \
-    .drawbox(50, 50, 120, 120, color='red', thickness=5) \
-    .output(TEST_OUTPUT_FILE) \
+    )
+    .overlay(overlay_file.hflip())
+    .drawbox(50, 50, 120, 120, color='red', thickness=5)
+    .output(TEST_OUTPUT_FILE)
     .run()
+)
 ```
 
 `ffmpeg-python` takes care of running `ffmpeg` with the command-line arguments that correspond to the above filter diagram, and it's easy to see what's going on and make changes as needed.
@@ -112,11 +114,12 @@ ffmpeg.run(stream)
 
 Or fluently:
 ```
-ffmpeg \
-    .input('dummy.mp4') \
-    .filter_('fps', fps=25, round='up') \
-    .output('dummy2.mp4') \
+(ffmpeg
+    .input('dummy.mp4')
+    .filter_('fps', fps=25, round='up')
+    .output('dummy2.mp4')
     .run()
+)
 ```
 
 When in doubt, refer to the [existing filters](https://github.com/kkroening/ffmpeg-python/blob/master/ffmpeg/_filters.py) and/or the [official ffmpeg documentation](https://ffmpeg.org/ffmpeg-filters.html).
