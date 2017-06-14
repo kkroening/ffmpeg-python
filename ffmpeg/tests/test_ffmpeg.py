@@ -201,7 +201,7 @@ def test_pipe():
     p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     in_data = bytes(bytearray([random.randint(0,255) for _ in range(frame_size * frame_count)]))
-    p.stdin.write(in_data)
+    p.stdin.write(in_data)  # note: this could block, in which case need to use threads 
     p.stdin.close()
 
     out_data = p.stdout.read()
