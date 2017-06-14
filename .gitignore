@@ -1,5 +1,7 @@
 .cache
+.eggs
+.tox/
 dist/
 ffmpeg/tests/sample_data/dummy2.mp4
+ffmpeg_python.egg-info/
 venv*
-.tox/

@@ -1,4 +1,5 @@
 future
 pytest
+pytest-runner
 sphinx
 tox

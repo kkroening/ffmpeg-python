@@ -1,5 +1,4 @@
-from distutils.core import setup
-from ffmpeg._filters import __all__ as filter_names
+from setuptools import setup
 from textwrap import dedent
 import subprocess
 
@@ -61,11 +60,13 @@ misc_keywords = [
     'wrapper',
 ]
 
-keywords = misc_keywords + file_formats + filter_names
+keywords = misc_keywords + file_formats
 
 setup(
     name='ffmpeg-python',
     packages=['ffmpeg'],
+    setup_requires=['pytest-runner'],
+    tests_require=['pytest'],
     version='0.1.5',
     description='Python bindings for FFmpeg - with support for complex filtering',
     author='Karl Kroening',
