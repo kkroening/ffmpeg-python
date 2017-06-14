@@ -1,7 +1,7 @@
 language: python
 before_install:
   - >
-    [ -d ffmpeg-3.3.1-64bit-static/ffmpeg ] || (
+    [ -f ffmpeg-3.3.1-64bit-static/ffmpeg ] || (
         curl -O https://johnvansickle.com/ffmpeg/releases/ffmpeg-3.3.1-64bit-static.tar.xz &&
         tar Jxf ffmpeg-3.3.1-64bit-static.tar.xz
     )
