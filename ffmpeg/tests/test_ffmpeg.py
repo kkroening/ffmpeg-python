@@ -3,6 +3,7 @@ import ffmpeg
 import os
 import pytest
 import subprocess
+import random
 
 
 TEST_DIR = os.path.dirname(__file__)
@@ -167,3 +168,41 @@ def test_custom_filter_fluent():
         '-map', '[v0]',
         'dummy2.mp4'
     ]
+
+
+def test_pipe():
+    width = 32
+    height = 32
+    frame_size = width * height * 3  # 3 bytes for rgb24
+    frame_count = 10
+    start_frame = 2
+
+    out = (ffmpeg
+        .input('pipe:0', format='rawvideo', pixel_format='rgb24', video_size=(width, height), framerate=10)
+        .trim(start_frame=start_frame)
+        .output('pipe:1', format='rawvideo')
+    )
+    args = out.get_args()
+    assert args == [
+        '-f', 'rawvideo',
+        '-video_size', '{}x{}'.format(width, height),
+        '-pixel_format', 'rgb24',
+        '-framerate', '10',
+        '-i', 'pipe:0',
+        '-filter_complex',
+            '[0]trim=start_frame=2[v0]',
+        '-map', '[v0]',
+        '-f', 'rawvideo',
+        'pipe:1'
+    ]
+
+    cmd = ['ffmpeg'] + args
+    p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    in_data = bytes(bytearray([random.randint(0,255) for _ in range(frame_size * frame_count)]))
+    p.stdin.write(in_data)
+    p.stdin.close()
+
+    out_data = p.stdout.read()
+    assert len(out_data) == frame_size * (frame_count - start_frame)
+    assert out_data == in_data[start_frame*frame_size:]
