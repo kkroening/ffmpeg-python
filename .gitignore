@@ -2,3 +2,4 @@
 dist/
 ffmpeg/tests/sample_data/dummy2.mp4
 venv*
+.tox/
