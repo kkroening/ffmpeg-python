@@ -187,8 +187,8 @@ def test_pipe():
     assert args == [
         '-f', 'rawvideo',
         '-video_size', '{}x{}'.format(width, height),
-        '-pixel_format', 'rgb24',
         '-framerate', '10',
+        '-pixel_format', 'rgb24',
         '-i', 'pipe:0',
         '-filter_complex',
             '[0]trim=start_frame=2[v0]',

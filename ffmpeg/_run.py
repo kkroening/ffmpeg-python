@@ -23,6 +23,16 @@ def _get_stream_name(name):
     return '[{}]'.format(name)
 
 
+def _convert_kwargs_to_cmd_line_args(kwargs):
+    args = []
+    for k in sorted(kwargs.keys()):
+        v = kwargs[k]
+        args.append('-{}'.format(k))
+        if v:
+            args.append('{}'.format(v))
+    return args
+
+
 def _get_input_args(input_node):
     if input_node._name == input.__name__:
         kwargs = copy.copy(input_node._kwargs)
@@ -34,10 +44,7 @@ def _get_input_args(input_node):
             args += ['-f', fmt]
         if video_size:
             args += ['-video_size', '{}x{}'.format(video_size[0], video_size[1])]
-        for k, v in kwargs.items():
-            args.append('-{}'.format(k))
-            if v:
-                args.append('{}'.format(v))
+        args += _convert_kwargs_to_cmd_line_args(kwargs)
         args += ['-i', filename]
     else:
         assert False, 'Unsupported input node: {}'.format(input_node)
@@ -95,13 +102,9 @@ def _get_output_args(node, stream_name_map):
             kwargs = copy.copy(node._kwargs)
             filename = kwargs.pop('filename')
             fmt = kwargs.pop('format', None)
-
             if fmt:
                 args += ['-f', fmt]
-            for k, v in kwargs.items():
-                args.append('-{}'.format(k))
-                if v:
-                    args.append('{}'.format(v))
+            args += _convert_kwargs_to_cmd_line_args(kwargs)
             args += [filename]
         else:
             assert False, 'Unsupported output node: {}'.format(node)
