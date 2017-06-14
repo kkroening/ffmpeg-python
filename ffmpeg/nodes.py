@@ -1,3 +1,6 @@
+from __future__ import unicode_literals
+
+from builtins import object
 import hashlib
 import json
 
@@ -18,15 +21,18 @@ class Node(object):
         formatted_props += ['{}={!r}'.format(key, self._kwargs[key]) for key in sorted(self._kwargs)]
         return '{}({})'.format(self._name, ','.join(formatted_props))
 
+    def __hash__(self):
+        return int(self._hash, base=16)
+
     def __eq__(self, other):
         return self._hash == other._hash
 
     def _update_hash(self):
         props = {'args': self._args, 'kwargs': self._kwargs}
-        my_hash = hashlib.md5(json.dumps(props, sort_keys=True)).hexdigest()
+        my_hash = hashlib.md5(json.dumps(props, sort_keys=True).encode('utf-8')).hexdigest()
         parent_hashes = [parent._hash for parent in self._parents]
         hashes = parent_hashes + [my_hash]
-        self._hash = hashlib.md5(','.join(hashes)).hexdigest()
+        self._hash = hashlib.md5(','.join(hashes).encode('utf-8')).hexdigest()
 
 
 class InputNode(Node):
