@@ -182,6 +182,7 @@ def test_pipe():
         .trim(start_frame=start_frame)
         .output('pipe:1', format='rawvideo')
     )
+
     args = out.get_args()
     assert args == [
         '-f', 'rawvideo',
