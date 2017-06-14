@@ -1,7 +1,6 @@
 language: python
 before_install:
-  - curl -O https://johnvansickle.com/ffmpeg/releases/ffmpeg-3.3.1-64bit-static.tar.xz
-  - tar Jxf ffmpeg-3.3.1-64bit-static.tar.xz
+  - [ -d ffmpeg-3.3.1-64bit-static ] || (curl -O https://johnvansickle.com/ffmpeg/releases/ffmpeg-3.3.1-64bit-static.tar.xz && tar Jxf ffmpeg-3.3.1-64bit-static.tar.xz)
 matrix:
   include:
     - python: 2.7
@@ -30,3 +29,4 @@ script:
 cache:
   directories:
     - .tox
+    - ffmpeg-3.3.1-64bit-static
