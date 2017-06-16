@@ -67,7 +67,7 @@ setup(
     packages=['ffmpeg'],
     setup_requires=['pytest-runner'],
     tests_require=['pytest'],
-    version='0.1.5',
+    version='0.1.6',
     description='Python bindings for FFmpeg - with support for complex filtering',
     author='Karl Kroening',
     author_email='karlk@kralnet.us',
