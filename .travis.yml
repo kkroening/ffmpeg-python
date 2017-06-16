@@ -1,9 +1,36 @@
 language: python
 before_install:
-  - curl -O https://johnvansickle.com/ffmpeg/releases/ffmpeg-3.3.1-64bit-static.tar.xz
-  - tar Jxf ffmpeg-3.3.1-64bit-static.tar.xz
+  - >
+    [ -f ffmpeg-3.3.1-64bit-static/ffmpeg ] || (
+        curl -O https://johnvansickle.com/ffmpeg/releases/ffmpeg-3.3.1-64bit-static.tar.xz &&
+        tar Jxf ffmpeg-3.3.1-64bit-static.tar.xz
+    )
+matrix:
+  include:
+    - python: 2.7
+      env:
+      - TOX_ENV=py27
+    - python: 3.3
+      env:
+      - TOX_ENV=py33
+    - python: 3.4
+      env:
+      - TOX_ENV=py34
+    - python: 3.5
+      env:
+      - TOX_ENV=py35
+    - python: 3.6
+      env:
+      - TOX_ENV=py36
+    - python: pypy
+      env:
+      - TOX_ENV=pypy
 install:
-  - pip install -r requirements.txt
+  - pip install tox
 script:
   - export PATH=$(readlink -f ffmpeg-3.3.1-64bit-static):$PATH
-  - py.test
+  - tox -e $TOX_ENV
+cache:
+  directories:
+    - .tox
+    - ffmpeg-3.3.1-64bit-static

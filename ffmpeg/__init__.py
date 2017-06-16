@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from . import _filters, _ffmpeg, _run
 from ._filters import *
 from ._ffmpeg import *

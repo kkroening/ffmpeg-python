@@ -1,5 +1,4 @@
-from distutils.core import setup
-from ffmpeg._filters import __all__ as filter_names
+from setuptools import setup
 from textwrap import dedent
 import subprocess
 
@@ -61,18 +60,34 @@ misc_keywords = [
     'wrapper',
 ]
 
-keywords = misc_keywords + file_formats + filter_names
+keywords = misc_keywords + file_formats
 
 setup(
-    name = 'ffmpeg-python',
-    packages = ['ffmpeg'],
-    version = '0.1.5',
-    description = 'Python bindings for FFmpeg - with support for complex filtering',
-    author = 'Karl Kroening',
-    author_email = 'karlk@kralnet.us',
-    url = 'https://github.com/kkroening/ffmpeg-python',
-    download_url = download_url,
-    classifiers = [],
-    keywords = keywords,
-    long_description = long_description,
+    name='ffmpeg-python',
+    packages=['ffmpeg'],
+    setup_requires=['pytest-runner'],
+    tests_require=['pytest'],
+    version='0.1.5',
+    description='Python bindings for FFmpeg - with support for complex filtering',
+    author='Karl Kroening',
+    author_email='karlk@kralnet.us',
+    url='https://github.com/kkroening/ffmpeg-python',
+    download_url=download_url,
+    keywords=keywords,
+    long_description=long_description,
+    install_requires=['future'],
+    classifiers=[
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: Apache Software License',
+        'Natural Language :: English',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+    ],
 )

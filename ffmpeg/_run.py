@@ -1,3 +1,6 @@
+from __future__ import unicode_literals
+
+from past.builtins import basestring
 import operator as _operator
 import subprocess as _subprocess
 
@@ -13,6 +16,7 @@ from .nodes import (
     operator,
     OutputNode,
 )
+from functools import reduce
 
 def _get_stream_name(name):
     return '[{}]'.format(name)
