@@ -32,6 +32,8 @@ def overwrite_output(parent_node):
 
 @operator(node_classes={OutputNode})
 def merge_outputs(*parent_nodes):
+    """Include all given outputs in one ffmpeg command line
+    """
     return OutputNode(parent_nodes, merge_outputs.__name__)
 
 
