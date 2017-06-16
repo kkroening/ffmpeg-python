@@ -2,12 +2,8 @@ from setuptools import setup
 from textwrap import dedent
 import subprocess
 
-
-def get_current_commit_hash():
-    p = subprocess.Popen(['git', 'rev-parse', 'HEAD'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    commit_hash = p.communicate()[0].strip()
-    return commit_hash
-
+version = '0.1.6'
+download_url = 'https://github.com/kkroening/ffmpeg-python/archive/v{}.zip'.format(version)
 
 long_description = dedent("""\
     ffmpeg-python: Python bindings for FFmpeg
@@ -17,10 +13,6 @@ long_description = dedent("""\
     :API Reference: https://kkroening.github.io/ffmpeg-python/
 """)
 
-
-
-commit_hash = get_current_commit_hash()
-download_url = 'https://github.com/kkroening/ffmpeg-python/archive/{}.zip'.format(commit_hash)
 
 file_formats = [
     'aac',
@@ -67,7 +59,7 @@ setup(
     packages=['ffmpeg'],
     setup_requires=['pytest-runner'],
     tests_require=['pytest'],
-    version='0.1.6',
+    version=version,
     description='Python bindings for FFmpeg - with support for complex filtering',
     author='Karl Kroening',
     author_email='karlk@kralnet.us',
