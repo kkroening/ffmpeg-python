@@ -1,6 +1,8 @@
 from __future__ import unicode_literals
 
+from functools import reduce
 from past.builtins import basestring
+import copy
 import operator as _operator
 import subprocess as _subprocess
 
@@ -16,15 +18,34 @@ from .nodes import (
     operator,
     OutputNode,
 )
-from functools import reduce
 
 def _get_stream_name(name):
     return '[{}]'.format(name)
 
 
+def _convert_kwargs_to_cmd_line_args(kwargs):
+    args = []
+    for k in sorted(kwargs.keys()):
+        v = kwargs[k]
+        args.append('-{}'.format(k))
+        if v:
+            args.append('{}'.format(v))
+    return args
+
+
 def _get_input_args(input_node):
     if input_node._name == input.__name__:
-        args = ['-i', input_node._kwargs['filename']]
+        kwargs = copy.copy(input_node._kwargs)
+        filename = kwargs.pop('filename')
+        fmt = kwargs.pop('format', None)
+        video_size = kwargs.pop('video_size', None)
+        args = []
+        if fmt:
+            args += ['-f', fmt]
+        if video_size:
+            args += ['-video_size', '{}x{}'.format(video_size[0], video_size[1])]
+        args += _convert_kwargs_to_cmd_line_args(kwargs)
+        args += ['-i', filename]
     else:
         assert False, 'Unsupported input node: {}'.format(input_node)
     return args
@@ -78,7 +99,13 @@ def _get_output_args(node, stream_name_map):
         if stream_name != '[0]':
             args += ['-map', stream_name]
         if node._name == output.__name__:
-            args += [node._kwargs['filename']]
+            kwargs = copy.copy(node._kwargs)
+            filename = kwargs.pop('filename')
+            fmt = kwargs.pop('format', None)
+            if fmt:
+                args += ['-f', fmt]
+            args += _convert_kwargs_to_cmd_line_args(kwargs)
+            args += [filename]
         else:
             assert False, 'Unsupported output node: {}'.format(node)
     return args

@@ -8,12 +8,17 @@ from .nodes import (
 )
 
 
-def input(filename):
+def input(filename, **kwargs):
     """Input file URL (ffmpeg ``-i`` option)
 
     Official documentation: `Main options <https://ffmpeg.org/ffmpeg.html#Main-options>`__
     """
-    return InputNode(input.__name__, filename=filename)
+    kwargs['filename'] = filename
+    fmt = kwargs.pop('f', None)
+    if fmt:
+        assert 'format' not in kwargs, "Can't specify both `format` and `f` kwargs"
+        kwargs['format'] = fmt
+    return InputNode(input.__name__, **kwargs)
 
 
 @operator(node_classes={OutputNode, GlobalNode})
@@ -31,12 +36,17 @@ def merge_outputs(*parent_nodes):
 
 
 @operator(node_classes={InputNode, FilterNode})
-def output(parent_node, filename):
+def output(parent_node, filename, **kwargs):
     """Output file URL
 
     Official documentation: `Synopsis <https://ffmpeg.org/ffmpeg.html#Synopsis>`__
     """
-    return OutputNode([parent_node], output.__name__, filename=filename)
+    kwargs['filename'] = filename
+    fmt = kwargs.pop('f', None)
+    if fmt:
+        assert 'format' not in kwargs, "Can't specify both `format` and `f` kwargs"
+        kwargs['format'] = fmt
+    return OutputNode([parent_node], output.__name__, **kwargs)
 
 
 
