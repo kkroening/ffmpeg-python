@@ -8,13 +8,13 @@ import json
 class Node(object):
     """Node base"""
     def __init__(self, parents, name, *args, **kwargs):
-        parent_hashes = [parent._hash for parent in parents]
+        parent_hashes = [hash(parent) for parent in parents]
         assert len(parent_hashes) == len(set(parent_hashes)), 'Same node cannot be included as parent multiple times'
         self._parents = parents
+        self._hash = None
         self._name = name
         self._args = args
         self._kwargs = kwargs
-        self._update_hash()
 
     def __repr__(self):
         formatted_props = ['{}'.format(arg) for arg in self._args]
@@ -22,17 +22,22 @@ class Node(object):
         return '{}({})'.format(self._name, ','.join(formatted_props))
 
     def __hash__(self):
-        return int(self._hash, base=16)
+        if self._hash is None:
+            self._update_hash()
+        return self._hash
 
     def __eq__(self, other):
-        return self._hash == other._hash
+        return hash(self) == hash(other)
 
     def _update_hash(self):
         props = {'args': self._args, 'kwargs': self._kwargs}
-        my_hash = hashlib.md5(json.dumps(props, sort_keys=True).encode('utf-8')).hexdigest()
-        parent_hashes = [parent._hash for parent in self._parents]
+        props_str = json.dumps(props, sort_keys=True).encode('utf-8')
+        my_hash = hashlib.md5(props_str).hexdigest()
+        parent_hashes = [str(hash(parent)) for parent in self._parents]
         hashes = parent_hashes + [my_hash]
-        self._hash = hashlib.md5(','.join(hashes).encode('utf-8')).hexdigest()
+        hashes_str = ','.join(hashes).encode('utf-8')
+        hash_str = hashlib.md5(hashes_str).hexdigest()
+        self._hash = int(hash_str, base=16)
 
 
 class InputNode(Node):
