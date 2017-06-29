@@ -207,7 +207,7 @@ is missing from <code class="docutils literal"><span class="pre">fmpeg-python</s
 
 <dl class="function">
 <dt id="ffmpeg.overlay">
-<code class="descclassname">ffmpeg.</code><code class="descname">overlay</code><span class="sig-paren">(</span><em>main_parent_node</em>, <em>overlay_parent_node</em>, <em>eof_action=’repeat’</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.overlay" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">ffmpeg.</code><code class="descname">overlay</code><span class="sig-paren">(</span><em>main_parent_node</em>, <em>overlay_parent_node</em>, <em>eof_action=u’repeat’</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.overlay" title="Permalink to this definition">¶</a></dt>
 <dd><p>Overlay one video on top of another.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -341,7 +341,7 @@ for single input image.</li>
 
 <dl class="function">
 <dt id="ffmpeg.input">
-<code class="descclassname">ffmpeg.</code><code class="descname">input</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.input" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">ffmpeg.</code><code class="descname">input</code><span class="sig-paren">(</span><em>filename</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.input" title="Permalink to this definition">¶</a></dt>
 <dd><p>Input file URL (ffmpeg <code class="docutils literal"><span class="pre">-i</span></code> option)</p>
 <p>Official documentation: <a class="reference external" href="https://ffmpeg.org/ffmpeg.html#Main-options">Main options</a></p>
 </dd></dl>
@@ -349,11 +349,12 @@ for single input image.</li>
 <dl class="function">
 <dt id="ffmpeg.merge_outputs">
 <code class="descclassname">ffmpeg.</code><code class="descname">merge_outputs</code><span class="sig-paren">(</span><em>*parent_nodes</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.merge_outputs" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Include all given outputs in one ffmpeg command line</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="ffmpeg.output">
-<code class="descclassname">ffmpeg.</code><code class="descname">output</code><span class="sig-paren">(</span><em>parent_node</em>, <em>filename</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.output" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">ffmpeg.</code><code class="descname">output</code><span class="sig-paren">(</span><em>parent_node</em>, <em>filename</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.output" title="Permalink to this definition">¶</a></dt>
 <dd><p>Output file URL</p>
 <p>Official documentation: <a class="reference external" href="https://ffmpeg.org/ffmpeg.html#Synopsis">Synopsis</a></p>
 </dd></dl>
@@ -373,7 +374,7 @@ for single input image.</li>
 
 <dl class="function">
 <dt id="ffmpeg.run">
-<code class="descclassname">ffmpeg.</code><code class="descname">run</code><span class="sig-paren">(</span><em>node</em>, <em>cmd=’ffmpeg’</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.run" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">ffmpeg.</code><code class="descname">run</code><span class="sig-paren">(</span><em>node</em>, <em>cmd=u’ffmpeg’</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run ffmpeg on node graph.</p>
 </dd></dl>
 
@@ -434,7 +435,7 @@ for single input image.</li>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Karl Kroening.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
     </div>
   </body>
 </html>
