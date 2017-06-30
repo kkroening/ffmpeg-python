@@ -9,7 +9,8 @@ class Node(object):
     """Node base"""
     def __init__(self, parents, name, *args, **kwargs):
         parent_hashes = [hash(parent) for parent in parents]
-        assert len(parent_hashes) == len(set(parent_hashes)), 'Same node cannot be included as parent multiple times'
+        if len(parent_hashes) != len(set(parent_hashes)):
+            raise ValueError('Same node cannot be included as parent multiple times')
         self._parents = parents
         self._hash = None
         self._name = name
@@ -65,7 +66,8 @@ class OutputNode(Node):
 
 class GlobalNode(Node):
     def __init__(self, parent, name, *args, **kwargs):
-        assert isinstance(parent, OutputNode), 'Global nodes can only be attached after output nodes'
+        if not isinstance(parent, OutputNode):
+            raise RuntimeError('Global nodes can only be attached after output nodes')
         super(GlobalNode, self).__init__([parent], name, *args, **kwargs)
 
 
