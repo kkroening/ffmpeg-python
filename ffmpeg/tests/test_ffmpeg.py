@@ -73,12 +73,12 @@ def test_repr():
     trim3 = ffmpeg.trim(in_file, start_frame=50, end_frame=60)
     concatted = ffmpeg.concat(trim1, trim2, trim3)
     output = ffmpeg.output(concatted, 'dummy2.mp4')
-    assert repr(in_file) == "input(filename={!r})".format('dummy.mp4')
-    assert repr(trim1) == "trim(end_frame=20,start_frame=10)"
-    assert repr(trim2) == "trim(end_frame=40,start_frame=30)"
-    assert repr(trim3) == "trim(end_frame=60,start_frame=50)"
-    assert repr(concatted) == "concat(n=3)"
-    assert repr(output) == "output(filename={!r})".format('dummy2.mp4')
+    assert repr(in_file) == "input(filename={!r}) <{}>".format('dummy.mp4', in_file._short_hash)
+    assert repr(trim1) == "trim(end_frame=20, start_frame=10) <{}>".format(trim1._short_hash)
+    assert repr(trim2) == "trim(end_frame=40, start_frame=30) <{}>".format(trim2._short_hash)
+    assert repr(trim3) == "trim(end_frame=60, start_frame=50) <{}>".format(trim3._short_hash)
+    assert repr(concatted) == "concat(n=3) <{}>".format(concatted._short_hash)
+    assert repr(output) == "output(filename={!r}) <{}>".format('dummy2.mp4', output._short_hash)
 
 
 def test_get_args_simple():
