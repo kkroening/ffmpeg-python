@@ -44,7 +44,8 @@ class OutputNode(Node):
 
 class GlobalNode(Node):
     def __init__(self, parent, name, *args, **kwargs):
-        assert isinstance(parent, OutputNode), 'Global nodes can only be attached after output nodes'
+        if not isinstance(parent, OutputNode):
+            raise RuntimeError('Global nodes can only be attached after output nodes')
         super(GlobalNode, self).__init__([parent], name, *args, **kwargs)
 
 

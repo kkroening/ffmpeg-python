@@ -162,7 +162,8 @@ def topo_sort(start_nodes):
     sorted_nodes = []
     child_map = {}
     def visit(node, child):
-        assert node not in marked_nodes, 'Graph is not a DAG'
+        if node in marked_nodes:
+            raise RuntimeError('Graph is not a DAG')
         if child is not None:
             if node not in child_map:
                 child_map[node] = []

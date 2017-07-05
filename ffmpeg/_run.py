@@ -48,7 +48,7 @@ def _get_input_args(input_node):
         args += _convert_kwargs_to_cmd_line_args(kwargs)
         args += ['-i', filename]
     else:
-        assert False, 'Unsupported input node: {}'.format(input_node)
+        raise ValueError('Unsupported input node: {}'.format(input_node))
     return args
 
 
@@ -69,7 +69,7 @@ def _get_global_args(node):
     if node.name == overwrite_output.__name__:
         return ['-y']
     else:
-        assert False, 'Unsupported global node: {}'.format(node)
+        raise ValueError('Unsupported global node: {}'.format(node))
 
 
 def _get_output_args(node, stream_name_map):
@@ -87,7 +87,7 @@ def _get_output_args(node, stream_name_map):
             args += _convert_kwargs_to_cmd_line_args(kwargs)
             args += [filename]
         else:
-            assert False, 'Unsupported output node: {}'.format(node)
+            raise ValueError('Unsupported output node: {}'.format(node))
     return args
 
 
