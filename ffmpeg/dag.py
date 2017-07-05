@@ -104,8 +104,9 @@ def get_incoming_edges(downstream_node, incoming_edge_map):
 
 def get_outgoing_edges(upstream_node, outgoing_edge_map):
     edges = []
-    for upstream_label, (downstream_node, downstream_label) in outgoing_edge_map.items():
-        edges += [DagEdge(downstream_node, downstream_label, upstream_node, upstream_label)]
+    for upstream_label, downstream_infos in outgoing_edge_map.items():
+        for (downstream_node, downstream_label) in downstream_infos:
+            edges += [DagEdge(downstream_node, downstream_label, upstream_node, upstream_label)]
     return edges
 
 
@@ -176,9 +177,11 @@ def topo_sort(downstream_nodes):
             raise RuntimeError('Graph is not a DAG')
 
         if downstream_node is not None:
-            if upstream_node not in outgoing_edge_maps:
-                outgoing_edge_maps[upstream_node] = {}
-            outgoing_edge_maps[upstream_node][upstream_label] = (downstream_node, downstream_label)
+            outgoing_edge_map = outgoing_edge_maps.get(upstream_node, {})
+            outgoing_edge_infos = outgoing_edge_map.get(upstream_label, [])
+            outgoing_edge_infos += [(downstream_node, downstream_label)]
+            outgoing_edge_map[upstream_label] = outgoing_edge_infos
+            outgoing_edge_maps[upstream_node] = outgoing_edge_map
 
         if upstream_node not in sorted_nodes:
             marked_nodes.append(upstream_node)
