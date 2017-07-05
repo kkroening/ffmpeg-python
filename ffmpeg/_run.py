@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from .dag import topo_sort
 from functools import reduce
 from past.builtins import basestring
 import copy
@@ -34,8 +35,8 @@ def _convert_kwargs_to_cmd_line_args(kwargs):
 
 
 def _get_input_args(input_node):
-    if input_node._name == input.__name__:
-        kwargs = copy.copy(input_node._kwargs)
+    if input_node.name == input.__name__:
+        kwargs = copy.copy(input_node.kwargs)
         filename = kwargs.pop('filename')
         fmt = kwargs.pop('format', None)
         video_size = kwargs.pop('video_size', None)
@@ -49,27 +50,6 @@ def _get_input_args(input_node):
     else:
         assert False, 'Unsupported input node: {}'.format(input_node)
     return args
-
-
-def _topo_sort(start_node):
-    marked_nodes = []
-    sorted_nodes = []
-    child_map = {}
-    def visit(node, child):
-        assert node not in marked_nodes, 'Graph is not a DAG'
-        if child is not None:
-            if node not in child_map:
-                child_map[node] = []
-            child_map[node].append(child)
-        if node not in sorted_nodes:
-            marked_nodes.append(node)
-            [visit(parent, node) for parent in node._parents]
-            marked_nodes.remove(node)
-            sorted_nodes.append(node)
-    unmarked_nodes = [start_node]
-    while unmarked_nodes:
-        visit(unmarked_nodes.pop(), None)
-    return sorted_nodes, child_map
 
 
 def _get_filter_spec(i, node, stream_name_map):
@@ -86,7 +66,7 @@ def _get_filter_arg(filter_nodes, stream_name_map):
 
 
 def _get_global_args(node):
-    if node._name == overwrite_output.__name__:
+    if node.name == overwrite_output.__name__:
         return ['-y']
     else:
         assert False, 'Unsupported global node: {}'.format(node)
@@ -94,12 +74,12 @@ def _get_global_args(node):
 
 def _get_output_args(node, stream_name_map):
     args = []
-    if node._name != merge_outputs.__name__:
+    if node.name != merge_outputs.__name__:
         stream_name = stream_name_map[node._parents[0]]
         if stream_name != '[0]':
             args += ['-map', stream_name]
-        if node._name == output.__name__:
-            kwargs = copy.copy(node._kwargs)
+        if node.name == output.__name__:
+            kwargs = copy.copy(node.kwargs)
             filename = kwargs.pop('filename')
             fmt = kwargs.pop('format', None)
             if fmt:
@@ -116,7 +96,7 @@ def get_args(node):
     """Get command-line arguments for ffmpeg."""
     args = []
     # TODO: group nodes together, e.g. `-i somefile -r somerate`.
-    sorted_nodes, child_map = _topo_sort(node)
+    sorted_nodes, child_map = topo_sort([node])
     del(node)
     input_nodes = [node for node in sorted_nodes if isinstance(node, InputNode)]
     output_nodes = [node for node in sorted_nodes if isinstance(node, OutputNode) and not

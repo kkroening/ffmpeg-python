@@ -1,105 +1,22 @@
 from __future__ import unicode_literals
 
-from builtins import object
-import copy
-import hashlib
+from .dag import KwargReprNode
 
 
-def _recursive_repr(item):
-    """Hack around python `repr` to deterministically represent dictionaries.
-
-    This is able to represent more things than json.dumps, since it does not require things to be JSON serializable
-    (e.g. datetimes).
-    """
-    if isinstance(item, basestring):
-        result = str(item)
-    elif isinstance(item, list):
-        result = '[{}]'.format(', '.join([_recursive_repr(x) for x in item]))
-    elif isinstance(item, dict):
-        kv_pairs = ['{}: {}'.format(_recursive_repr(k), _recursive_repr(item[k])) for k in sorted(item)]
-        result = '{' + ', '.join(kv_pairs) + '}'
-    else:
-        result = repr(item)
-    return result
-
-
-def _create_hash(item):
-    hasher = hashlib.sha224()
-    repr_ = _recursive_repr(item)
-    hasher.update(repr_.encode('utf-8'))
-    return hasher.hexdigest()
-
-
-class _NodeBase(object):
-    @property
-    def hash(self):
-        if self._hash is None:
-            self._update_hash()
-        return self._hash
-
-    def __init__(self, parents, name):
-        parent_hashes = [hash(parent) for parent in parents]
-        assert len(parent_hashes) == len(set(parent_hashes)), 'Same node cannot be included as parent multiple times'
-        self._parents = parents
-        self._hash = None
-        self._name = name
-
-    def _transplant(self, new_parents):
-        other = copy.copy(self)
-        other._parents = copy.copy(new_parents)
-        return other
-
-    @property
-    def _repr_args(self):
-        raise NotImplementedError()
-
-    @property
-    def _repr_kwargs(self):
-        raise NotImplementedError()
-
-    @property
-    def _short_hash(self):
-        return '{:x}'.format(abs(hash(self)))[:12]
-
-    def __repr__(self):
-        args = self._repr_args
-        kwargs = self._repr_kwargs
-        formatted_props = ['{!r}'.format(arg) for arg in args]
-        formatted_props += ['{}={!r}'.format(key, kwargs[key]) for key in sorted(kwargs)]
-        return '{}({}) <{}>'.format(self._name, ', '.join(formatted_props), self._short_hash)
-
-    def __hash__(self):
-        if self._hash is None:
-            self._update_hash()
-        return self._hash
-
-    def __eq__(self, other):
-        return hash(self) == hash(other)
-
-    def _update_hash(self):
-        props = {'args': self._repr_args, 'kwargs': self._repr_kwargs}
-        my_hash = _create_hash(props)
-        parent_hashes = [str(hash(parent)) for parent in self._parents]
-        hashes = parent_hashes + [my_hash]
-        hashes_str = ','.join(hashes).encode('utf-8')
-        hash_str = hashlib.md5(hashes_str).hexdigest()
-        self._hash = int(hash_str, base=16)
-
-
-class Node(_NodeBase):
+class Node(KwargReprNode):
     """Node base"""
     def __init__(self, parents, name, *args, **kwargs):
-        super(Node, self).__init__(parents, name)
-        self._args = args
-        self._kwargs = kwargs
+        incoming_edge_map = {}
+        for downstream_label, parent in enumerate(parents):
+            upstream_label = 0  # assume nodes have a single output (FIXME)
+            upstream_node = parent
+            incoming_edge_map[downstream_label] = (upstream_node, upstream_label)
+        super(Node, self).__init__(incoming_edge_map, name, args, kwargs)
 
     @property
-    def _repr_args(self):
-        return self._args
-
-    @property
-    def _repr_kwargs(self):
-        return self._kwargs
+    def _parents(self):
+        # TODO: change graph compilation to use `self.incoming_edges` instead.
+        return [edge.upstream_node for edge in self.incoming_edges]
 
 
 class InputNode(Node):
@@ -111,9 +28,9 @@ class InputNode(Node):
 class FilterNode(Node):
     """FilterNode"""
     def _get_filter(self):
-        params_text = self._name
-        arg_params = ['{}'.format(arg) for arg in self._args]
-        kwarg_params = ['{}={}'.format(k, self._kwargs[k]) for k in sorted(self._kwargs)]
+        params_text = self.name
+        arg_params = ['{}'.format(arg) for arg in self.args]
+        kwarg_params = ['{}={}'.format(k, self.kwargs[k]) for k in sorted(self.kwargs)]
         params = arg_params + kwarg_params
         if params:
             params_text += '={}'.format(':'.join(params))
