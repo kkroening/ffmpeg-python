@@ -55,7 +55,7 @@ def _get_input_args(input_node):
 def _get_filter_spec(i, node, stream_name_map):
     stream_name = _get_stream_name('v{}'.format(i))
     stream_name_map[node] = stream_name
-    inputs = [stream_name_map[parent] for parent in node._parents]
+    inputs = [stream_name_map[edge.upstream_node] for edge in node.incoming_edges]
     filter_spec = '{}{}{}'.format(''.join(inputs), node._get_filter(), stream_name)
     return filter_spec
 
@@ -75,7 +75,8 @@ def _get_global_args(node):
 def _get_output_args(node, stream_name_map):
     args = []
     if node.name != merge_outputs.__name__:
-        stream_name = stream_name_map[node._parents[0]]
+        assert len(node.incoming_edges) == 1
+        stream_name = stream_name_map[node.incoming_edges[0].upstream_node]
         if stream_name != '[0]':
             args += ['-map', stream_name]
         if node.name == output.__name__:
@@ -96,7 +97,7 @@ def get_args(node):
     """Get command-line arguments for ffmpeg."""
     args = []
     # TODO: group nodes together, e.g. `-i somefile -r somerate`.
-    sorted_nodes, child_map = topo_sort([node])
+    sorted_nodes, outgoing_edge_maps = topo_sort([node])
     del(node)
     input_nodes = [node for node in sorted_nodes if isinstance(node, InputNode)]
     output_nodes = [node for node in sorted_nodes if isinstance(node, OutputNode) and not

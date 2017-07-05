@@ -13,11 +13,6 @@ class Node(KwargReprNode):
             incoming_edge_map[downstream_label] = (upstream_node, upstream_label)
         super(Node, self).__init__(incoming_edge_map, name, args, kwargs)
 
-    @property
-    def _parents(self):
-        # TODO: change graph compilation to use `self.incoming_edges` instead.
-        return [edge.upstream_node for edge in self.incoming_edges]
-
 
 class InputNode(Node):
     """InputNode type"""
