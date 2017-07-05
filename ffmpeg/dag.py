@@ -1,6 +1,5 @@
 from builtins import object
 from collections import namedtuple
-import copy
 import hashlib
 
 
@@ -105,7 +104,7 @@ def get_incoming_edges(downstream_node, incoming_edge_map):
 
 def get_outgoing_edges(upstream_node, outgoing_edge_map):
     edges = []
-    for upstream_label, (downstream_node, downstream_label) in outgoing_edge_map:
+    for upstream_label, (downstream_node, downstream_label) in outgoing_edge_map.items():
         edges += [DagEdge(downstream_node, downstream_label, upstream_node, upstream_label)]
     return edges
 
