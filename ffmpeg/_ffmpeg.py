@@ -16,7 +16,8 @@ def input(filename, **kwargs):
     kwargs['filename'] = filename
     fmt = kwargs.pop('f', None)
     if fmt:
-        assert 'format' not in kwargs, "Can't specify both `format` and `f` kwargs"
+        if 'format' in kwargs:
+            raise ValueError("Can't specify both `format` and `f` kwargs")
         kwargs['format'] = fmt
     return InputNode(input.__name__, **kwargs)
 
@@ -46,7 +47,8 @@ def output(parent_node, filename, **kwargs):
     kwargs['filename'] = filename
     fmt = kwargs.pop('f', None)
     if fmt:
-        assert 'format' not in kwargs, "Can't specify both `format` and `f` kwargs"
+        if 'format' in kwargs:
+            raise ValueError("Can't specify both `format` and `f` kwargs")
         kwargs['format'] = fmt
     return OutputNode([parent_node], output.__name__, **kwargs)
 
