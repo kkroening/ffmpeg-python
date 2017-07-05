@@ -170,7 +170,8 @@ def topo_sort(start_nodes):
             child_map[node].append(child)
         if node not in sorted_nodes:
             marked_nodes.append(node)
-            [visit(parent, node) for parent in node._parents]
+            parents = [edge.upstream_node for edge in node.incoming_edges]
+            [visit(parent, node) for parent in parents]
             marked_nodes.remove(node)
             sorted_nodes.append(node)
     unmarked_nodes = list(copy.copy(start_nodes))
