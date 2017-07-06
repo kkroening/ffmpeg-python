@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+
 from .nodes import (
     filter_operator,
     GlobalNode,

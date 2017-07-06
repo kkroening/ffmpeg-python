@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from builtins import object
 from .dag import KwargReprNode
 from ._utils import get_hash_int
 
@@ -49,7 +50,7 @@ class Node(KwargReprNode):
 
     @classmethod
     def __check_input_types(cls, stream_map, incoming_stream_types):
-        for stream in stream_map.values():
+        for stream in list(stream_map.values()):
             if not _is_of_types(stream, incoming_stream_types):
                 raise TypeError('Expected incoming stream(s) to be of one of the following types: {}; got {}'
                     .format(_get_types_str(incoming_stream_types), type(stream)))
@@ -69,7 +70,7 @@ class Node(KwargReprNode):
     @classmethod
     def __get_incoming_edge_map(cls, stream_map):
         incoming_edge_map = {}
-        for downstream_label, upstream in stream_map.items():
+        for downstream_label, upstream in list(stream_map.items()):
             incoming_edge_map[downstream_label] = (upstream.node, upstream.label)
         return incoming_edge_map
 

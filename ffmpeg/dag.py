@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from ._utils import get_hash, get_hash_int
 from builtins import object
 from collections import namedtuple
@@ -72,14 +74,14 @@ DagEdge = namedtuple('DagEdge', ['downstream_node', 'downstream_label', 'upstrea
 
 def get_incoming_edges(downstream_node, incoming_edge_map):
     edges = []
-    for downstream_label, (upstream_node, upstream_label) in incoming_edge_map.items():
+    for downstream_label, (upstream_node, upstream_label) in list(incoming_edge_map.items()):
         edges += [DagEdge(downstream_node, downstream_label, upstream_node, upstream_label)]
     return edges
 
 
 def get_outgoing_edges(upstream_node, outgoing_edge_map):
     edges = []
-    for upstream_label, downstream_infos in outgoing_edge_map.items():
+    for upstream_label, downstream_infos in list(outgoing_edge_map.items()):
         for (downstream_node, downstream_label) in downstream_infos:
             edges += [DagEdge(downstream_node, downstream_label, upstream_node, upstream_label)]
     return edges
@@ -91,7 +93,7 @@ class KwargReprNode(DagNode):
     @property
     def __upstream_hashes(self):
         hashes = []
-        for downstream_label, (upstream_node, upstream_label) in self.incoming_edge_map.items():
+        for downstream_label, (upstream_node, upstream_label) in list(self.incoming_edge_map.items()):
             hashes += [hash(x) for x in [downstream_label, upstream_node, upstream_label]]
         return hashes
 
