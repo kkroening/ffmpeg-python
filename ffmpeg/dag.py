@@ -1,31 +1,6 @@
+from ._utils import get_hash, get_hash_int
 from builtins import object
 from collections import namedtuple
-import hashlib
-
-
-def _recursive_repr(item):
-    """Hack around python `repr` to deterministically represent dictionaries.
-
-    This is able to represent more things than json.dumps, since it does not require things to be JSON serializable
-    (e.g. datetimes).
-    """
-    if isinstance(item, basestring):
-        result = str(item)
-    elif isinstance(item, list):
-        result = '[{}]'.format(', '.join([_recursive_repr(x) for x in item]))
-    elif isinstance(item, dict):
-        kv_pairs = ['{}: {}'.format(_recursive_repr(k), _recursive_repr(item[k])) for k in sorted(item)]
-        result = '{' + ', '.join(kv_pairs) + '}'
-    else:
-        result = repr(item)
-    return result
-
-
-def _get_hash(item):
-    hasher = hashlib.sha224()
-    repr_ = _recursive_repr(item)
-    hasher.update(repr_.encode('utf-8'))
-    return hasher.hexdigest()
 
 
 class DagNode(object):
@@ -113,20 +88,6 @@ def get_outgoing_edges(upstream_node, outgoing_edge_map):
 class KwargReprNode(DagNode):
     """A DagNode that can be represented as a set of args+kwargs.
     """
-    def __get_hash(self):
-        hashes = self.__upstream_hashes + [self.__inner_hash]
-        hash_strs = [str(x) for x in hashes]
-        hashes_str = ','.join(hash_strs).encode('utf-8')
-        hash_str = hashlib.md5(hashes_str).hexdigest()
-        return int(hash_str, base=16)
-
-    def __init__(self, incoming_edge_map, name, args, kwargs):
-        self.__incoming_edge_map = incoming_edge_map
-        self.name = name
-        self.args = args
-        self.kwargs = kwargs
-        self.__hash = self.__get_hash()
-
     @property
     def __upstream_hashes(self):
         hashes = []
@@ -137,7 +98,18 @@ class KwargReprNode(DagNode):
     @property
     def __inner_hash(self):
         props = {'args': self.args, 'kwargs': self.kwargs}
-        return _get_hash(props)
+        return get_hash(props)
+
+    def __get_hash(self):
+        hashes = self.__upstream_hashes + [self.__inner_hash]
+        return get_hash_int(hashes)
+
+    def __init__(self, incoming_edge_map, name, args, kwargs):
+        self.__incoming_edge_map = incoming_edge_map
+        self.name = name
+        self.args = args
+        self.kwargs = kwargs
+        self.__hash = self.__get_hash()
 
     def __hash__(self):
         return self.__hash
@@ -149,10 +121,16 @@ class KwargReprNode(DagNode):
     def short_hash(self):
         return '{:x}'.format(abs(hash(self)))[:12]
 
-    def __repr__(self):
+    def long_repr(self, include_hash=True):
         formatted_props = ['{!r}'.format(arg) for arg in self.args]
         formatted_props += ['{}={!r}'.format(key, self.kwargs[key]) for key in sorted(self.kwargs)]
-        return '{}({}) <{}>'.format(self.name, ', '.join(formatted_props), self.short_hash)
+        out = '{}({})'.format(self.name, ', '.join(formatted_props))
+        if include_hash:
+            out += ' <{}>'.format(self.short_hash)
+        return out
+
+    def __repr__(self):
+        return self.long_repr()
 
     @property
     def incoming_edges(self):
@@ -190,7 +168,7 @@ def topo_sort(downstream_nodes):
             marked_nodes.remove(upstream_node)
             sorted_nodes.append(upstream_node)
 
-    unmarked_nodes = [(node, 0) for node in downstream_nodes]
+    unmarked_nodes = [(node, None) for node in downstream_nodes]
     while unmarked_nodes:
         upstream_node, upstream_label = unmarked_nodes.pop()
         visit(upstream_node, upstream_label, None, None)

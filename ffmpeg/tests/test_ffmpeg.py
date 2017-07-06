@@ -39,11 +39,8 @@ def test_fluent_concat():
     concat1 = ffmpeg.concat(trimmed1, trimmed2, trimmed3)
     concat2 = ffmpeg.concat(trimmed1, trimmed2, trimmed3)
     concat3 = ffmpeg.concat(trimmed1, trimmed3, trimmed2)
-    concat4 = ffmpeg.concat()
-    concat5 = ffmpeg.concat()
     assert concat1 == concat2
     assert concat1 != concat3
-    assert concat4 == concat5
 
 
 def test_fluent_output():
@@ -66,19 +63,28 @@ def test_fluent_complex_filter():
     )
 
 
-def test_repr():
+def test_node_repr():
     in_file = ffmpeg.input('dummy.mp4')
     trim1 = ffmpeg.trim(in_file, start_frame=10, end_frame=20)
     trim2 = ffmpeg.trim(in_file, start_frame=30, end_frame=40)
     trim3 = ffmpeg.trim(in_file, start_frame=50, end_frame=60)
     concatted = ffmpeg.concat(trim1, trim2, trim3)
     output = ffmpeg.output(concatted, 'dummy2.mp4')
-    assert repr(in_file) == "input(filename={!r}) <{}>".format('dummy.mp4', in_file.short_hash)
-    assert repr(trim1) == "trim(end_frame=20, start_frame=10) <{}>".format(trim1.short_hash)
-    assert repr(trim2) == "trim(end_frame=40, start_frame=30) <{}>".format(trim2.short_hash)
-    assert repr(trim3) == "trim(end_frame=60, start_frame=50) <{}>".format(trim3.short_hash)
-    assert repr(concatted) == "concat(n=3) <{}>".format(concatted.short_hash)
-    assert repr(output) == "output(filename={!r}) <{}>".format('dummy2.mp4', output.short_hash)
+    assert repr(in_file.node) == "input(filename={!r}) <{}>".format('dummy.mp4', in_file.node.short_hash)
+    assert repr(trim1.node) == "trim(end_frame=20, start_frame=10) <{}>".format(trim1.node.short_hash)
+    assert repr(trim2.node) == "trim(end_frame=40, start_frame=30) <{}>".format(trim2.node.short_hash)
+    assert repr(trim3.node) == "trim(end_frame=60, start_frame=50) <{}>".format(trim3.node.short_hash)
+    assert repr(concatted.node) == "concat(n=3) <{}>".format(concatted.node.short_hash)
+    assert repr(output.node) == "output(filename={!r}) <{}>".format('dummy2.mp4', output.node.short_hash)
+
+
+def test_stream_repr():
+    in_file = ffmpeg.input('dummy.mp4')
+    assert repr(in_file) == "input(filename={!r})[None] <{}>".format('dummy.mp4', in_file.node.short_hash)
+    split0 = in_file.filter_multi_output('split')[0]
+    assert repr(split0) == "split()[0] <{}>".format(split0.node.short_hash)
+    dummy_out = in_file.filter_multi_output('dummy')['out']
+    assert repr(dummy_out) == "dummy()[{!r}] <{}>".format(dummy_out.label, dummy_out.node.short_hash)
 
 
 def test_get_args_simple():
@@ -201,7 +207,7 @@ def test_pipe():
     p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     in_data = bytes(bytearray([random.randint(0,255) for _ in range(frame_size * frame_count)]))
-    p.stdin.write(in_data)  # note: this could block, in which case need to use threads 
+    p.stdin.write(in_data)  # note: this could block, in which case need to use threads
     p.stdin.close()
 
     out_data = p.stdout.read()

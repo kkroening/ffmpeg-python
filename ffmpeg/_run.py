@@ -4,21 +4,22 @@ from .dag import topo_sort
 from functools import reduce
 from past.builtins import basestring
 import copy
-import operator as _operator
+import operator
 import subprocess as _subprocess
 
 from ._ffmpeg import (
     input,
-    merge_outputs,
     output,
     overwrite_output,
 )
 from .nodes import (
     GlobalNode,
     InputNode,   
-    operator,
     OutputNode,
+    output_operator,
+    Stream,
 )
+
 
 def _get_stream_name(name):
     return '[{}]'.format(name)
@@ -73,32 +74,31 @@ def _get_global_args(node):
 
 
 def _get_output_args(node, stream_name_map):
+    if node.name != output.__name__:
+        raise ValueError('Unsupported output node: {}'.format(node))
     args = []
-    if node.name != merge_outputs.__name__:
-        assert len(node.incoming_edges) == 1
-        stream_name = stream_name_map[node.incoming_edges[0].upstream_node]
-        if stream_name != '[0]':
-            args += ['-map', stream_name]
-        if node.name == output.__name__:
-            kwargs = copy.copy(node.kwargs)
-            filename = kwargs.pop('filename')
-            fmt = kwargs.pop('format', None)
-            if fmt:
-                args += ['-f', fmt]
-            args += _convert_kwargs_to_cmd_line_args(kwargs)
-            args += [filename]
-        else:
-            raise ValueError('Unsupported output node: {}'.format(node))
+    assert len(node.incoming_edges) == 1
+    stream_name = stream_name_map[node.incoming_edges[0].upstream_node]
+    if stream_name != '[0]':
+        args += ['-map', stream_name]
+    kwargs = copy.copy(node.kwargs)
+    filename = kwargs.pop('filename')
+    fmt = kwargs.pop('format', None)
+    if fmt:
+        args += ['-f', fmt]
+    args += _convert_kwargs_to_cmd_line_args(kwargs)
+    args += [filename]
     return args
 
 
-@operator(node_classes={OutputNode, GlobalNode})
-def get_args(node):
+@output_operator()
+def get_args(stream):
     """Get command-line arguments for ffmpeg."""
+    if not isinstance(stream, Stream):
+        raise TypeError('Expected Stream; got {}'.format(type(stream)))
     args = []
     # TODO: group nodes together, e.g. `-i somefile -r somerate`.
-    sorted_nodes, outgoing_edge_maps = topo_sort([node])
-    del(node)
+    sorted_nodes, outgoing_edge_maps = topo_sort([stream.node])
     input_nodes = [node for node in sorted_nodes if isinstance(node, InputNode)]
     output_nodes = [node for node in sorted_nodes if isinstance(node, OutputNode) and not
         isinstance(node, GlobalNode)]
@@ -106,15 +106,15 @@ def get_args(node):
     filter_nodes = [node for node in sorted_nodes if node not in (input_nodes + output_nodes + global_nodes)]
     stream_name_map = {node: _get_stream_name(i) for i, node in enumerate(input_nodes)}
     filter_arg = _get_filter_arg(filter_nodes, stream_name_map)
-    args += reduce(_operator.add, [_get_input_args(node) for node in input_nodes])
+    args += reduce(operator.add, [_get_input_args(node) for node in input_nodes])
     if filter_arg:
         args += ['-filter_complex', filter_arg]
-    args += reduce(_operator.add, [_get_output_args(node, stream_name_map) for node in output_nodes])
-    args += reduce(_operator.add, [_get_global_args(node) for node in global_nodes], [])
+    args += reduce(operator.add, [_get_output_args(node, stream_name_map) for node in output_nodes])
+    args += reduce(operator.add, [_get_global_args(node) for node in global_nodes], [])
     return args
 
 
-@operator(node_classes={OutputNode, GlobalNode})
+@output_operator()
 def run(node, cmd='ffmpeg'):
     """Run ffmpeg on node graph."""
     if isinstance(cmd, basestring):
