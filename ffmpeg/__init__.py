@@ -4,5 +4,6 @@ from . import _filters, _ffmpeg, _run
 from ._filters import *
 from ._ffmpeg import *
 from ._run import *
+from ._view import *
 
-__all__ = _filters.__all__ + _ffmpeg.__all__ + _run.__all__
+__all__ = _filters.__all__ + _ffmpeg.__all__ + _run.__all__ + _view.__all__
