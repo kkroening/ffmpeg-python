@@ -62,10 +62,18 @@ def view(*streams, **kwargs):
 
         for edge in get_outgoing_edges(node, outgoing_edge_map):
             kwargs = {}
-            if show_labels and (edge.upstream_label is not None or edge.downstream_label is not None):
-                upstream_label = edge.upstream_label if edge.upstream_label is not None else ''
-                downstream_label = edge.downstream_label if edge.downstream_label is not None else ''
-                kwargs['label'] = '{}     {}'.format(upstream_label, downstream_label)
+            up_label = edge.upstream_label
+            down_label = edge.downstream_label
+            if show_labels and (up_label is not None or down_label is not None):
+                if up_label is None:
+                    up_label = ''
+                if down_label is None:
+                    down_label = ''
+                if up_label != '' and down_label != '':
+                    middle = ' -> '
+                else:
+                    middle = ''
+                kwargs['label'] = '{}  {}  {}'.format(up_label, middle, down_label)
             upstream_node_id = str(hash(edge.upstream_node))
             downstream_node_id = str(hash(edge.downstream_node))
             graph.edge(upstream_node_id, downstream_node_id, **kwargs)
