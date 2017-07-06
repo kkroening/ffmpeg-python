@@ -14,6 +14,9 @@ from ffmpeg.nodes import (
 )
 
 
+_RIGHT_ARROW = '\u2192'
+
+
 def _get_node_color(node):
     if isinstance(node, InputNode):
         color = '#99cc00'
@@ -70,7 +73,7 @@ def view(*streams, **kwargs):
                 if down_label is None:
                     down_label = ''
                 if up_label != '' and down_label != '':
-                    middle = ' -> '
+                    middle = ' {} '.format(_RIGHT_ARROW)
                 else:
                     middle = ''
                 kwargs['label'] = '{}  {}  {}'.format(up_label, middle, down_label)
