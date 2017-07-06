@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from builtins import str
 from .dag import get_outgoing_edges
 from ._run import topo_sort
 import os
@@ -7,6 +8,7 @@ import tempfile
 
 from ffmpeg.nodes import (
     FilterNode,
+    get_stream_map,
     InputNode,
     OutputNode,
     Stream,
@@ -30,7 +32,7 @@ def _get_node_color(node):
 
 
 @stream_operator()
-def view(*streams, **kwargs):
+def view(stream_spec, **kwargs):
     try:
         import graphviz
     except ImportError:
@@ -43,7 +45,8 @@ def view(*streams, **kwargs):
         filename = tempfile.mktemp()
 
     nodes = []
-    for stream in streams:
+    stream_map = get_stream_map(stream_spec)
+    for stream in stream_map.values():
         if not isinstance(stream, Stream):
             raise TypeError('Expected Stream; got {}'.format(type(stream)))
         nodes.append(stream.node)
@@ -51,8 +54,8 @@ def view(*streams, **kwargs):
     sorted_nodes, outgoing_edge_maps = topo_sort(nodes)
     graph = graphviz.Digraph()
     graph.attr(rankdir='LR')
-    if len(kwargs.keys()) != 0:
-        raise ValueError('Invalid kwargs key(s): {}'.format(', '.join(kwargs.keys())))
+    if len(list(kwargs.keys())) != 0:
+        raise ValueError('Invalid kwargs key(s): {}'.format(', '.join(list(kwargs.keys()))))
 
     for node in sorted_nodes:
         name = node.name
@@ -83,6 +86,7 @@ def view(*streams, **kwargs):
 
     graph.view(filename)
 
+    return stream_spec
 
 
 __all__ = [
