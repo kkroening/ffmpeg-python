@@ -93,12 +93,19 @@ def test_get_args_simple():
 
 
 def _get_complex_filter_example():
-    in_file = ffmpeg.input(TEST_INPUT_FILE)
+    split = (ffmpeg
+        .input(TEST_INPUT_FILE)
+        .vflip()
+        .split()
+    )
+    split0 = split[0]
+    split1 = split[1]
+
     overlay_file = ffmpeg.input(TEST_OVERLAY_FILE)
     return (ffmpeg
         .concat(
-            in_file.trim(start_frame=10, end_frame=20),
-            in_file.trim(start_frame=30, end_frame=40),
+            split0.trim(start_frame=10, end_frame=20),
+            split1.trim(start_frame=30, end_frame=40),
         )
         .overlay(overlay_file.hflip())
         .drawbox(50, 50, 120, 120, color='red', thickness=5)
@@ -110,19 +117,21 @@ def _get_complex_filter_example():
 def test_get_args_complex_filter():
     out = _get_complex_filter_example()
     args = ffmpeg.get_args(out)
-    assert args == [
-        '-i', TEST_INPUT_FILE,
+    assert args == ['-i', TEST_INPUT_FILE,
         '-i', TEST_OVERLAY_FILE,
         '-filter_complex',
-            '[0]trim=end_frame=20:start_frame=10[v0];' \
-            '[0]trim=end_frame=40:start_frame=30[v1];' \
-            '[v0][v1]concat=n=2[v2];' \
-            '[1]hflip[v3];' \
-            '[v2][v3]overlay=eof_action=repeat[v4];' \
-            '[v4]drawbox=50:50:120:120:red:t=5[v5]',
-        '-map', '[v5]', os.path.join(SAMPLE_DATA_DIR, 'dummy2.mp4'),
+            '[0]vflip[s0];' \
+            '[s0]split[s1][s2];' \
+            '[s1]trim=end_frame=20:start_frame=10[s3];' \
+            '[s2]trim=end_frame=40:start_frame=30[s4];' \
+            '[s3][s4]concat=n=2[s5];' \
+            '[1]hflip[s6];' \
+            '[s5][s6]overlay=eof_action=repeat[s7];' \
+            '[s7]drawbox=50:50:120:120:red:t=5[s8]',
+        '-map', '[s8]', os.path.join(SAMPLE_DATA_DIR, 'dummy2.mp4'),
         '-y'
     ]
+
 
 
 #def test_version():
@@ -156,8 +165,8 @@ def test_custom_filter():
     node = ffmpeg.output(node, 'dummy2.mp4')
     assert node.get_args() == [
         '-i', 'dummy.mp4',
-        '-filter_complex', '[0]custom_filter=a:b:kwarg1=c[v0]',
-        '-map', '[v0]',
+        '-filter_complex', '[0]custom_filter=a:b:kwarg1=c[s0]',
+        '-map', '[s0]',
         'dummy2.mp4'
     ]
 
@@ -170,8 +179,8 @@ def test_custom_filter_fluent():
     )
     assert node.get_args() == [
         '-i', 'dummy.mp4',
-        '-filter_complex', '[0]custom_filter=a:b:kwarg1=c[v0]',
-        '-map', '[v0]',
+        '-filter_complex', '[0]custom_filter=a:b:kwarg1=c[s0]',
+        '-map', '[s0]',
         'dummy2.mp4'
     ]
 
@@ -197,8 +206,8 @@ def test_pipe():
         '-pixel_format', 'rgb24',
         '-i', 'pipe:0',
         '-filter_complex',
-            '[0]trim=start_frame=2[v0]',
-        '-map', '[v0]',
+            '[0]trim=start_frame=2[s0]',
+        '-map', '[s0]',
         '-f', 'rawvideo',
         'pipe:1'
     ]

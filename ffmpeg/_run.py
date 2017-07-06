@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from .dag import topo_sort
+from .dag import get_outgoing_edges, topo_sort
 from functools import reduce
 from past.builtins import basestring
 import copy
@@ -53,16 +53,31 @@ def _get_input_args(input_node):
     return args
 
 
-def _get_filter_spec(i, node, stream_name_map):
-    stream_name = _get_stream_name('v{}'.format(i))
-    stream_name_map[node] = stream_name
-    inputs = [stream_name_map[edge.upstream_node] for edge in node.incoming_edges]
-    filter_spec = '{}{}{}'.format(''.join(inputs), node._get_filter(), stream_name)
+def _get_filter_spec(node, outgoing_edge_map, stream_name_map):
+    incoming_edges = node.incoming_edges
+    outgoing_edges = get_outgoing_edges(node, outgoing_edge_map)
+    inputs = [stream_name_map[edge.upstream_node, edge.upstream_label] for edge in incoming_edges]
+    outputs = [stream_name_map[edge.upstream_node, edge.upstream_label] for edge in outgoing_edges]
+    filter_spec = '{}{}{}'.format(''.join(inputs), node._get_filter(), ''.join(outputs))
     return filter_spec
 
 
-def _get_filter_arg(filter_nodes, stream_name_map):
-    filter_specs = [_get_filter_spec(i, node, stream_name_map) for i, node in enumerate(filter_nodes)]
+def _allocate_filter_stream_names(filter_nodes, outgoing_edge_maps, stream_name_map):
+    stream_count = 0
+    for upstream_node in filter_nodes:
+        outgoing_edge_map = outgoing_edge_maps[upstream_node]
+        for upstream_label, downstreams in outgoing_edge_map.items():
+            if len(downstreams) > 1:
+                # TODO: automatically insert `splits` ahead of time via graph transformation.
+                raise ValueError('Encountered {} with multiple outgoing edges with same upstream label {!r}; a '
+                    '`split` filter is probably required'.format(upstream_node, upstream_label))
+            stream_name_map[upstream_node, upstream_label] = _get_stream_name('s{}'.format(stream_count))
+            stream_count += 1
+
+
+def _get_filter_arg(filter_nodes, outgoing_edge_maps, stream_name_map):
+    _allocate_filter_stream_names(filter_nodes, outgoing_edge_maps, stream_name_map)
+    filter_specs = [_get_filter_spec(node, outgoing_edge_maps[node], stream_name_map) for node in filter_nodes]
     return ';'.join(filter_specs)
 
 
@@ -78,7 +93,8 @@ def _get_output_args(node, stream_name_map):
         raise ValueError('Unsupported output node: {}'.format(node))
     args = []
     assert len(node.incoming_edges) == 1
-    stream_name = stream_name_map[node.incoming_edges[0].upstream_node]
+    edge = node.incoming_edges[0]
+    stream_name = stream_name_map[edge.upstream_node, edge.upstream_label]
     if stream_name != '[0]':
         args += ['-map', stream_name]
     kwargs = copy.copy(node.kwargs)
@@ -104,8 +120,8 @@ def get_args(stream):
         isinstance(node, GlobalNode)]
     global_nodes = [node for node in sorted_nodes if isinstance(node, GlobalNode)]
     filter_nodes = [node for node in sorted_nodes if node not in (input_nodes + output_nodes + global_nodes)]
-    stream_name_map = {node: _get_stream_name(i) for i, node in enumerate(input_nodes)}
-    filter_arg = _get_filter_arg(filter_nodes, stream_name_map)
+    stream_name_map = {(node, None): _get_stream_name(i) for i, node in enumerate(input_nodes)}
+    filter_arg = _get_filter_arg(filter_nodes, outgoing_edge_maps, stream_name_map)
     args += reduce(operator.add, [_get_input_args(node) for node in input_nodes])
     if filter_arg:
         args += ['-filter_complex', filter_arg]

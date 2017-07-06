@@ -1,4 +1,8 @@
-﻿import hashlib
+﻿from __future__ import unicode_literals
+
+from builtins import str
+from past.builtins import basestring
+import hashlib
 
 
 def _recursive_repr(item):
