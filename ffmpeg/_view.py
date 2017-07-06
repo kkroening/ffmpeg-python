@@ -2,8 +2,8 @@ from __future__ import unicode_literals
 
 from .dag import get_outgoing_edges
 from ._run import topo_sort
-import graphviz
 import os
+import tempfile
 
 from ffmpeg.nodes import (
     InputNode,
@@ -15,10 +15,20 @@ from ffmpeg.nodes import (
 
 @operator()
 def view(*downstream_nodes, **kwargs):
+    try:
+        import graphviz
+    except ImportError:
+        raise ImportError('failed to import graphviz; please make sure graphviz is installed (e.g. `pip install '
+            'graphviz`)')
+
+    filename = kwargs.pop('filename', None)
+    show_labels = kwargs.pop('show_labels', False)
+    if filename is None:
+        filename = tempfile.mktemp()
+
     sorted_nodes, outgoing_edge_maps = topo_sort(downstream_nodes)
     graph = graphviz.Digraph()
     graph.attr(rankdir='LR')
-    show_labels = kwargs.pop('show_labels', False)
     if len(kwargs.keys()) != 0:
         raise ValueError('Invalid kwargs key(s): {}'.format(', '.join(kwargs.keys())))
 
@@ -44,4 +54,10 @@ def view(*downstream_nodes, **kwargs):
             downstream_node_id = str(hash(edge.downstream_node))
             graph.edge(upstream_node_id, downstream_node_id, **kwargs)
 
-    graph.view('graph.png')
+    graph.view(filename)
+
+
+
+__all__ = [
+    'view',
+]
