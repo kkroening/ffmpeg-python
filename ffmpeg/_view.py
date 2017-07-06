@@ -58,12 +58,9 @@ def view(stream_spec, **kwargs):
         raise ValueError('Invalid kwargs key(s): {}'.format(', '.join(list(kwargs.keys()))))
 
     for node in sorted_nodes:
-        name = node.name
-        if '_kwargs' in dir(node) and 'filename' in node._kwargs:
-            name = os.path.basename(node._kwargs['filename'])
         color = _get_node_color(node)
 
-        graph.node(str(hash(node)), name, shape='box', style='filled', fillcolor=color)
+        graph.node(str(hash(node)), node.short_repr, shape='box', style='filled', fillcolor=color)
         outgoing_edge_map = outgoing_edge_maps.get(node, {})
 
         for edge in get_outgoing_edges(node, outgoing_edge_map):
