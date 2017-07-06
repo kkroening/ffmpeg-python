@@ -39,6 +39,18 @@ class Stream(object):
         return out
 
 
+def get_stream_map(stream_spec):
+    if stream_spec is None:
+        stream_map = {}
+    elif isinstance(stream_spec, Stream):
+        stream_map = {None: stream_spec}
+    elif isinstance(stream_spec, (list, tuple)):
+        stream_map = dict(enumerate(stream_spec))
+    elif isinstance(stream_spec, dict):
+        stream_map = stream_spec
+    return stream_map
+
+
 class Node(KwargReprNode):
     """Node base"""
     @classmethod
@@ -56,18 +68,6 @@ class Node(KwargReprNode):
                     .format(_get_types_str(incoming_stream_types), type(stream)))
 
     @classmethod
-    def __get_stream_map(cls, stream_spec):
-        if stream_spec is None:
-            stream_map = {}
-        elif isinstance(stream_spec, Stream):
-            stream_map = {None: stream_spec}
-        elif isinstance(stream_spec, (list, tuple)):
-            stream_map = dict(enumerate(stream_spec))
-        elif isinstance(stream_spec, dict):
-            stream_map = stream_spec
-        return stream_map
-
-    @classmethod
     def __get_incoming_edge_map(cls, stream_map):
         incoming_edge_map = {}
         for downstream_label, upstream in list(stream_map.items()):
@@ -76,7 +76,7 @@ class Node(KwargReprNode):
 
     def __init__(self, stream_spec, name, incoming_stream_types, outgoing_stream_type, min_inputs, max_inputs, args,
             kwargs):
-        stream_map = self.__get_stream_map(stream_spec)
+        stream_map = get_stream_map(stream_spec)
         self.__check_input_len(stream_map, min_inputs, max_inputs)
         self.__check_input_types(stream_map, incoming_stream_types)
         incoming_edge_map = self.__get_incoming_edge_map(stream_map)
