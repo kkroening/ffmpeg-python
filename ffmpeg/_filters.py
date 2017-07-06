@@ -49,6 +49,11 @@ def filter_(stream_spec, filter_name, *args, **kwargs):
 
 
 @filter_operator()
+def split(stream):
+    return FilterNode(stream, split.__name__)
+
+
+@filter_operator()
 def setpts(stream, expr):
     """Change the PTS (presentation timestamp) of the input frames.
 
