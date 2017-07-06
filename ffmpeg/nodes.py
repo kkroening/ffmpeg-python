@@ -1,8 +1,9 @@
 from __future__ import unicode_literals
 
-from builtins import object
 from .dag import KwargReprNode
 from ._utils import get_hash_int
+from builtins import object
+import os
 
 
 def _is_of_types(obj, types):
@@ -115,6 +116,10 @@ class InputNode(Node):
             kwargs=kwargs
         )
 
+    @property
+    def short_repr(self):
+        return os.path.basename(self.kwargs['filename'])
+
 
 class FilterNode(Node):
     def __init__(self, stream_spec, name, max_inputs=1, args=[], kwargs={}):
@@ -151,6 +156,10 @@ class OutputNode(Node):
             args=args,
             kwargs=kwargs
         )
+
+    @property
+    def short_repr(self):
+        return os.path.basename(self.kwargs['filename'])
 
 
 class OutputStream(Stream):
