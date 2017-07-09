@@ -52,6 +52,20 @@ def get_stream_map(stream_spec):
     return stream_map
 
 
+def get_stream_map_nodes(stream_map):
+    nodes = []
+    for stream in stream_map.values():
+        if not isinstance(stream, Stream):
+            raise TypeError('Expected Stream; got {}'.format(type(stream)))
+        nodes.append(stream.node)
+    return nodes
+
+
+def get_stream_spec_nodes(stream_spec):
+    stream_map = get_stream_map(stream_spec)
+    return get_stream_map_nodes(stream_map)
+
+
 class Node(KwargReprNode):
     """Node base"""
     @classmethod
@@ -75,8 +89,8 @@ class Node(KwargReprNode):
             incoming_edge_map[downstream_label] = (upstream.node, upstream.label)
         return incoming_edge_map
 
-    def __init__(self, stream_spec, name, incoming_stream_types, outgoing_stream_type, min_inputs, max_inputs, args,
-            kwargs):
+    def __init__(self, stream_spec, name, incoming_stream_types, outgoing_stream_type, min_inputs, max_inputs, args=[],
+            kwargs={}):
         stream_map = get_stream_map(stream_spec)
         self.__check_input_len(stream_map, min_inputs, max_inputs)
         self.__check_input_types(stream_map, incoming_stream_types)
@@ -164,13 +178,13 @@ class OutputNode(Node):
 
 class OutputStream(Stream):
     def __init__(self, upstream_node, upstream_label):
-        super(OutputStream, self).__init__(upstream_node, upstream_label, {OutputNode, GlobalNode})
+        super(OutputStream, self).__init__(upstream_node, upstream_label, {OutputNode, GlobalNode, MergeOutputsNode})
 
 
 class MergeOutputsNode(Node):
-    def __init__(self, stream, name):
+    def __init__(self, streams, name):
         super(MergeOutputsNode, self).__init__(
-            stream_spec=None,
+            stream_spec=streams,
             name=name,
             incoming_stream_types={OutputStream},
             outgoing_stream_type=OutputStream,
