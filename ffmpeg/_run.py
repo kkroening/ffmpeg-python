@@ -13,11 +13,12 @@ from ._ffmpeg import (
     overwrite_output,
 )
 from .nodes import (
+    get_stream_spec_nodes,
+    FilterNode,
     GlobalNode,
     InputNode,   
     OutputNode,
     output_operator,
-    Stream,
 )
 
 
@@ -108,18 +109,16 @@ def _get_output_args(node, stream_name_map):
 
 
 @output_operator()
-def get_args(stream):
+def get_args(stream_spec, overwrite_output=False):
     """Get command-line arguments for ffmpeg."""
-    if not isinstance(stream, Stream):
-        raise TypeError('Expected Stream; got {}'.format(type(stream)))
+    nodes = get_stream_spec_nodes(stream_spec)
     args = []
     # TODO: group nodes together, e.g. `-i somefile -r somerate`.
-    sorted_nodes, outgoing_edge_maps = topo_sort([stream.node])
+    sorted_nodes, outgoing_edge_maps = topo_sort(nodes)
     input_nodes = [node for node in sorted_nodes if isinstance(node, InputNode)]
-    output_nodes = [node for node in sorted_nodes if isinstance(node, OutputNode) and not
-        isinstance(node, GlobalNode)]
+    output_nodes = [node for node in sorted_nodes if isinstance(node, OutputNode)]
     global_nodes = [node for node in sorted_nodes if isinstance(node, GlobalNode)]
-    filter_nodes = [node for node in sorted_nodes if node not in (input_nodes + output_nodes + global_nodes)]
+    filter_nodes = [node for node in sorted_nodes if isinstance(node, FilterNode)]
     stream_name_map = {(node, None): _get_stream_name(i) for i, node in enumerate(input_nodes)}
     filter_arg = _get_filter_arg(filter_nodes, outgoing_edge_maps, stream_name_map)
     args += reduce(operator.add, [_get_input_args(node) for node in input_nodes])
@@ -127,17 +126,23 @@ def get_args(stream):
         args += ['-filter_complex', filter_arg]
     args += reduce(operator.add, [_get_output_args(node, stream_name_map) for node in output_nodes])
     args += reduce(operator.add, [_get_global_args(node) for node in global_nodes], [])
+    if overwrite_output:
+        args += ['-y']
     return args
 
 
 @output_operator()
-def run(node, cmd='ffmpeg'):
-    """Run ffmpeg on node graph."""
+def run(stream_spec, cmd='ffmpeg', **kwargs):
+    """Run ffmpeg on node graph.
+
+    Args:
+        **kwargs: keyword-arguments passed to ``get_args()`` (e.g. ``overwrite_output=True``).
+    """
     if isinstance(cmd, basestring):
         cmd = [cmd]
     elif type(cmd) != list:
         cmd = list(cmd)
-    args = cmd + node.get_args()
+    args = cmd + get_args(stream_spec, **kwargs)
     _subprocess.check_call(args)
 
 

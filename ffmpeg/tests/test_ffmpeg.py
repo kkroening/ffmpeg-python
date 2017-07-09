@@ -8,9 +8,10 @@ import random
 
 TEST_DIR = os.path.dirname(__file__)
 SAMPLE_DATA_DIR = os.path.join(TEST_DIR, 'sample_data')
-TEST_INPUT_FILE = os.path.join(SAMPLE_DATA_DIR, 'dummy.mp4')
+TEST_INPUT_FILE1 = os.path.join(SAMPLE_DATA_DIR, 'in1.mp4')
 TEST_OVERLAY_FILE = os.path.join(SAMPLE_DATA_DIR, 'overlay.png')
-TEST_OUTPUT_FILE = os.path.join(SAMPLE_DATA_DIR, 'dummy2.mp4')
+TEST_OUTPUT_FILE1 = os.path.join(SAMPLE_DATA_DIR, 'out1.mp4')
+TEST_OUTPUT_FILE2 = os.path.join(SAMPLE_DATA_DIR, 'out2.mp4')
 
 
 subprocess.check_call(['ffmpeg', '-version'])
@@ -94,7 +95,7 @@ def test_get_args_simple():
 
 def _get_complex_filter_example():
     split = (ffmpeg
-        .input(TEST_INPUT_FILE)
+        .input(TEST_INPUT_FILE1)
         .vflip()
         .split()
     )
@@ -109,7 +110,7 @@ def _get_complex_filter_example():
         )
         .overlay(overlay_file.hflip())
         .drawbox(50, 50, 120, 120, color='red', thickness=5)
-        .output(TEST_OUTPUT_FILE)
+        .output(TEST_OUTPUT_FILE1)
         .overwrite_output()
     )
 
@@ -117,7 +118,7 @@ def _get_complex_filter_example():
 def test_get_args_complex_filter():
     out = _get_complex_filter_example()
     args = ffmpeg.get_args(out)
-    assert args == ['-i', TEST_INPUT_FILE,
+    assert args == ['-i', TEST_INPUT_FILE1,
         '-i', TEST_OVERLAY_FILE,
         '-filter_complex',
             '[0]vflip[s0];' \
@@ -128,7 +129,7 @@ def test_get_args_complex_filter():
             '[1]hflip[s6];' \
             '[s5][s6]overlay=eof_action=repeat[s7];' \
             '[s7]drawbox=50:50:120:120:red:t=5[s8]',
-        '-map', '[s8]', os.path.join(SAMPLE_DATA_DIR, 'dummy2.mp4'),
+        '-map', '[s8]', TEST_OUTPUT_FILE1,
         '-y'
     ]
 
@@ -139,31 +140,38 @@ def test_get_args_complex_filter():
 
 
 def test_run():
-    node = _get_complex_filter_example()
-    ffmpeg.run(node)
+    stream = _get_complex_filter_example()
+    ffmpeg.run(stream)
+
+
+def test_run_multi_output():
+    in_ = ffmpeg.input(TEST_INPUT_FILE1)
+    out1 = in_.output(TEST_OUTPUT_FILE1)
+    out2 = in_.output(TEST_OUTPUT_FILE2)
+    ffmpeg.run([out1, out2], overwrite_output=True)
 
 
 def test_run_dummy_cmd():
-    node = _get_complex_filter_example()
-    ffmpeg.run(node, cmd='true')
+    stream = _get_complex_filter_example()
+    ffmpeg.run(stream, cmd='true')
 
 
 def test_run_dummy_cmd_list():
-    node = _get_complex_filter_example()
-    ffmpeg.run(node, cmd=['true', 'ignored'])
+    stream = _get_complex_filter_example()
+    ffmpeg.run(stream, cmd=['true', 'ignored'])
 
 
 def test_run_failing_cmd():
-    node = _get_complex_filter_example()
+    stream = _get_complex_filter_example()
     with pytest.raises(subprocess.CalledProcessError):
-        ffmpeg.run(node, cmd='false')
+        ffmpeg.run(stream, cmd='false')
 
 
 def test_custom_filter():
-    node = ffmpeg.input('dummy.mp4')
-    node = ffmpeg.filter_(node, 'custom_filter', 'a', 'b', kwarg1='c')
-    node = ffmpeg.output(node, 'dummy2.mp4')
-    assert node.get_args() == [
+    stream = ffmpeg.input('dummy.mp4')
+    stream = ffmpeg.filter_(stream, 'custom_filter', 'a', 'b', kwarg1='c')
+    stream = ffmpeg.output(stream, 'dummy2.mp4')
+    assert stream.get_args() == [
         '-i', 'dummy.mp4',
         '-filter_complex', '[0]custom_filter=a:b:kwarg1=c[s0]',
         '-map', '[s0]',
@@ -172,16 +180,48 @@ def test_custom_filter():
 
 
 def test_custom_filter_fluent():
-    node = (ffmpeg
+    stream = (ffmpeg
         .input('dummy.mp4')
         .filter_('custom_filter', 'a', 'b', kwarg1='c')
         .output('dummy2.mp4')
     )
-    assert node.get_args() == [
+    assert stream.get_args() == [
         '-i', 'dummy.mp4',
         '-filter_complex', '[0]custom_filter=a:b:kwarg1=c[s0]',
         '-map', '[s0]',
         'dummy2.mp4'
+    ]
+
+
+def test_merge_outputs():
+    in_ = ffmpeg.input('in.mp4')
+    out1 = in_.output('out1.mp4')
+    out2 = in_.output('out2.mp4')
+    assert ffmpeg.merge_outputs(out1, out2).get_args() == [
+        '-i', 'in.mp4', 'out1.mp4', 'out2.mp4'
+    ]
+    assert ffmpeg.get_args([out1, out2]) == [
+        '-i', 'in.mp4', 'out2.mp4', 'out1.mp4'
+    ]
+
+
+def test_multi_passthrough():
+    out1 = ffmpeg.input('in1.mp4').output('out1.mp4')
+    out2 = ffmpeg.input('in2.mp4').output('out2.mp4')
+    out = ffmpeg.merge_outputs(out1, out2)
+    assert ffmpeg.get_args(out) == [
+        '-i', 'in1.mp4',
+        '-i', 'in2.mp4',
+        'out1.mp4',
+        '-map', '[1]',  # FIXME: this should not be here (see #23)
+        'out2.mp4'
+    ]
+    assert ffmpeg.get_args([out1, out2]) == [
+        '-i', 'in2.mp4',
+        '-i', 'in1.mp4',
+        'out2.mp4',
+        '-map', '[1]',  # FIXME: this should not be here (see #23)
+        'out1.mp4'
     ]
 
 
