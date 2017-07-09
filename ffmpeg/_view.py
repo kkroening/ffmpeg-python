@@ -8,7 +8,7 @@ import tempfile
 
 from ffmpeg.nodes import (
     FilterNode,
-    get_stream_map,
+    get_stream_spec_nodes,
     InputNode,
     OutputNode,
     Stream,
@@ -44,12 +44,7 @@ def view(stream_spec, **kwargs):
     if filename is None:
         filename = tempfile.mktemp()
 
-    nodes = []
-    stream_map = get_stream_map(stream_spec)
-    for stream in stream_map.values():
-        if not isinstance(stream, Stream):
-            raise TypeError('Expected Stream; got {}'.format(type(stream)))
-        nodes.append(stream.node)
+    nodes = get_stream_spec_nodes(stream_spec)
 
     sorted_nodes, outgoing_edge_maps = topo_sort(nodes)
     graph = graphviz.Digraph()
