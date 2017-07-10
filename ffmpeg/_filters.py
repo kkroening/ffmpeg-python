@@ -50,8 +50,8 @@ def filter_(stream_spec, filter_name, *args, **kwargs):
 
 
 @filter_operator()
-def split(stream):
-    return FilterNode(stream, split.__name__)
+def split(stream, splits=None):
+    return FilterNode(stream, split.__name__, args=[splits] if splits else [],)
 
 
 @filter_operator()
