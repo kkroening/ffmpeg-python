@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+import warnings
+
 from .dag import get_outgoing_edges, topo_sort
 from functools import reduce
 from past.builtins import basestring
@@ -70,8 +72,8 @@ def _allocate_filter_stream_names(filter_nodes, outgoing_edge_maps, stream_name_
         for upstream_label, downstreams in outgoing_edge_map.items():
             if len(downstreams) > 1:
                 # TODO: automatically insert `splits` ahead of time via graph transformation.
-                raise ValueError('Encountered {} with multiple outgoing edges with same upstream label {!r}; a '
-                    '`split` filter is probably required'.format(upstream_node, upstream_label))
+                warnings.warn('Encountered {} with multiple outgoing edges with same upstream label {!r}; a '
+                    '`split` filter is probably required'.format(upstream_node, upstream_label), RuntimeWarning)
             stream_name_map[upstream_node, upstream_label] = _get_stream_name('s{}'.format(stream_count))
             stream_count += 1
 
