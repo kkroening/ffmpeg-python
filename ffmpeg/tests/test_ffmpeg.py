@@ -122,7 +122,7 @@ def test_get_args_complex_filter():
         '-i', TEST_OVERLAY_FILE,
         '-filter_complex',
             '[0]vflip[s0];' \
-            '[s0]split[s1][s2];' \
+            '[s0]split=2[s1][s2];' \
             '[s1]trim=end_frame=20:start_frame=10[s3];' \
             '[s2]trim=end_frame=40:start_frame=30[s4];' \
             '[s3][s4]concat=n=2[s5];' \

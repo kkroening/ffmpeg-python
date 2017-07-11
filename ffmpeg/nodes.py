@@ -148,11 +148,17 @@ class FilterNode(Node):
             kwargs=kwargs
         )
 
-    def _get_filter(self):
-        params_text = self.name
-        arg_params = ['{}'.format(arg) for arg in self.args]
-        kwarg_params = ['{}={}'.format(k, self.kwargs[k]) for k in sorted(self.kwargs)]
+    def _get_filter(self, outgoing_edges):
+        args = self.args
+        kwargs = self.kwargs
+        if self.name == 'split':
+            args = [len(outgoing_edges)]
+
+        arg_params = ['{}'.format(arg) for arg in args]
+        kwarg_params = ['{}={}'.format(k, kwargs[k]) for k in sorted(kwargs)]
         params = arg_params + kwarg_params
+
+        params_text = self.name
         if params:
             params_text += '={}'.format(':'.join(params))
         return params_text
