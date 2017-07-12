@@ -54,7 +54,7 @@ def get_stream_map(stream_spec):
 
 def get_stream_map_nodes(stream_map):
     nodes = []
-    for stream in stream_map.values():
+    for stream in list(stream_map.values()):
         if not isinstance(stream, Stream):
             raise TypeError('Expected Stream; got {}'.format(type(stream)))
         nodes.append(stream.node)
@@ -157,7 +157,7 @@ class FilterNode(Node):
 
         out_args = [escape_chars(x, '\\\'=:') for x in args]
         out_kwargs = {}
-        for k, v in kwargs.items():
+        for k, v in list(kwargs.items()):
             k = escape_chars(k, '\\\'=:')
             v = escape_chars(v, '\\\'=:')
             out_kwargs[k] = v
