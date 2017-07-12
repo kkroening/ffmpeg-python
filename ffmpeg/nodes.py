@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from ._utils import escape_chars
 from builtins import object
 import hashlib
 import json
@@ -50,13 +51,21 @@ class InputNode(Node):
 class FilterNode(Node):
     """FilterNode"""
     def _get_filter(self):
-        params_text = self._name
-        arg_params = ['{}'.format(arg) for arg in self._args]
-        kwarg_params = ['{}={}'.format(k, self._kwargs[k]) for k in sorted(self._kwargs)]
+        args = [escape_chars(x, '\\\'=:') for x in self._args]
+        kwargs = {}
+        for k, v in self._kwargs.items():
+            k = escape_chars(k, '\\\'=:')
+            v = escape_chars(v, '\\\'=:')
+            kwargs[k] = v
+
+        arg_params = [escape_chars(v, '\\\'=:') for v in args]
+        kwarg_params = ['{}={}'.format(k, kwargs[k]) for k in sorted(kwargs)]
         params = arg_params + kwarg_params
+
+        params_text = escape_chars(self._name, '\\\'=:')
         if params:
             params_text += '={}'.format(':'.join(params))
-        return params_text
+        return escape_chars(params_text, '\\\'[],;')
 
 
 class OutputNode(Node):

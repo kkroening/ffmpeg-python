@@ -1,9 +1,11 @@
 from __future__ import unicode_literals
+
 import ffmpeg
 import os
 import pytest
-import subprocess
 import random
+import re
+import subprocess
 
 
 TEST_DIR = os.path.dirname(__file__)
@@ -14,6 +16,13 @@ TEST_OUTPUT_FILE = os.path.join(SAMPLE_DATA_DIR, 'dummy2.mp4')
 
 
 subprocess.check_call(['ffmpeg', '-version'])
+
+
+def test_escape_chars():
+    assert ffmpeg._utils.escape_chars('a:b', ':') == 'a\:b'
+    assert ffmpeg._utils.escape_chars('a\\:b', ':\\') == 'a\\\\\\:b'
+    assert ffmpeg._utils.escape_chars('a:b,c[d]e%{}f\'g\'h\\i', '\\\':,[]%') == 'a\\:b\\,c\\[d\\]e\\%{}f\\\'g\\\'h\\\\i'
+    assert ffmpeg._utils.escape_chars(123, ':\\') == '123'
 
 
 def test_fluent_equality():
@@ -117,6 +126,74 @@ def test_get_args_complex_filter():
         '-map', '[v5]', os.path.join(SAMPLE_DATA_DIR, 'dummy2.mp4'),
         '-y'
     ]
+
+
+def test_filter_normal_arg_escape():
+    """Test string escaping of normal filter args (e.g. ``font`` param of ``drawtext`` filter)."""
+    def _get_drawtext_font_repr(font):
+        """Build a command-line arg using drawtext ``font`` param and extract the ``-filter_complex`` arg."""
+        args = (ffmpeg
+            .input('in')
+            .drawtext('test', font='a{}b'.format(font))
+            .output('out')
+            .get_args()
+        )
+        assert args[:3] == ['-i', 'in', '-filter_complex']
+        assert args[4:] == ['-map', '[v0]', 'out']
+        match = re.match(r'\[0\]drawtext=font=a((.|\n)*)b:text=test\[v0\]', args[3], re.MULTILINE)
+        assert match is not None, 'Invalid -filter_complex arg: {!r}'.format(args[3])
+        return match.group(1)
+
+    expected_backslash_counts = {
+        'x': 0,
+        '\'': 3,
+        '\\': 3,
+        '%': 0,
+        ':': 2,
+        ',': 1,
+        '[': 1,
+        ']': 1,
+        '=': 2,
+        '\n': 0,
+    }
+    for ch, expected_backslash_count in expected_backslash_counts.items():
+        expected = '{}{}'.format('\\' * expected_backslash_count, ch)
+        actual = _get_drawtext_font_repr(ch)
+        assert expected == actual
+
+
+def test_filter_text_arg_str_escape():
+    """Test string escaping of normal filter args (e.g. ``text`` param of ``drawtext`` filter)."""
+    def _get_drawtext_text_repr(text):
+        """Build a command-line arg using drawtext ``text`` param and extract the ``-filter_complex`` arg."""
+        args = (ffmpeg
+            .input('in')
+            .drawtext('a{}b'.format(text))
+            .output('out')
+            .get_args()
+        )
+        assert args[:3] == ['-i', 'in', '-filter_complex']
+        assert args[4:] == ['-map', '[v0]', 'out']
+        match = re.match(r'\[0\]drawtext=text=a((.|\n)*)b\[v0\]', args[3], re.MULTILINE)
+        assert match is not None, 'Invalid -filter_complex arg: {!r}'.format(args[3])
+        return match.group(1)
+
+    expected_backslash_counts = {
+        'x': 0,
+        '\'': 7,
+        '\\': 7,
+        '%': 4,
+        ':': 2,
+        ',': 1,
+        '[': 1,
+        ']': 1,
+        '=': 2,
+        '\n': 0,
+    }
+    for ch, expected_backslash_count in expected_backslash_counts.items():
+        expected = '{}{}'.format('\\' * expected_backslash_count, ch)
+        actual = _get_drawtext_text_repr(ch)
+        assert expected == actual
 
 
 #def test_version():
