@@ -59,7 +59,7 @@ def _get_filter_spec(node, outgoing_edge_map, stream_name_map):
     outgoing_edges = get_outgoing_edges(node, outgoing_edge_map)
     inputs = [stream_name_map[edge.upstream_node, edge.upstream_label] for edge in incoming_edges]
     outputs = [stream_name_map[edge.upstream_node, edge.upstream_label] for edge in outgoing_edges]
-    filter_spec = '{}{}{}'.format(''.join(inputs), node._get_filter(), ''.join(outputs))
+    filter_spec = '{}{}{}'.format(''.join(inputs), node._get_filter(outgoing_edges), ''.join(outputs))
     return filter_spec
 
 
