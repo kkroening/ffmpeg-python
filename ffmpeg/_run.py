@@ -1,23 +1,26 @@
 from __future__ import unicode_literals
 
+from .dag import get_outgoing_edges, topo_sort
 from functools import reduce
 from past.builtins import basestring
 import copy
-import operator as _operator
+import operator
 import subprocess as _subprocess
 
 from ._ffmpeg import (
     input,
-    merge_outputs,
     output,
     overwrite_output,
 )
 from .nodes import (
+    get_stream_spec_nodes,
+    FilterNode,
     GlobalNode,
     InputNode,   
-    operator,
     OutputNode,
+    output_operator,
 )
+
 
 def _get_stream_name(name):
     return '[{}]'.format(name)
@@ -34,8 +37,8 @@ def _convert_kwargs_to_cmd_line_args(kwargs):
 
 
 def _get_input_args(input_node):
-    if input_node._name == input.__name__:
-        kwargs = copy.copy(input_node._kwargs)
+    if input_node.name == input.__name__:
+        kwargs = copy.copy(input_node.kwargs)
         filename = kwargs.pop('filename')
         fmt = kwargs.pop('format', None)
         video_size = kwargs.pop('video_size', None)
@@ -51,97 +54,95 @@ def _get_input_args(input_node):
     return args
 
 
-def _topo_sort(start_node):
-    marked_nodes = []
-    sorted_nodes = []
-    child_map = {}
-    def visit(node, child):
-        if node in marked_nodes:
-            raise RuntimeError('Graph is not a DAG')
-        if child is not None:
-            if node not in child_map:
-                child_map[node] = []
-            child_map[node].append(child)
-        if node not in sorted_nodes:
-            marked_nodes.append(node)
-            [visit(parent, node) for parent in node._parents]
-            marked_nodes.remove(node)
-            sorted_nodes.append(node)
-    unmarked_nodes = [start_node]
-    while unmarked_nodes:
-        visit(unmarked_nodes.pop(), None)
-    return sorted_nodes, child_map
-
-
-def _get_filter_spec(i, node, stream_name_map):
-    stream_name = _get_stream_name('v{}'.format(i))
-    stream_name_map[node] = stream_name
-    inputs = [stream_name_map[parent] for parent in node._parents]
-    filter_spec = '{}{}{}'.format(''.join(inputs), node._get_filter(), stream_name)
+def _get_filter_spec(node, outgoing_edge_map, stream_name_map):
+    incoming_edges = node.incoming_edges
+    outgoing_edges = get_outgoing_edges(node, outgoing_edge_map)
+    inputs = [stream_name_map[edge.upstream_node, edge.upstream_label] for edge in incoming_edges]
+    outputs = [stream_name_map[edge.upstream_node, edge.upstream_label] for edge in outgoing_edges]
+    filter_spec = '{}{}{}'.format(''.join(inputs), node._get_filter(outgoing_edges), ''.join(outputs))
     return filter_spec
 
 
-def _get_filter_arg(filter_nodes, stream_name_map):
-    filter_specs = [_get_filter_spec(i, node, stream_name_map) for i, node in enumerate(filter_nodes)]
+def _allocate_filter_stream_names(filter_nodes, outgoing_edge_maps, stream_name_map):
+    stream_count = 0
+    for upstream_node in filter_nodes:
+        outgoing_edge_map = outgoing_edge_maps[upstream_node]
+        for upstream_label, downstreams in list(outgoing_edge_map.items()):
+            if len(downstreams) > 1:
+                # TODO: automatically insert `splits` ahead of time via graph transformation.
+                raise ValueError('Encountered {} with multiple outgoing edges with same upstream label {!r}; a '
+                    '`split` filter is probably required'.format(upstream_node, upstream_label))
+            stream_name_map[upstream_node, upstream_label] = _get_stream_name('s{}'.format(stream_count))
+            stream_count += 1
+
+
+def _get_filter_arg(filter_nodes, outgoing_edge_maps, stream_name_map):
+    _allocate_filter_stream_names(filter_nodes, outgoing_edge_maps, stream_name_map)
+    filter_specs = [_get_filter_spec(node, outgoing_edge_maps[node], stream_name_map) for node in filter_nodes]
     return ';'.join(filter_specs)
 
 
 def _get_global_args(node):
-    if node._name == overwrite_output.__name__:
+    if node.name == overwrite_output.__name__:
         return ['-y']
     else:
         raise ValueError('Unsupported global node: {}'.format(node))
 
 
 def _get_output_args(node, stream_name_map):
+    if node.name != output.__name__:
+        raise ValueError('Unsupported output node: {}'.format(node))
     args = []
-    if node._name != merge_outputs.__name__:
-        stream_name = stream_name_map[node._parents[0]]
-        if stream_name != '[0]':
-            args += ['-map', stream_name]
-        if node._name == output.__name__:
-            kwargs = copy.copy(node._kwargs)
-            filename = kwargs.pop('filename')
-            fmt = kwargs.pop('format', None)
-            if fmt:
-                args += ['-f', fmt]
-            args += _convert_kwargs_to_cmd_line_args(kwargs)
-            args += [filename]
-        else:
-            raise ValueError('Unsupported output node: {}'.format(node))
+    assert len(node.incoming_edges) == 1
+    edge = node.incoming_edges[0]
+    stream_name = stream_name_map[edge.upstream_node, edge.upstream_label]
+    if stream_name != '[0]':
+        args += ['-map', stream_name]
+    kwargs = copy.copy(node.kwargs)
+    filename = kwargs.pop('filename')
+    fmt = kwargs.pop('format', None)
+    if fmt:
+        args += ['-f', fmt]
+    args += _convert_kwargs_to_cmd_line_args(kwargs)
+    args += [filename]
     return args
 
 
-@operator(node_classes={OutputNode, GlobalNode})
-def get_args(node):
+@output_operator()
+def get_args(stream_spec, overwrite_output=False):
     """Get command-line arguments for ffmpeg."""
+    nodes = get_stream_spec_nodes(stream_spec)
     args = []
     # TODO: group nodes together, e.g. `-i somefile -r somerate`.
-    sorted_nodes, child_map = _topo_sort(node)
-    del(node)
+    sorted_nodes, outgoing_edge_maps = topo_sort(nodes)
     input_nodes = [node for node in sorted_nodes if isinstance(node, InputNode)]
-    output_nodes = [node for node in sorted_nodes if isinstance(node, OutputNode) and not
-        isinstance(node, GlobalNode)]
+    output_nodes = [node for node in sorted_nodes if isinstance(node, OutputNode)]
     global_nodes = [node for node in sorted_nodes if isinstance(node, GlobalNode)]
-    filter_nodes = [node for node in sorted_nodes if node not in (input_nodes + output_nodes + global_nodes)]
-    stream_name_map = {node: _get_stream_name(i) for i, node in enumerate(input_nodes)}
-    filter_arg = _get_filter_arg(filter_nodes, stream_name_map)
-    args += reduce(_operator.add, [_get_input_args(node) for node in input_nodes])
+    filter_nodes = [node for node in sorted_nodes if isinstance(node, FilterNode)]
+    stream_name_map = {(node, None): _get_stream_name(i) for i, node in enumerate(input_nodes)}
+    filter_arg = _get_filter_arg(filter_nodes, outgoing_edge_maps, stream_name_map)
+    args += reduce(operator.add, [_get_input_args(node) for node in input_nodes])
     if filter_arg:
         args += ['-filter_complex', filter_arg]
-    args += reduce(_operator.add, [_get_output_args(node, stream_name_map) for node in output_nodes])
-    args += reduce(_operator.add, [_get_global_args(node) for node in global_nodes], [])
+    args += reduce(operator.add, [_get_output_args(node, stream_name_map) for node in output_nodes])
+    args += reduce(operator.add, [_get_global_args(node) for node in global_nodes], [])
+    if overwrite_output:
+        args += ['-y']
     return args
 
 
-@operator(node_classes={OutputNode, GlobalNode})
-def run(node, cmd='ffmpeg'):
-    """Run ffmpeg on node graph."""
+@output_operator()
+def run(stream_spec, cmd='ffmpeg', **kwargs):
+    """Run ffmpeg on node graph.
+
+    Args:
+        **kwargs: keyword-arguments passed to ``get_args()`` (e.g. ``overwrite_output=True``).
+    """
     if isinstance(cmd, basestring):
         cmd = [cmd]
     elif type(cmd) != list:
         cmd = list(cmd)
-    args = cmd + node.get_args()
+    args = cmd + get_args(stream_spec, **kwargs)
     _subprocess.check_call(args)
 
 

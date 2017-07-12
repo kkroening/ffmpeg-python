@@ -1,10 +1,12 @@
 from __future__ import unicode_literals
+
 from .nodes import (
-    FilterNode,
+    filter_operator,
     GlobalNode,
     InputNode,
-    operator,
+    MergeOutputsNode,
     OutputNode,
+    output_operator,
 )
 
 
@@ -19,27 +21,27 @@ def input(filename, **kwargs):
         if 'format' in kwargs:
             raise ValueError("Can't specify both `format` and `f` kwargs")
         kwargs['format'] = fmt
-    return InputNode(input.__name__, **kwargs)
+    return InputNode(input.__name__, kwargs=kwargs).stream()
 
 
-@operator(node_classes={OutputNode, GlobalNode})
-def overwrite_output(parent_node):
+@output_operator()
+def overwrite_output(stream):
     """Overwrite output files without asking (ffmpeg ``-y`` option)
 
     Official documentation: `Main options <https://ffmpeg.org/ffmpeg.html#Main-options>`__
     """
-    return GlobalNode(parent_node, overwrite_output.__name__)
+    return GlobalNode(stream, overwrite_output.__name__).stream()
 
 
-@operator(node_classes={OutputNode})
-def merge_outputs(*parent_nodes):
+@output_operator()
+def merge_outputs(*streams):
     """Include all given outputs in one ffmpeg command line
     """
-    return OutputNode(parent_nodes, merge_outputs.__name__)
+    return MergeOutputsNode(streams, merge_outputs.__name__).stream()
 
 
-@operator(node_classes={InputNode, FilterNode})
-def output(parent_node, filename, **kwargs):
+@filter_operator()
+def output(stream, filename, **kwargs):
     """Output file URL
 
     Official documentation: `Synopsis <https://ffmpeg.org/ffmpeg.html#Synopsis>`__
@@ -50,7 +52,7 @@ def output(parent_node, filename, **kwargs):
         if 'format' in kwargs:
             raise ValueError("Can't specify both `format` and `f` kwargs")
         kwargs['format'] = fmt
-    return OutputNode([parent_node], output.__name__, **kwargs)
+    return OutputNode(stream, output.__name__, kwargs=kwargs).stream()
 
 
 

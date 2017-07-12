@@ -1,25 +1,42 @@
 from __future__ import unicode_literals
 
-from .nodes import FilterNode, operator
+from .nodes import FilterNode, filter_operator
 from ._utils import escape_chars
 
 
-@operator()
-def filter_(parent_node, filter_name, *args, **kwargs):
-    """Apply custom single-source filter.
+@filter_operator()
+def filter_multi_output(stream_spec, filter_name, *args, **kwargs):
+    """Apply custom filter with one or more outputs.
+
+    This is the same as ``filter_`` except that the filter can produce more than one output.
+
+    To reference an output stream, use either the ``.stream`` operator or bracket shorthand:
+
+    Example:
+
+        ```
+        split = ffmpeg.input('in.mp4').filter_multi_output('split')
+        split0 = split.stream(0)
+        split1 = split[1]
+        ffmpeg.concat(split0, split1).output('out.mp4').run()
+        ```
+    """
+    return FilterNode(stream_spec, filter_name, args=args, kwargs=kwargs, max_inputs=None)
+
+
+@filter_operator()
+def filter_(stream_spec, filter_name, *args, **kwargs):
+    """Apply custom filter.
 
     ``filter_`` is normally used by higher-level filter functions such as ``hflip``, but if a filter implementation
     is missing from ``fmpeg-python``, you can call ``filter_`` directly to have ``fmpeg-python`` pass the filter name
     and arguments to ffmpeg verbatim.
 
     Args:
-        parent_node: Source stream to apply filter to.
+        stream_spec: a Stream, list of Streams, or label-to-Stream dictionary mapping
         filter_name: ffmpeg filter name, e.g. `colorchannelmixer`
         *args: list of args to pass to ffmpeg verbatim
         **kwargs: list of keyword-args to pass to ffmpeg verbatim
-
-    This function is used internally by all of the other single-source filters (e.g. ``hflip``, ``crop``, etc.).
-    For custom multi-source filters, see ``filter_multi`` instead.
 
     The function name is suffixed with ``_`` in order avoid confusion with the standard python ``filter`` function.
 
@@ -27,37 +44,16 @@ def filter_(parent_node, filter_name, *args, **kwargs):
 
         ``ffmpeg.input('in.mp4').filter_('hflip').output('out.mp4').run()``
     """
-    return FilterNode([parent_node], filter_name, *args, **kwargs)
+    return filter_multi_output(stream_spec, filter_name, *args, **kwargs).stream()
 
 
-def filter_multi(parent_nodes, filter_name, *args, **kwargs):
-    """Apply custom multi-source filter.
-
-    This is nearly identical to the ``filter`` function except that it allows filters to be applied to multiple
-    streams.  It's normally used by higher-level filter functions such as ``concat``, but if a filter implementation
-    is missing from ``fmpeg-python``, you can call ``filter_multi`` directly.
-
-    Note that because it applies to multiple streams, it can't be used as an operator, unlike the ``filter`` function
-    (e.g. ``ffmpeg.input('in.mp4').filter_('hflip')``)
-
-    Args:
-        parent_nodes: List of source streams to apply filter to.
-        filter_name: ffmpeg filter name, e.g. `concat`
-        *args: list of args to pass to ffmpeg verbatim
-        **kwargs: list of keyword-args to pass to ffmpeg verbatim
-
-    For custom single-source filters, see ``filter_multi`` instead.
-
-    Example:
-
-        ``ffmpeg.filter_multi(ffmpeg.input('in1.mp4'), ffmpeg.input('in2.mp4'), 'concat', n=2).output('out.mp4').run()``
-    """
-    return FilterNode(parent_nodes, filter_name, *args, **kwargs)
+@filter_operator()
+def split(stream):
+    return FilterNode(stream, split.__name__)
 
 
-
-@operator()
-def setpts(parent_node, expr):
+@filter_operator()
+def setpts(stream, expr):
     """Change the PTS (presentation timestamp) of the input frames.
 
     Args:
@@ -65,11 +61,11 @@ def setpts(parent_node, expr):
 
     Official documentation: `setpts, asetpts <https://ffmpeg.org/ffmpeg-filters.html#setpts_002c-asetpts>`__
     """
-    return filter_(parent_node, setpts.__name__, expr)
+    return FilterNode(stream, setpts.__name__, args=[expr]).stream()
 
 
-@operator()
-def trim(parent_node, **kwargs):
+@filter_operator()
+def trim(stream, **kwargs):
     """Trim the input so that the output contains one continuous subpart of the input.
 
     Args:
@@ -87,10 +83,10 @@ def trim(parent_node, **kwargs):
 
     Official documentation: `trim <https://ffmpeg.org/ffmpeg-filters.html#trim>`__
     """
-    return filter_(parent_node, trim.__name__, **kwargs)
+    return FilterNode(stream, trim.__name__, kwargs=kwargs).stream()
 
 
-@operator()
+@filter_operator()
 def overlay(main_parent_node, overlay_parent_node, eof_action='repeat', **kwargs):
     """Overlay one video on top of another.
 
@@ -135,29 +131,29 @@ def overlay(main_parent_node, overlay_parent_node, eof_action='repeat', **kwargs
     Official documentation: `overlay <https://ffmpeg.org/ffmpeg-filters.html#overlay-1>`__
     """
     kwargs['eof_action'] = eof_action
-    return filter_multi([main_parent_node, overlay_parent_node], overlay.__name__, **kwargs)
+    return FilterNode([main_parent_node, overlay_parent_node], overlay.__name__, kwargs=kwargs, max_inputs=2).stream()
 
 
-@operator()
-def hflip(parent_node):
+@filter_operator()
+def hflip(stream):
     """Flip the input video horizontally.
 
     Official documentation: `hflip <https://ffmpeg.org/ffmpeg-filters.html#hflip>`__
     """
-    return filter_(parent_node, hflip.__name__)
+    return FilterNode(stream, hflip.__name__).stream()
 
 
-@operator()
-def vflip(parent_node):
+@filter_operator()
+def vflip(stream):
     """Flip the input video vertically.
 
     Official documentation: `vflip <https://ffmpeg.org/ffmpeg-filters.html#vflip>`__
     """
-    return filter_(parent_node, vflip.__name__)
+    return FilterNode(stream, vflip.__name__).stream()
 
 
-@operator()
-def drawbox(parent_node, x, y, width, height, color, thickness=None, **kwargs):
+@filter_operator()
+def drawbox(stream, x, y, width, height, color, thickness=None, **kwargs):
     """Draw a colored box on the input image.
 
     Args:
@@ -178,11 +174,11 @@ def drawbox(parent_node, x, y, width, height, color, thickness=None, **kwargs):
     """
     if thickness:
         kwargs['t'] = thickness
-    return filter_(parent_node, drawbox.__name__, x, y, width, height, color, **kwargs)
+    return FilterNode(stream, drawbox.__name__, args=[x, y, width, height, color], kwargs=kwargs).stream()
 
 
-@operator()
-def drawtext(parent_node, text=None, x=0, y=0, escape_text=True, **kwargs):
+@filter_operator()
+def drawtext(stream, text=None, x=0, y=0, escape_text=True, **kwargs):
     """Draw a text string or text from a specified file on top of a video, using the libfreetype library.
 
     To enable compilation of this filter, you need to configure FFmpeg with ``--enable-libfreetype``. To enable default
@@ -320,11 +316,11 @@ def drawtext(parent_node, text=None, x=0, y=0, escape_text=True, **kwargs):
         kwargs['x'] = x
     if y != 0:
         kwargs['y'] = y
-    return filter_(parent_node, drawtext.__name__, **kwargs)
+    return filter_(stream, drawtext.__name__, **kwargs)
 
 
-@operator()
-def concat(*parent_nodes, **kwargs):
+@filter_operator()
+def concat(*streams, **kwargs):
     """Concatenate audio and video streams, joining them together one after the other.
 
     The filter works on segments of synchronized video and audio streams. All segments must have the same number of
@@ -349,12 +345,12 @@ def concat(*parent_nodes, **kwargs):
 
     Official documentation: `concat <https://ffmpeg.org/ffmpeg-filters.html#concat>`__
     """
-    kwargs['n'] = len(parent_nodes)
-    return filter_multi(parent_nodes, concat.__name__, **kwargs)
+    kwargs['n'] = len(streams)
+    return FilterNode(streams, concat.__name__, kwargs=kwargs, max_inputs=None).stream()
 
 
-@operator()
-def zoompan(parent_node, **kwargs):
+@filter_operator()
+def zoompan(stream, **kwargs):
     """Apply Zoom & Pan effect.
 
     Args:
@@ -369,11 +365,11 @@ def zoompan(parent_node, **kwargs):
 
     Official documentation: `zoompan <https://ffmpeg.org/ffmpeg-filters.html#zoompan>`__
     """
-    return filter_(parent_node, zoompan.__name__, **kwargs)
+    return FilterNode(stream, zoompan.__name__, kwargs=kwargs).stream()
 
 
-@operator()
-def hue(parent_node, **kwargs):
+@filter_operator()
+def hue(stream, **kwargs):
     """Modify the hue and/or the saturation of the input.
 
     Args:
@@ -384,16 +380,16 @@ def hue(parent_node, **kwargs):
 
     Official documentation: `hue <https://ffmpeg.org/ffmpeg-filters.html#hue>`__
     """
-    return filter_(parent_node, hue.__name__, **kwargs)
+    return FilterNode(stream, hue.__name__, kwargs=kwargs).stream()
 
 
-@operator()
-def colorchannelmixer(parent_node, *args, **kwargs):
+@filter_operator()
+def colorchannelmixer(stream, *args, **kwargs):
     """Adjust video input frames by re-mixing color channels.
 
     Official documentation: `colorchannelmixer <https://ffmpeg.org/ffmpeg-filters.html#colorchannelmixer>`__
     """
-    return filter_(parent_node, colorchannelmixer.__name__, **kwargs)
+    return FilterNode(stream, colorchannelmixer.__name__, kwargs=kwargs).stream()
 
 
 __all__ = [
@@ -401,7 +397,6 @@ __all__ = [
     'concat',
     'drawbox',
     'filter_',
-    'filter_multi',
     'hflip',
     'hue',
     'overlay',
