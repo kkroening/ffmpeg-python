@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from .dag import KwargReprNode
-from ._utils import get_hash_int
+from ._utils import escape_chars, get_hash_int
 from builtins import object
 import os
 
@@ -148,20 +148,29 @@ class FilterNode(Node):
             kwargs=kwargs
         )
 
+    """FilterNode"""
     def _get_filter(self, outgoing_edges):
         args = self.args
         kwargs = self.kwargs
         if self.name == 'split':
             args = [len(outgoing_edges)]
 
-        arg_params = ['{}'.format(arg) for arg in args]
-        kwarg_params = ['{}={}'.format(k, kwargs[k]) for k in sorted(kwargs)]
+        out_args = [escape_chars(x, '\\\'=:') for x in args]
+        out_kwargs = {}
+        for k, v in kwargs.items():
+            k = escape_chars(k, '\\\'=:')
+            v = escape_chars(v, '\\\'=:')
+            out_kwargs[k] = v
+
+        arg_params = [escape_chars(v, '\\\'=:') for v in out_args]
+        kwarg_params = ['{}={}'.format(k, out_kwargs[k]) for k in sorted(out_kwargs)]
         params = arg_params + kwarg_params
 
-        params_text = self.name
+        params_text = escape_chars(self.name, '\\\'=:')
+
         if params:
             params_text += '={}'.format(':'.join(params))
-        return params_text
+        return escape_chars(params_text, '\\\'[],;')
 
 
 class OutputNode(Node):
