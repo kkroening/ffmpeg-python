@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
+from ._utils import escape_chars
 from builtins import object
-from past.builtins import basestring
 import hashlib
 import json
 
@@ -51,26 +51,21 @@ class InputNode(Node):
 class FilterNode(Node):
     """FilterNode"""
     def _get_filter(self):
-        params_text = self._name
+        args = [escape_chars(x, '\\\'=:') for x in self._args]
+        kwargs = {}
+        for k, v in self._kwargs.items():
+            k = escape_chars(k, '\\\'=:')
+            v = escape_chars(v, '\\\'=:')
+            kwargs[k] = v
 
-        # Helper function to escape uncomfortable characters
-        def escape_chars(seq, keys):
-            for k in keys:
-                if not isinstance(seq[k], basestring):
-                    continue
-                for ch in "[]=;:,":
-                    seq[k] = seq[k].replace(ch, "\\\\"+ch)
-            return seq
-
-        _args = escape_chars(self._args[:], range(len(self._args)))
-        _kwargs = escape_chars(self._kwargs.copy(), self._kwargs.keys())
-
-        arg_params = ['{}'.format(arg) for arg in _args]
-        kwarg_params = ['{}={}'.format(k, _kwargs[k]) for k in sorted(_kwargs)]
+        arg_params = [escape_chars(v, '\\\'=:') for v in args]
+        kwarg_params = ['{}={}'.format(k, kwargs[k]) for k in sorted(kwargs)]
         params = arg_params + kwarg_params
+
+        params_text = escape_chars(self._name, '\\\'=:')
         if params:
             params_text += '={}'.format(':'.join(params))
-        return params_text
+        return escape_chars(params_text, '\\\'[],;')
 
 
 class OutputNode(Node):
