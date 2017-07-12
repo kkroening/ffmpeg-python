@@ -140,7 +140,7 @@ def test_filter_normal_arg_escape():
         )
         assert args[:3] == ['-i', 'in', '-filter_complex']
         assert args[4:] == ['-map', '[v0]', 'out']
-        match = re.match(r'\[0\]drawbox=font=a((.|\n)*)b:text=test\[v0\]', args[3], re.MULTILINE)
+        match = re.match(r'\[0\]drawtext=font=a((.|\n)*)b:text=test\[v0\]', args[3], re.MULTILINE)
         assert match is not None, 'Invalid -filter_complex arg: {!r}'.format(args[3])
         return match.group(1)
 
@@ -174,7 +174,7 @@ def test_filter_text_arg_str_escape():
         )
         assert args[:3] == ['-i', 'in', '-filter_complex']
         assert args[4:] == ['-map', '[v0]', 'out']
-        match = re.match(r'\[0\]drawbox=text=a((.|\n)*)b\[v0\]', args[3], re.MULTILINE)
+        match = re.match(r'\[0\]drawtext=text=a((.|\n)*)b\[v0\]', args[3], re.MULTILINE)
         assert match is not None, 'Invalid -filter_complex arg: {!r}'.format(args[3])
         return match.group(1)
 

@@ -1,3 +1,6 @@
+from builtins import str
+
+
 def escape_chars(text, chars):
     """Helper function to escape uncomfortable characters."""
     text = str(text)

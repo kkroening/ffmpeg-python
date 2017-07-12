@@ -320,7 +320,7 @@ def drawtext(parent_node, text=None, x=0, y=0, escape_text=True, **kwargs):
         kwargs['x'] = x
     if y != 0:
         kwargs['y'] = y
-    return filter_(parent_node, drawbox.__name__, **kwargs)
+    return filter_(parent_node, drawtext.__name__, **kwargs)
 
 
 @operator()
