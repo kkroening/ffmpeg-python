@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+from builtins import bytes
+from builtins import range
 import ffmpeg
 import os
 import pytest
@@ -171,7 +173,7 @@ def test_filter_normal_arg_escape():
         '=': 2,
         '\n': 0,
     }
-    for ch, expected_backslash_count in expected_backslash_counts.items():
+    for ch, expected_backslash_count in list(expected_backslash_counts.items()):
         expected = '{}{}'.format('\\' * expected_backslash_count, ch)
         actual = _get_drawtext_font_repr(ch)
         assert expected == actual
@@ -205,7 +207,7 @@ def test_filter_text_arg_str_escape():
         '=': 2,
         '\n': 0,
     }
-    for ch, expected_backslash_count in expected_backslash_counts.items():
+    for ch, expected_backslash_count in list(expected_backslash_counts.items()):
         expected = '{}{}'.format('\\' * expected_backslash_count, ch)
         actual = _get_drawtext_text_repr(ch)
         assert expected == actual
