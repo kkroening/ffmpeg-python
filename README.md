@@ -64,7 +64,7 @@ overlay_file = ffmpeg.input('overlay.png')
     )
     .overlay(overlay_file.hflip())
     .drawbox(50, 50, 120, 120, color='red', thickness=5)
-    .output(TEST_OUTPUT_FILE)
+    .output('out.mp4')
     .run()
 )
 ```
