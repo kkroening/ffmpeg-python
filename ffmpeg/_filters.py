@@ -153,6 +153,28 @@ def vflip(stream):
 
 
 @filter_operator()
+def crop(stream, x, y, width, height, **kwargs):
+    """Crop the input video.
+
+    Args:
+        x: The horizontal position, in the input video, of the left edge of
+           the output video.
+        y: The vertical position, in the input video, of the top edge of the
+           output video.
+        width: The width of the output video. Must be greater than 0.
+        heigth: The height of the output video. Must be greater than 0.
+
+    Official documentation: `crop <https://ffmpeg.org/ffmpeg-filters.html#crop>`__
+    """
+    return FilterNode(
+        stream,
+        crop.__name__,
+        args=[width, height, x, y],
+        kwargs=kwargs
+    ).stream()
+
+
+@filter_operator()
 def drawbox(stream, x, y, width, height, color, thickness=None, **kwargs):
     """Draw a colored box on the input image.
 
@@ -395,6 +417,7 @@ def colorchannelmixer(stream, *args, **kwargs):
 __all__ = [
     'colorchannelmixer',
     'concat',
+    'crop',
     'drawbox',
     'filter_',
     'hflip',
