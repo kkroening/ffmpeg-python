@@ -1,7 +1,7 @@
 language: python
 before_install:
   - >
-    [ -f ffmpeg-release-64bit-static/ffmpeg ] || (
+    [ -f ffmpeg-3.3.4-64bit-static/ffmpeg ] || (
         curl -O https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-64bit-static.tar.xz &&
         tar Jxf ffmpeg-release-64bit-static.tar.xz
     )
@@ -28,9 +28,9 @@ matrix:
 install:
   - pip install tox
 script:
-  - export PATH=$(readlink -f ffmpeg-release-64bit-static):$PATH
+  - export PATH=$(readlink -f ffmpeg-3.3.4-64bit-static):$PATH
   - tox -e $TOX_ENV
 cache:
   directories:
     - .tox
-    - ffmpeg-release-64bit-static
+    - ffmpeg-3.3.4-64bit-static
