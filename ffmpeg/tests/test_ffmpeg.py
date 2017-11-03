@@ -99,6 +99,11 @@ def test_stream_repr():
     assert repr(dummy_out) == "dummy()[{!r}] <{}>".format(dummy_out.label, dummy_out.node.short_hash)
 
 
+def test_overwrite_output():
+    with pytest.raises(NameError):
+        ffmpeg.input('dummy.mp4').output('dummy2.mp4').overwrite_output()
+
+
 def test_get_args_simple():
     out_file = ffmpeg.input('dummy.mp4').output('dummy2.mp4')
     assert out_file.get_args() == ['-i', 'dummy.mp4', 'dummy2.mp4', '-y']

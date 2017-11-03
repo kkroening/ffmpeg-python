@@ -24,6 +24,14 @@ def input(filename, **kwargs):
 
 
 @output_operator()
+def overwrite_output(stream):
+    """No longer supported; see ``overwrite_output`` parameter of ``get_args`` function instead.
+    """
+    raise NameError('`overwrite_output` operator is no longer supported; see `overwrite_output` parameter of '
+        '`get_args` function instead')
+
+
+@output_operator()
 def merge_outputs(*streams):
     """Include all given outputs in one ffmpeg command line
     """
@@ -50,4 +58,5 @@ __all__ = [
     'input',
     'merge_outputs',
     'output',
+    'overwrite_output',
 ]
