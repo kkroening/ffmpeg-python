@@ -10,7 +10,6 @@ import subprocess as _subprocess
 from ._ffmpeg import (
     input,
     output,
-    overwrite_output,
 )
 from .nodes import (
     get_stream_spec_nodes,
@@ -83,10 +82,7 @@ def _get_filter_arg(filter_nodes, outgoing_edge_maps, stream_name_map):
 
 
 def _get_global_args(node):
-    if node.name == overwrite_output.__name__:
-        return ['-y']
-    else:
-        raise ValueError('Unsupported global node: {}'.format(node))
+    raise ValueError('Unsupported global node: {}'.format(node))
 
 
 def _get_output_args(node, stream_name_map):
@@ -109,7 +105,7 @@ def _get_output_args(node, stream_name_map):
 
 
 @output_operator()
-def get_args(stream_spec, overwrite_output=False):
+def get_args(stream_spec, overwrite_output=True):
     """Get command-line arguments for ffmpeg."""
     nodes = get_stream_spec_nodes(stream_spec)
     args = []
@@ -126,7 +122,9 @@ def get_args(stream_spec, overwrite_output=False):
         args += ['-filter_complex', filter_arg]
     args += reduce(operator.add, [_get_output_args(node, stream_name_map) for node in output_nodes])
     args += reduce(operator.add, [_get_global_args(node) for node in global_nodes], [])
-    if overwrite_output:
+    if overwrite_output is False:
+        args += ['-n']
+    elif overwrite_output is not None:
         args += ['-y']
     return args
 
@@ -136,7 +134,7 @@ def run(stream_spec, cmd='ffmpeg', **kwargs):
     """Run ffmpeg on node graph.
 
     Args:
-        **kwargs: keyword-arguments passed to ``get_args()`` (e.g. ``overwrite_output=True``).
+        **kwargs: keyword-arguments passed to ``get_args()`` (e.g. ``overwrite_output=False``).
     """
     if isinstance(cmd, basestring):
         cmd = [cmd]

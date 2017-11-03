@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 from .nodes import (
     filter_operator,
-    GlobalNode,
     InputNode,
     MergeOutputsNode,
     OutputNode,
@@ -22,15 +21,6 @@ def input(filename, **kwargs):
             raise ValueError("Can't specify both `format` and `f` kwargs")
         kwargs['format'] = fmt
     return InputNode(input.__name__, kwargs=kwargs).stream()
-
-
-@output_operator()
-def overwrite_output(stream):
-    """Overwrite output files without asking (ffmpeg ``-y`` option)
-
-    Official documentation: `Main options <https://ffmpeg.org/ffmpeg.html#Main-options>`__
-    """
-    return GlobalNode(stream, overwrite_output.__name__).stream()
 
 
 @output_operator()
@@ -60,5 +50,4 @@ __all__ = [
     'input',
     'merge_outputs',
     'output',
-    'overwrite_output',
 ]
