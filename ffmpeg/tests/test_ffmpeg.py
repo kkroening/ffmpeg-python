@@ -102,6 +102,8 @@ def test_stream_repr():
 def test_get_args_simple():
     out_file = ffmpeg.input('dummy.mp4').output('dummy2.mp4')
     assert out_file.get_args() == ['-i', 'dummy.mp4', 'dummy2.mp4', '-y']
+    assert out_file.get_args(overwrite_output=False) == ['-i', 'dummy.mp4', 'dummy2.mp4', '-n']
+    assert out_file.get_args(overwrite_output=None) == ['-i', 'dummy.mp4', 'dummy2.mp4']
 
 
 def _get_complex_filter_example():
