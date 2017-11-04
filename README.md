@@ -4,8 +4,6 @@
 
 <img src="https://ibin.co/3g6Z1Duj7SVU.png" alt="ffmpeg-python logo" width="60%" />
 
-<br />
-
 ## Overview
 
 There are tons of Python FFmpeg wrappers out there but they seem to lack complex filter support.  `ffmpeg-python` works well for simple as well as complex signal graphs.
