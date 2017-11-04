@@ -1,11 +1,15 @@
 # ffmpeg-python: Python bindings for FFmpeg
 
+<img align="right" src="https://ibin.co/3g6LKIovKQNr.png" alt="ffmpeg-python logo" width="8%" />
+
 [![Build status](https://travis-ci.org/kkroening/ffmpeg-python.svg?branch=master)](https://travis-ci.org/kkroening/ffmpeg-python)
 
+<br />
 
 ## Overview
 
 There are tons of Python FFmpeg wrappers out there but they seem to lack complex filter support.  `ffmpeg-python` works well for simple as well as complex signal graphs.
+
 
 ## Quickstart
 
