@@ -1,7 +1,5 @@
 # ffmpeg-python: Python bindings for FFmpeg
 
-<img align="right" src="https://ibin.co/3g6LKIovKQNr.png" alt="ffmpeg-python logo" width="8%" />
-
 [![Build status](https://travis-ci.org/kkroening/ffmpeg-python.svg?branch=master)](https://travis-ci.org/kkroening/ffmpeg-python)
 
 <br />
@@ -130,13 +128,15 @@ When in doubt, refer to the [existing filters](https://github.com/kkroening/ffmp
 
 ## Contributing
 
+<img align="right" src="https://ibin.co/3g6LKIovKQNr.png" alt="ffmpeg-python logo" width="25%" />
+
 Feel free to report any bugs or feature requests.
 
 It should be fairly easy to use filters that aren't explicitly built into `ffmpeg-python` but if there's a feature or filter you'd really like to see included in the library, don't hesitate to open a feature request.
 
 Pull requests are welcome as well.
 
-<img src="https://ibin.co/3g6F7L02f8Zh.png" alt="Hammer logo" width="25%" />
+
 
 ## Additional Resources
 
