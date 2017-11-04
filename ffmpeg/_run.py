@@ -109,7 +109,7 @@ def _get_output_args(node, stream_name_map):
 
 
 @output_operator()
-def get_args(stream_spec, overwrite_output=False):
+def get_args(stream_spec, overwrite_output=True):
     """Get command-line arguments for ffmpeg."""
     nodes = get_stream_spec_nodes(stream_spec)
     args = []
@@ -126,8 +126,14 @@ def get_args(stream_spec, overwrite_output=False):
         args += ['-filter_complex', filter_arg]
     args += reduce(operator.add, [_get_output_args(node, stream_name_map) for node in output_nodes])
     args += reduce(operator.add, [_get_global_args(node) for node in global_nodes], [])
-    if overwrite_output:
+
+    if bool(overwrite_output) is True:
         args += ['-y']
+    # bool(None) evaluates to False, skip it earlier
+    elif overwrite_output is None:
+        pass
+    elif bool(overwrite_output) is False:
+        args += ['-n']
     return args
 
 
