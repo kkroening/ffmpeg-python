@@ -2,7 +2,7 @@
 
 [![Build status](https://travis-ci.org/kkroening/ffmpeg-python.svg?branch=master)](https://travis-ci.org/kkroening/ffmpeg-python)
 
-<img src="https://ibin.co/3g6XWo5Xenzj.png" alt="ffmpeg-python logo" width="60%" />
+<img src="https://ibin.co/3g6Z1Duj7SVU.png" alt="ffmpeg-python logo" width="60%" />
 
 <br />
 
