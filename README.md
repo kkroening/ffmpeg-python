@@ -124,9 +124,9 @@ Or fluently:
 
 When in doubt, refer to the [existing filters](https://github.com/kkroening/ffmpeg-python/blob/master/ffmpeg/_filters.py) and/or the [official ffmpeg documentation](https://ffmpeg.org/ffmpeg-filters.html).
 
-<img align="right" src="https://ibin.co/3g6LKIovKQNr.png" alt="ffmpeg-python logo" width="25%" />
-
 ## Contributing
+
+<img align="right" src="https://ibin.co/3g6LKIovKQNr.png" alt="ffmpeg-python logo" width="25%" />
 
 Feel free to report any bugs or feature requests.
 
