@@ -126,7 +126,7 @@ When in doubt, refer to the [existing filters](https://github.com/kkroening/ffmp
 
 ## Contributing
 
-<img align="right" src="https://ibin.co/3g6OWYqRFWZl.png" alt="ffmpeg-python logo" width="25%" />
+<img align="right" src="https://ibin.co/3g6Sc59MfWZp.png" alt="ffmpeg-python logo" width="25%" />
 
 Feel free to report any bugs or feature requests.
 
