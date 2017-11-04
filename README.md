@@ -132,6 +132,8 @@ It should be fairly easy to use filters that aren't explicitly built into `ffmpe
 
 Pull requests are welcome as well.
 
+<img src="https://ibin.co/3g6F7L02f8Zh.png" alt="Hammer logo" width="25%" />
+
 ## Additional Resources
 
 - [API Reference](https://kkroening.github.io/ffmpeg-python/)
