@@ -2,6 +2,10 @@
 
 [![Build status](https://travis-ci.org/kkroening/ffmpeg-python.svg?branch=master)](https://travis-ci.org/kkroening/ffmpeg-python)
 
+<img src="https://ibin.co/3g6WWzIdobWo.png" alt="ffmpeg-python logo" width="70%" />
+
+<br />
+
 ## Overview
 
 There are tons of Python FFmpeg wrappers out there but they seem to lack complex filter support.  `ffmpeg-python` works well for simple as well as complex signal graphs.
@@ -126,7 +130,7 @@ When in doubt, refer to the [existing filters](https://github.com/kkroening/ffmp
 
 ## Contributing
 
-<img align="right" src="https://ibin.co/3g6Sc59MfWZp.png" alt="ffmpeg-python logo" width="25%" />
+<img align="right" src="https://ibin.co/3g6U1BtizfZG.png" alt="ffmpeg-python logo" width="40%" />
 
 Feel free to report any bugs or feature requests.
 
