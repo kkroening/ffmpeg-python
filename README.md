@@ -86,9 +86,9 @@ pip install ffmpeg-python
 
 It's also possible to clone the source and put it on your python path (`$PYTHONPATH`, `sys.path`, etc.):
 ```
-> git clone git@github.com:kkroening/ffmpeg-python.git
-> export PYTHONPATH=${PYTHONPATH}:ffmpeg-python
-> python
+$ git clone git@github.com:kkroening/ffmpeg-python.git
+$ export PYTHONPATH=${PYTHONPATH}:ffmpeg-python
+$ python
 >>> import ffmpeg
 ```
 
@@ -98,8 +98,8 @@ API documentation is automatically generated from python docstrings and hosted o
 
 Alternatively, standard python help is available, such as at the python REPL prompt as follows:
 ```
-import ffmpeg
-help(ffmpeg)
+>>> import ffmpeg
+>>> help(ffmpeg)
 ```
 
 ## Custom Filters
@@ -140,3 +140,4 @@ Pull requests are welcome as well.
 - [FFmpeg Homepage](https://ffmpeg.org/)
 - [FFmpeg Documentation](https://ffmpeg.org/ffmpeg.html)
 - [FFmpeg Filters Documentation](https://ffmpeg.org/ffmpeg-filters.html)
+- [Matrix Chat: #ffmpeg-python:matrix.org](https://riot.im/app/#/room/#ffmpeg-python:matrix.org)
