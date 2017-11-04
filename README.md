@@ -130,7 +130,7 @@ When in doubt, refer to the [existing filters](https://github.com/kkroening/ffmp
 
 ## Contributing
 
-<img align="right" src="https://ibin.co/3g6U1BtizfZG.png" alt="ffmpeg-python logo" width="40%" />
+<img align="right" src="https://ibin.co/3g6U1BtizfZG.png" alt="ffmpeg-python logo" width="20%" />
 
 Feel free to report any bugs or feature requests.
 
