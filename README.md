@@ -2,10 +2,12 @@
 
 [![Build status](https://travis-ci.org/kkroening/ffmpeg-python.svg?branch=master)](https://travis-ci.org/kkroening/ffmpeg-python)
 
+<img src="https://ibin.co/3g6Z1Duj7SVU.png" alt="ffmpeg-python logo" width="60%" />
 
 ## Overview
 
 There are tons of Python FFmpeg wrappers out there but they seem to lack complex filter support.  `ffmpeg-python` works well for simple as well as complex signal graphs.
+
 
 ## Quickstart
 
@@ -86,9 +88,9 @@ pip install ffmpeg-python
 
 It's also possible to clone the source and put it on your python path (`$PYTHONPATH`, `sys.path`, etc.):
 ```
-> git clone git@github.com:kkroening/ffmpeg-python.git
-> export PYTHONPATH=${PYTHONPATH}:ffmpeg-python
-> python
+$ git clone git@github.com:kkroening/ffmpeg-python.git
+$ export PYTHONPATH=${PYTHONPATH}:ffmpeg-python
+$ python
 >>> import ffmpeg
 ```
 
@@ -98,8 +100,8 @@ API documentation is automatically generated from python docstrings and hosted o
 
 Alternatively, standard python help is available, such as at the python REPL prompt as follows:
 ```
-import ffmpeg
-help(ffmpeg)
+>>> import ffmpeg
+>>> help(ffmpeg)
 ```
 
 ## Custom Filters
@@ -126,11 +128,15 @@ When in doubt, refer to the [existing filters](https://github.com/kkroening/ffmp
 
 ## Contributing
 
+<img align="right" src="https://ibin.co/3g6U1BtizfZG.png" alt="ffmpeg-python logo" width="20%" />
+
 Feel free to report any bugs or feature requests.
 
 It should be fairly easy to use filters that aren't explicitly built into `ffmpeg-python` but if there's a feature or filter you'd really like to see included in the library, don't hesitate to open a feature request.
 
 Pull requests are welcome as well.
+
+<br />
 
 ## Additional Resources
 
@@ -140,3 +146,4 @@ Pull requests are welcome as well.
 - [FFmpeg Homepage](https://ffmpeg.org/)
 - [FFmpeg Documentation](https://ffmpeg.org/ffmpeg.html)
 - [FFmpeg Filters Documentation](https://ffmpeg.org/ffmpeg-filters.html)
+- Matrix Chat: [#ffmpeg-python:matrix.org](https://riot.im/app/#/room/#ffmpeg-python:matrix.org)

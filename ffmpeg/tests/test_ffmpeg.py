@@ -114,6 +114,7 @@ def _get_complex_filter_example():
     split1 = split[1]
 
     overlay_file = ffmpeg.input(TEST_OVERLAY_FILE)
+    overlay_file = ffmpeg.crop(overlay_file, 10, 10, 158, 112)
     return (ffmpeg
         .concat(
             split0.trim(start_frame=10, end_frame=20),
@@ -137,10 +138,11 @@ def test_get_args_complex_filter():
             '[s1]trim=end_frame=20:start_frame=10[s3];' \
             '[s2]trim=end_frame=40:start_frame=30[s4];' \
             '[s3][s4]concat=n=2[s5];' \
-            '[1]hflip[s6];' \
-            '[s5][s6]overlay=eof_action=repeat[s7];' \
-            '[s7]drawbox=50:50:120:120:red:t=5[s8]',
-        '-map', '[s8]', TEST_OUTPUT_FILE1,
+            '[1]crop=158:112:10:10[s6];' \
+            '[s6]hflip[s7];' \
+            '[s5][s7]overlay=eof_action=repeat[s8];' \
+            '[s8]drawbox=50:50:120:120:red:t=5[s9]',
+        '-map', '[s9]', TEST_OUTPUT_FILE1,
         '-y'
     ]
 
