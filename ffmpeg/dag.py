@@ -42,6 +42,7 @@ class DagNode(object):
 
         Again, because nodes are immutable, the string representations should remain constant.
     """
+
     def __hash__(self):
         """Return an integer hash of the node."""
         raise NotImplementedError()
@@ -90,10 +91,12 @@ def get_outgoing_edges(upstream_node, outgoing_edge_map):
 class KwargReprNode(DagNode):
     """A DagNode that can be represented as a set of args+kwargs.
     """
+
     @property
     def __upstream_hashes(self):
         hashes = []
-        for downstream_label, (upstream_node, upstream_label) in list(self.incoming_edge_map.items()):
+        # This is needed to allow extra stuff in the incoming_edge_map's value tuples
+        for downstream_label, (upstream_node, upstream_label) in [(i[0], i[1][:2]) for i in self.incoming_edge_map.items()]:
             hashes += [hash(x) for x in [downstream_label, upstream_node, upstream_label]]
         return hashes
 
