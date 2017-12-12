@@ -21,12 +21,13 @@ def _get_types_str(types):
 
 class Stream(object):
     """Represents the outgoing edge of an upstream node; may be used to create more downstream nodes."""
-    def __init__(self, upstream_node, upstream_label, node_types):
+    def __init__(self, upstream_node, upstream_label, node_types, upstream_selector=None):
         if not _is_of_types(upstream_node, node_types):
             raise TypeError('Expected upstream node to be of one of the following type(s): {}; got {}'.format(
                 _get_types_str(node_types), type(upstream_node)))
         self.node = upstream_node
         self.label = upstream_label
+        self.selector = upstream_selector
 
     def __hash__(self):
         return get_hash_int([hash(self.node), hash(self.label)])
@@ -36,7 +37,10 @@ class Stream(object):
 
     def __repr__(self):
         node_repr = self.node.long_repr(include_hash=False)
-        out = '{}[{!r}] <{}>'.format(node_repr, self.label, self.node.short_hash)
+        selector = ""
+        if self.selector:
+            selector = ":{}".format(self.selector)
+        out = '{}[{!r}{}] <{}>'.format(node_repr, self.label, selector, self.node.short_hash)
         return out
 
 
@@ -86,11 +90,11 @@ class Node(KwargReprNode):
     def __get_incoming_edge_map(cls, stream_map):
         incoming_edge_map = {}
         for downstream_label, upstream in list(stream_map.items()):
-            incoming_edge_map[downstream_label] = (upstream.node, upstream.label)
+            incoming_edge_map[downstream_label] = (upstream.node, upstream.label, upstream.selector)
         return incoming_edge_map
 
     def __init__(self, stream_spec, name, incoming_stream_types, outgoing_stream_type, min_inputs, max_inputs, args=[],
-            kwargs={}):
+                 kwargs={}):
         stream_map = get_stream_map(stream_spec)
         self.__check_input_len(stream_map, min_inputs, max_inputs)
         self.__check_input_types(stream_map, incoming_stream_types)
@@ -98,22 +102,27 @@ class Node(KwargReprNode):
         super(Node, self).__init__(incoming_edge_map, name, args, kwargs)
         self.__outgoing_stream_type = outgoing_stream_type
 
-    def stream(self, label=None):
+    def stream(self, label=None, select=None):
         """Create an outgoing stream originating from this node.
 
         More nodes may be attached onto the outgoing stream.
         """
-        return self.__outgoing_stream_type(self, label)
+        return self.__outgoing_stream_type(self, label, upstream_selector=select)
 
-    def __getitem__(self, label):
+    def __getitem__(self, item):
         """Create an outgoing stream originating from this node; syntactic sugar for ``self.stream(label)``.
+        It can also be used to apply a selector: e.g. node[0:"audio"] returns a stream with label 0 and
+        selector "audio", which is the same as ``node.stream(label=0, select="audio")``.
         """
-        return self.stream(label)
+        if isinstance(item, slice):
+            return self.stream(label=item.start, select=item.stop)
+        else:
+            return self.stream(label=item)
 
 
 class FilterableStream(Stream):
-    def __init__(self, upstream_node, upstream_label):
-        super(FilterableStream, self).__init__(upstream_node, upstream_label, {InputNode, FilterNode})
+    def __init__(self, upstream_node, upstream_label, upstream_selector=None):
+        super(FilterableStream, self).__init__(upstream_node, upstream_label, {InputNode, FilterNode}, upstream_selector)
 
 
 class InputNode(Node):
