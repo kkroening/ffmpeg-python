@@ -93,11 +93,16 @@ def _get_output_args(node, stream_name_map):
     if node.name != output.__name__:
         raise ValueError('Unsupported output node: {}'.format(node))
     args = []
-    assert len(node.incoming_edges) == 1
-    edge = node.incoming_edges[0]
-    stream_name = "[{}{}]".format(stream_name_map[edge.upstream_node, edge.upstream_label], "" if not edge.upstream_selector else ":{}".format(edge.upstream_selector))
-    if stream_name != '[0]':
-        args += ['-map', stream_name]
+
+    if len(node.incoming_edges) == 0:
+        raise ValueError("Output node {} has no mapped streams")
+
+    for edge in node.incoming_edges:
+        # edge = node.incoming_edges[0]
+        stream_name = "[{}{}]".format(stream_name_map[edge.upstream_node, edge.upstream_label], "" if not edge.upstream_selector else ":{}".format(edge.upstream_selector))
+        if stream_name != '[0]':
+            args += ['-map', stream_name]
+
     kwargs = copy.copy(node.kwargs)
     filename = kwargs.pop('filename')
     fmt = kwargs.pop('format', None)
