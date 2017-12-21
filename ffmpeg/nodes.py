@@ -43,6 +43,17 @@ class Stream(object):
         out = '{}[{!r}{}] <{}>'.format(node_repr, self.label, selector, self.node.short_hash)
         return out
 
+    def __getitem__(self, item):
+        """
+        Select a component of the stream. `stream[:X]` is analogous to `stream.node.stream(select=X)`.
+        Please note that this can only be used to select a substream that already exist. If you want to split
+        the stream, use the `split` filter.
+        """
+        if item.start != None:
+            raise ValueError("Invalid syntax. Use 'stream[:\"something\"]', not 'stream[\"something\"]'.")
+
+        return self.node.stream(select=item.stop)
+
 
 def get_stream_map(stream_spec):
     if stream_spec is None:
@@ -201,8 +212,8 @@ class OutputNode(Node):
 
 
 class OutputStream(Stream):
-    def __init__(self, upstream_node, upstream_label):
-        super(OutputStream, self).__init__(upstream_node, upstream_label, {OutputNode, GlobalNode, MergeOutputsNode})
+    def __init__(self, upstream_node, upstream_label, upstream_selector=None):
+        super(OutputStream, self).__init__(upstream_node, upstream_label, {OutputNode, GlobalNode, MergeOutputsNode}, upstream_selector=upstream_selector)
 
 
 class MergeOutputsNode(Node):
