@@ -49,7 +49,7 @@ class Stream(object):
         Please note that this can only be used to select a substream that already exist. If you want to split
         the stream, use the `split` filter.
         """
-        if item.start != None:
+        if not isinstance(item, slice) or item.start is not None:
             raise ValueError("Invalid syntax. Use 'stream[:\"something\"]', not 'stream[\"something\"]'.")
 
         return self.node.stream(select=item.stop)
