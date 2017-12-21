@@ -21,6 +21,7 @@ def _get_types_str(types):
 
 class Stream(object):
     """Represents the outgoing edge of an upstream node; may be used to create more downstream nodes."""
+
     def __init__(self, upstream_node, upstream_label, node_types, upstream_selector=None):
         if not _is_of_types(upstream_node, node_types):
             raise TypeError('Expected upstream node to be of one of the following type(s): {}; got {}'.format(
@@ -83,6 +84,7 @@ def get_stream_spec_nodes(stream_spec):
 
 class Node(KwargReprNode):
     """Node base"""
+
     @classmethod
     def __check_input_len(cls, stream_map, min_inputs, max_inputs):
         if min_inputs is not None and len(stream_map) < min_inputs:
@@ -95,7 +97,7 @@ class Node(KwargReprNode):
         for stream in list(stream_map.values()):
             if not _is_of_types(stream, incoming_stream_types):
                 raise TypeError('Expected incoming stream(s) to be of one of the following types: {}; got {}'
-                    .format(_get_types_str(incoming_stream_types), type(stream)))
+                                .format(_get_types_str(incoming_stream_types), type(stream)))
 
     @classmethod
     def __get_incoming_edge_map(cls, stream_map):
@@ -112,6 +114,10 @@ class Node(KwargReprNode):
         incoming_edge_map = self.__get_incoming_edge_map(stream_map)
         super(Node, self).__init__(incoming_edge_map, name, args, kwargs)
         self.__outgoing_stream_type = outgoing_stream_type
+
+        self.__incoming_stream_types = incoming_stream_types
+        self.__min_inputs = min_inputs
+        self.__max_inputs = max_inputs
 
     def stream(self, label=None, select=None):
         """Create an outgoing stream originating from this node.
@@ -130,14 +136,41 @@ class Node(KwargReprNode):
         else:
             return self.stream(label=item)
 
+    def _add_streams(self, stream_spec):
+        """Attach additional streams after the Node is initialized.
+        """
+        # Back up previous edges
+        prev_edges = self.incoming_edge_map.values()
+
+        # Check new edges
+        new_stream_map = get_stream_map(stream_spec)
+        self.__check_input_types(new_stream_map, self.__incoming_stream_types)
+
+        # Generate new edge map
+        new_inc_edge_map = self.__get_incoming_edge_map(new_stream_map)
+        new_edges = new_inc_edge_map.values()
+
+        # Rename all edges
+        new_edge_map = dict(enumerate(list(prev_edges) + list(new_edges)))
+
+        # Check new length
+        self.__check_input_len(new_edge_map, self.__min_inputs, self.__max_inputs)
+
+        # Overwrite old map (exploiting the fact that dict is mutable; incoming_edge_map is a read-only property)
+        if None in self.incoming_edge_map:
+            self.incoming_edge_map.pop(None)
+        self.incoming_edge_map.update(new_edge_map)
+
 
 class FilterableStream(Stream):
     def __init__(self, upstream_node, upstream_label, upstream_selector=None):
-        super(FilterableStream, self).__init__(upstream_node, upstream_label, {InputNode, FilterNode}, upstream_selector)
+        super(FilterableStream, self).__init__(upstream_node, upstream_label, {InputNode, FilterNode},
+                                               upstream_selector)
 
 
 class InputNode(Node):
     """InputNode type"""
+
     def __init__(self, name, args=[], kwargs={}):
         super(InputNode, self).__init__(
             stream_spec=None,
@@ -169,6 +202,7 @@ class FilterNode(Node):
         )
 
     """FilterNode"""
+
     def _get_filter(self, outgoing_edges):
         args = self.args
         kwargs = self.kwargs
@@ -200,8 +234,8 @@ class OutputNode(Node):
             name=name,
             incoming_stream_types={FilterableStream},
             outgoing_stream_type=OutputStream,
-            min_inputs=1,
-            max_inputs=1,
+            min_inputs=0,  # Allow streams to be mapped afterwards
+            max_inputs=None,
             args=args,
             kwargs=kwargs
         )
@@ -213,7 +247,8 @@ class OutputNode(Node):
 
 class OutputStream(Stream):
     def __init__(self, upstream_node, upstream_label, upstream_selector=None):
-        super(OutputStream, self).__init__(upstream_node, upstream_label, {OutputNode, GlobalNode, MergeOutputsNode}, upstream_selector=upstream_selector)
+        super(OutputStream, self).__init__(upstream_node, upstream_label, {OutputNode, GlobalNode, MergeOutputsNode},
+                                           upstream_selector=upstream_selector)
 
 
 class MergeOutputsNode(Node):
@@ -247,6 +282,7 @@ def stream_operator(stream_classes={Stream}, name=None):
         func_name = name or func.__name__
         [setattr(stream_class, func_name, func) for stream_class in stream_classes]
         return func
+
     return decorator
 
 
