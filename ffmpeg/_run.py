@@ -100,7 +100,7 @@ def _get_output_args(node, stream_name_map):
     for edge in node.incoming_edges:
         # edge = node.incoming_edges[0]
         stream_name = "[{}{}]".format(stream_name_map[edge.upstream_node, edge.upstream_label], "" if not edge.upstream_selector else ":{}".format(edge.upstream_selector))
-        if stream_name != '[0]':
+        if stream_name != '[0]' or len(node.incoming_edges) > 1:
             args += ['-map', stream_name]
 
     kwargs = copy.copy(node.kwargs)
