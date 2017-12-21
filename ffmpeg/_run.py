@@ -23,7 +23,7 @@ from .nodes import (
 
 
 def _get_stream_name(name):
-    return '[{}]'.format(name)
+    return '{}'.format(name)
 
 
 def _convert_kwargs_to_cmd_line_args(kwargs):
@@ -57,8 +57,8 @@ def _get_input_args(input_node):
 def _get_filter_spec(node, outgoing_edge_map, stream_name_map):
     incoming_edges = node.incoming_edges
     outgoing_edges = get_outgoing_edges(node, outgoing_edge_map)
-    inputs = [stream_name_map[edge.upstream_node, edge.upstream_label] for edge in incoming_edges]
-    outputs = [stream_name_map[edge.upstream_node, edge.upstream_label] for edge in outgoing_edges]
+    inputs = ["[{}{}]".format(stream_name_map[edge.upstream_node, edge.upstream_label], "" if not edge.upstream_selector else ":{}".format(edge.upstream_selector)) for edge in incoming_edges]
+    outputs = ["[{}]".format(stream_name_map[edge.upstream_node, edge.upstream_label]) for edge in outgoing_edges]
     filter_spec = '{}{}{}'.format(''.join(inputs), node._get_filter(outgoing_edges), ''.join(outputs))
     return filter_spec
 
@@ -95,7 +95,7 @@ def _get_output_args(node, stream_name_map):
     args = []
     assert len(node.incoming_edges) == 1
     edge = node.incoming_edges[0]
-    stream_name = stream_name_map[edge.upstream_node, edge.upstream_label]
+    stream_name = "[{}{}]".format(stream_name_map[edge.upstream_node, edge.upstream_label], "" if not edge.upstream_selector else ":{}".format(edge.upstream_selector))
     if stream_name != '[0]':
         args += ['-map', stream_name]
     kwargs = copy.copy(node.kwargs)

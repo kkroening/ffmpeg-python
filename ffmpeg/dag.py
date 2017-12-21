@@ -70,21 +70,26 @@ class DagNode(object):
         raise NotImplementedError()
 
 
-DagEdge = namedtuple('DagEdge', ['downstream_node', 'downstream_label', 'upstream_node', 'upstream_label'])
+DagEdge = namedtuple('DagEdge', ['downstream_node', 'downstream_label', 'upstream_node', 'upstream_label', 'upstream_selector'])
 
 
 def get_incoming_edges(downstream_node, incoming_edge_map):
     edges = []
-    for downstream_label, (upstream_node, upstream_label) in list(incoming_edge_map.items()):
-        edges += [DagEdge(downstream_node, downstream_label, upstream_node, upstream_label)]
+    # downstream_label, (upstream_node, upstream_label) in [(i[0], i[1][:2]) for i in self.incoming_edge_map.items()]
+    for downstream_label, upstream_info in [(i[0], i[1]) for i in incoming_edge_map.items()]:
+        upstream_node, upstream_label = upstream_info[:2]
+        upstream_selector = None if len(upstream_info) < 3 else upstream_info[2]
+        edges += [DagEdge(downstream_node, downstream_label, upstream_node, upstream_label, upstream_selector)]
     return edges
 
 
 def get_outgoing_edges(upstream_node, outgoing_edge_map):
     edges = []
     for upstream_label, downstream_infos in list(outgoing_edge_map.items()):
-        for (downstream_node, downstream_label) in downstream_infos:
-            edges += [DagEdge(downstream_node, downstream_label, upstream_node, upstream_label)]
+        for downstream_info in downstream_infos:
+            downstream_node, downstream_label = downstream_info[:2]
+            downstream_selector = None if len(downstream_info) < 3 else downstream_info[2]
+            edges += [DagEdge(downstream_node, downstream_label, upstream_node, upstream_label, downstream_selector)]
     return edges
 
 
@@ -155,21 +160,21 @@ def topo_sort(downstream_nodes):
     sorted_nodes = []
     outgoing_edge_maps = {}
 
-    def visit(upstream_node, upstream_label, downstream_node, downstream_label):
+    def visit(upstream_node, upstream_label, downstream_node, downstream_label, downstream_selector=None):
         if upstream_node in marked_nodes:
             raise RuntimeError('Graph is not a DAG')
 
         if downstream_node is not None:
             outgoing_edge_map = outgoing_edge_maps.get(upstream_node, {})
             outgoing_edge_infos = outgoing_edge_map.get(upstream_label, [])
-            outgoing_edge_infos += [(downstream_node, downstream_label)]
+            outgoing_edge_infos += [(downstream_node, downstream_label, downstream_selector)]
             outgoing_edge_map[upstream_label] = outgoing_edge_infos
             outgoing_edge_maps[upstream_node] = outgoing_edge_map
 
         if upstream_node not in sorted_nodes:
             marked_nodes.append(upstream_node)
             for edge in upstream_node.incoming_edges:
-                visit(edge.upstream_node, edge.upstream_label, edge.downstream_node, edge.downstream_label)
+                visit(edge.upstream_node, edge.upstream_label, edge.downstream_node, edge.downstream_label, edge.upstream_selector)
             marked_nodes.remove(upstream_node)
             sorted_nodes.append(upstream_node)
 

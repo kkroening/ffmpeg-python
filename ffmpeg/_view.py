@@ -62,9 +62,13 @@ def view(stream_spec, **kwargs):
             kwargs = {}
             up_label = edge.upstream_label
             down_label = edge.downstream_label
-            if show_labels and (up_label is not None or down_label is not None):
+            up_selector = edge.upstream_selector
+
+            if show_labels and (up_label is not None or down_label is not None or up_selector is not None):
                 if up_label is None:
                     up_label = ''
+                if up_selector is not None:
+                    up_label += ":" + up_selector
                 if down_label is None:
                     down_label = ''
                 if up_label != '' and down_label != '':
