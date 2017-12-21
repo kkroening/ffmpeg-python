@@ -61,9 +61,6 @@ def output(*streams_and_filename, **kwargs):
         kwargs['filename'] = streams_and_filename.pop(-1)
     streams = streams_and_filename
 
-    if len(streams) < 1:
-        raise ValueError("You must specify at least one stream to produce an output")
-
     fmt = kwargs.pop('f', None)
     if fmt:
         if 'format' in kwargs:
