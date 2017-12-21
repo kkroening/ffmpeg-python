@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+from past.builtins import basestring
+
 from .nodes import (
     filter_operator,
     GlobalNode,
@@ -7,8 +9,9 @@ from .nodes import (
     MergeOutputsNode,
     OutputNode,
     output_operator,
-)
+    OutputStream)
 
+_py_map = map
 
 def input(filename, **kwargs):
     """Input file URL (ffmpeg ``-i`` option)
@@ -41,24 +44,62 @@ def merge_outputs(*streams):
 
 
 @filter_operator()
-def output(stream, filename, **kwargs):
+def output(*streams_and_filename, **kwargs):
     """Output file URL
+
+    Syntax:
+        `ffmpeg.output(stream1[, stream2, stream3...], filename, **ffmpeg_args)`
+
+        If multiple streams are provided, they are mapped to the same output.
 
     Official documentation: `Synopsis <https://ffmpeg.org/ffmpeg.html#Synopsis>`__
     """
-    kwargs['filename'] = filename
+    streams_and_filename = list(streams_and_filename)
+    if "filename" not in kwargs:
+        if not isinstance(streams_and_filename[-1], basestring):
+            raise ValueError("You must provide a filename")
+        kwargs['filename'] = streams_and_filename.pop(-1)
+    streams = streams_and_filename
+
+    if len(streams) < 1:
+        raise ValueError("You must specify at least one stream to produce an output")
+
     fmt = kwargs.pop('f', None)
     if fmt:
         if 'format' in kwargs:
             raise ValueError("Can't specify both `format` and `f` kwargs")
         kwargs['format'] = fmt
-    return OutputNode(stream, output.__name__, kwargs=kwargs).stream()
+    return OutputNode(streams, output.__name__, kwargs=kwargs).stream()
 
 
+@output_operator()
+def map(*streams):
+    """Map multiple streams to the same output
+    """
+    head = streams[0]
+    tail = streams[1:]
+
+    if not isinstance(head, OutputStream):
+        raise ValueError("First argument must be an output stream")
+
+    if not tail:
+        return head
+
+    head.node._add_streams(tail)
+
+    return head
+
+# stream_map = get_stream_map(stream_spec)
+# self.__check_input_len(stream_map, min_inputs, max_inputs)
+# self.__check_input_types(stream_map, incoming_stream_types)
+# incoming_edge_map = self.__get_incoming_edge_map(stream_map)
+# super(Node, self).__init__(incoming_edge_map, name, args, kwargs)
+# self.__outgoing_stream_type = outgoing_stream_type
 
 __all__ = [
     'input',
     'merge_outputs',
     'output',
+    'map',
     'overwrite_output',
 ]
