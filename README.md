@@ -2,7 +2,7 @@
 
 [![Build status](https://travis-ci.org/kkroening/ffmpeg-python.svg?branch=master)](https://travis-ci.org/kkroening/ffmpeg-python)
 
-<img src="https://ibin.co/3lt0FLwp662d" alt="ffmpeg-python logo" width="60%" />
+<img src="https://ibin.co/3g6Z1Duj7SVU.png" alt="ffmpeg-python logo" width="60%" />
 
 ## Overview
 
@@ -128,7 +128,7 @@ When in doubt, refer to the [existing filters](https://github.com/kkroening/ffmp
 
 ## Contributing
 
-<img align="right" src="https://ibin.co/3lt0A2rzxXBr" alt="ffmpeg-python logo" width="20%" />
+<img align="right" src="https://ibin.co/3g6U1BtizfZG.png" alt="ffmpeg-python logo" width="20%" />
 
 Feel free to report any bugs or feature requests.
 
