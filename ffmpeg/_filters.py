@@ -287,46 +287,46 @@ def drawtext(stream, text=None, x=0, y=0, escape_text=True, **kwargs):
             the top border of the output image. The default value is "0".  See below for the list of accepted constants
             and functions.
 
-        Expression constants:
-            The parameters for x and y are expressions containing the following constants and functions:
-                dar: input display aspect ratio, it is the same as ``(w / h) * sar``
-                hsub: horizontal chroma subsample values. For example for the pixel format "yuv422p" hsub is 2 and vsub
-                    is 1.
-                vsub: vertical chroma subsample values. For example for the pixel format "yuv422p" hsub is 2 and vsub
-                    is 1.
-                line_h: the height of each text line
-                lh: Alias for ``line_h``.
-                main_h: the input height
-                h: Alias for ``main_h``.
-                H: Alias for ``main_h``.
-                main_w: the input width
-                w: Alias for ``main_w``.
-                W: Alias for ``main_w``.
-                ascent: the maximum distance from the baseline to the highest/upper grid coordinate used to place a
-                    glyph outline point, for all the rendered glyphs. It is a positive value, due to the grid's
-                    orientation with the Y axis upwards.
-                max_glyph_a: Alias for ``ascent``.
-                descent: the maximum distance from the baseline to the lowest grid coordinate used to place a glyph
-                    outline point, for all the rendered glyphs. This is a negative value, due to the grid's
-                    orientation, with the Y axis upwards.
-                max_glyph_d: Alias for ``descent``.
-                max_glyph_h: maximum glyph height, that is the maximum height for all the glyphs contained in the
-                    rendered text, it is equivalent to ascent - descent.
-                max_glyph_w: maximum glyph width, that is the maximum width for all the glyphs contained in the
-                    rendered text
-                n: the number of input frame, starting from 0
-                rand(min, max): return a random number included between min and max
-                sar: The input sample aspect ratio.
-                t: timestamp expressed in seconds, NAN if the input timestamp is unknown
-                text_h: the height of the rendered text
-                th: Alias for ``text_h``.
-                text_w: the width of the rendered text
-                tw: Alias for ``text_w``.
-                x: the x offset coordinates where the text is drawn.
-                y: the y offset coordinates where the text is drawn.
+    Expression constants:
+        The parameters for x and y are expressions containing the following constants and functions:
+         - dar: input display aspect ratio, it is the same as ``(w / h) * sar``
+         - hsub: horizontal chroma subsample values. For example for the pixel format "yuv422p" hsub is 2 and vsub
+           is 1.
+         - vsub: vertical chroma subsample values. For example for the pixel format "yuv422p" hsub is 2 and vsub
+           is 1.
+         - line_h: the height of each text line
+         - lh: Alias for ``line_h``.
+         - main_h: the input height
+         - h: Alias for ``main_h``.
+         - H: Alias for ``main_h``.
+         - main_w: the input width
+         - w: Alias for ``main_w``.
+         - W: Alias for ``main_w``.
+         - ascent: the maximum distance from the baseline to the highest/upper grid coordinate used to place a glyph
+           outline point, for all the rendered glyphs. It is a positive value, due to the grid's orientation with the Y
+           axis upwards.
+         - max_glyph_a: Alias for ``ascent``.
+         - descent: the maximum distance from the baseline to the lowest grid coordinate used to place a glyph outline
+           point, for all the rendered glyphs. This is a negative value, due to the grid's orientation, with the Y axis
+           upwards.
+         - max_glyph_d: Alias for ``descent``.
+         - max_glyph_h: maximum glyph height, that is the maximum height for all the glyphs contained in the rendered
+           text, it is equivalent to ascent - descent.
+         - max_glyph_w: maximum glyph width, that is the maximum width for all the glyphs contained in the rendered
+           text.
+         - n: the number of input frame, starting from 0
+         - rand(min, max): return a random number included between min and max
+         - sar: The input sample aspect ratio.
+         - t: timestamp expressed in seconds, NAN if the input timestamp is unknown
+         - text_h: the height of the rendered text
+         - th: Alias for ``text_h``.
+         - text_w: the width of the rendered text
+         - tw: Alias for ``text_w``.
+         - x: the x offset coordinates where the text is drawn.
+         - y: the y offset coordinates where the text is drawn.
 
-            These parameters allow the x and y expressions to refer each other, so you can for example specify
-            ``y=x/dar``.
+        These parameters allow the x and y expressions to refer each other, so you can for example specify
+        ``y=x/dar``.
 
     Official documentation: `drawtext <https://ffmpeg.org/ffmpeg-filters.html#drawtext>`__
     """
@@ -419,6 +419,7 @@ __all__ = [
     'concat',
     'crop',
     'drawbox',
+    'drawtext',
     'filter_',
     'hflip',
     'hue',
