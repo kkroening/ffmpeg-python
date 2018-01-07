@@ -2,13 +2,15 @@
 from __future__ import unicode_literals
 
 import argparse
+import errno
 import ffmpeg
 import logging
+import os
 import re
 import subprocess
+import sys
 
-
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, format='%(message)s')
 logger = logging.getLogger(__file__)
 logger.setLevel(logging.INFO)
 
@@ -17,7 +19,7 @@ DEFAULT_THRESHOLD = -60
 
 parser = argparse.ArgumentParser(description='Split media into separate chunks wherever silence occurs')
 parser.add_argument('in_filename', help='Input filename (`-` for stdin)')
-parser.add_argument('out_pattern', help='Output filename pattern (e.g. `out/chunk_%%04d.wav`)')
+parser.add_argument('out_pattern', help='Output filename pattern (e.g. `out/chunk_{:04d}.wav`)')
 parser.add_argument('--silence-threshold', default=DEFAULT_THRESHOLD, type=int, help='Silence threshold (in dB)')
 parser.add_argument('--silence-duration', default=DEFAULT_DURATION, type=float, help='Silence duration')
 parser.add_argument('--start-time', type=float, help='Start time (seconds)')
@@ -47,6 +49,9 @@ def get_chunk_times(in_filename, silence_threshold, silence_duration, start_time
     )
     p = subprocess.Popen(['ffmpeg'] + args, stderr=subprocess.PIPE)
     output = p.communicate()[1].decode('utf-8')
+    if p.returncode != 0:
+        sys.stderr.write(output)
+        sys.exit(1)
     lines = output.splitlines()
 
     # Chunks start when silence ends, and chunks end when silence starts.
@@ -80,6 +85,14 @@ def get_chunk_times(in_filename, silence_threshold, silence_duration, start_time
     return list(zip(chunk_starts, chunk_ends))
 
 
+def _makedirs(path):
+    """Python2-compatible version of ``os.makedirs(path, exist_ok=True)``."""
+    try:
+        os.makedirs(path)
+    except OSError as exc:
+        if exc.errno != errno.EEXIST or not os.path.isdir(path):
+            raise
+
 def split_audio(
     in_filename,
     out_pattern,
@@ -89,9 +102,12 @@ def split_audio(
     end_time=None,
 ):
     chunk_times = get_chunk_times(in_filename, silence_threshold, silence_duration, start_time, end_time)
+
     for i, (start_time, end_time) in enumerate(chunk_times):
         time = end_time - start_time
-        out_filename = out_pattern % i
+        out_filename = out_pattern.format(i, i=i)
+        _makedirs(os.path.dirname(out_filename))
+
         logger.info('{}: start={:.02f}, end={:.02f}, duration={:.02f}'.format(out_filename, start_time, end_time,
             time))
         subprocess.Popen(
