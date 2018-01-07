@@ -10,6 +10,7 @@ import re
 import subprocess
 import sys
 
+
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 logger = logging.getLogger(__file__)
 logger.setLevel(logging.INFO)
@@ -24,12 +25,17 @@ parser.add_argument('--silence-threshold', default=DEFAULT_THRESHOLD, type=int, 
 parser.add_argument('--silence-duration', default=DEFAULT_DURATION, type=float, help='Silence duration')
 parser.add_argument('--start-time', type=float, help='Start time (seconds)')
 parser.add_argument('--end-time', type=float, help='End time (seconds)')
-
+parser.add_argument('-v', dest='verbose', action='store_true', help='Verbose mode')
 
 silence_start_re = re.compile(' silence_start: (?P<start>[0-9]+(\.?[0-9]*))$')
 silence_end_re = re.compile(' silence_end: (?P<end>[0-9]+(\.?[0-9]*)) ')
 total_duration_re = re.compile(
     'size=[^ ]+ time=(?P<hours>[0-9]{2}):(?P<minutes>[0-9]{2}):(?P<seconds>[0-9\.]{5}) bitrate=')
+
+
+def _logged_popen(cmd_line, *args, **kwargs):
+    logger.debug('Running command: {}'.format(subprocess.list2cmdline(cmd_line)))
+    return subprocess.Popen(cmd_line, *args, **kwargs)
 
 
 def get_chunk_times(in_filename, silence_threshold, silence_duration, start_time=None, end_time=None):
@@ -41,17 +47,20 @@ def get_chunk_times(in_filename, silence_threshold, silence_duration, start_time
     if end_time is not None:
         input_kwargs['t'] = end_time - start_time
 
-    args = (ffmpeg
-        .input(in_filename, **input_kwargs)
-        .filter_('silencedetect', n='{}dB'.format(silence_threshold), d=silence_duration)
-        .output('-', format='null')
-        .get_args()
+    p = _logged_popen(
+        (ffmpeg
+            .input(in_filename, **input_kwargs)
+            .filter_('silencedetect', n='{}dB'.format(silence_threshold), d=silence_duration)
+            .output('-', format='null')
+            .compile()
+        ) + ['-nostats'],  # FIXME: use .nostats() once it's implemented in ffmpeg-python.
+        stderr=subprocess.PIPE
     )
-    p = subprocess.Popen(['ffmpeg'] + args, stderr=subprocess.PIPE)
     output = p.communicate()[1].decode('utf-8')
     if p.returncode != 0:
         sys.stderr.write(output)
         sys.exit(1)
+    logger.debug(output)
     lines = output.splitlines()
 
     # Chunks start when silence ends, and chunks end when silence starts.
@@ -93,6 +102,7 @@ def _makedirs(path):
         if exc.errno != errno.EEXIST or not os.path.isdir(path):
             raise
 
+
 def split_audio(
     in_filename,
     out_pattern,
@@ -100,6 +110,7 @@ def split_audio(
     silence_duration=DEFAULT_DURATION,
     start_time=None,
     end_time=None,
+    verbose=False,
 ):
     chunk_times = get_chunk_times(in_filename, silence_threshold, silence_duration, start_time, end_time)
 
@@ -110,18 +121,21 @@ def split_audio(
 
         logger.info('{}: start={:.02f}, end={:.02f}, duration={:.02f}'.format(out_filename, start_time, end_time,
             time))
-        subprocess.Popen(
+        _logged_popen(
             (ffmpeg
                 .input(in_filename, ss=start_time, t=time)
                 .output(out_filename)
                 .overwrite_output()
                 .compile()
             ),
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            stdout=subprocess.PIPE if not verbose else None,
+            stderr=subprocess.PIPE if not verbose else None,
         ).communicate()
 
 
 if __name__ == '__main__':
-    args = parser.parse_args()
-    split_audio(**vars(args))
+    kwargs = vars(parser.parse_args())
+    if kwargs['verbose']:
+        logging.basicConfig(level=logging.DEBUG, format='%(levels): %(message)s')
+        logger.setLevel(logging.DEBUG)
+    split_audio(**kwargs)
