@@ -16,7 +16,7 @@ from .nodes import (
     get_stream_spec_nodes,
     FilterNode,
     GlobalNode,
-    InputNode,   
+    InputNode,
     OutputNode,
     output_operator,
 )
@@ -31,7 +31,7 @@ def _convert_kwargs_to_cmd_line_args(kwargs):
     for k in sorted(kwargs.keys()):
         v = kwargs[k]
         args.append('-{}'.format(k))
-        if v:
+        if v is not None:
             args.append('{}'.format(v))
     return args
 
