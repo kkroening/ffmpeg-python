@@ -16,7 +16,7 @@ logger = logging.getLogger(__file__)
 logger.setLevel(logging.INFO)
 
 DEFAULT_DURATION = 0.3
-DEFAULT_THRESHOLD = -60
+DEFAULT_THRESHOLD = -30
 
 parser = argparse.ArgumentParser(description='Split media into separate chunks wherever silence occurs')
 parser.add_argument('in_filename', help='Input filename (`-` for stdin)')
@@ -26,6 +26,7 @@ parser.add_argument('--silence-duration', default=DEFAULT_DURATION, type=float, 
 parser.add_argument('--start-time', type=float, help='Start time (seconds)')
 parser.add_argument('--end-time', type=float, help='End time (seconds)')
 parser.add_argument('-v', dest='verbose', action='store_true', help='Verbose mode')
+parser.add_argument('--padding', type=float, default=0., help='Output silence padding (seconds)')
 
 silence_start_re = re.compile(' silence_start: (?P<start>[0-9]+(\.?[0-9]*))$')
 silence_end_re = re.compile(' silence_end: (?P<end>[0-9]+(\.?[0-9]*)) ')
@@ -110,6 +111,7 @@ def split_audio(
     silence_duration=DEFAULT_DURATION,
     start_time=None,
     end_time=None,
+    padding=0.,
     verbose=False,
 ):
     chunk_times = get_chunk_times(in_filename, silence_threshold, silence_duration, start_time, end_time)
@@ -121,16 +123,30 @@ def split_audio(
 
         logger.info('{}: start={:.02f}, end={:.02f}, duration={:.02f}'.format(out_filename, start_time, end_time,
             time))
-        _logged_popen(
-            (ffmpeg
-                .input(in_filename, ss=start_time, t=time)
-                .output(out_filename)
-                .overwrite_output()
-                .compile()
-            ),
+
+        input = ffmpeg.input(in_filename, ss=start_time, t=time)
+
+        if padding > 0.:
+            silence = ffmpeg.input('aevalsrc=0:0::duration={}'.format(padding), format='lavfi')
+            input = ffmpeg.concat(silence, input, v=0, a=1)
+
+        ffmpeg_cmd = (input
+            .output(out_filename)
+            .overwrite_output()
+            .compile()
+        )
+        print ffmpeg_cmd
+
+        p = _logged_popen(
+            ffmpeg_cmd,
             stdout=subprocess.PIPE if not verbose else None,
             stderr=subprocess.PIPE if not verbose else None,
-        ).communicate()
+        )
+        out = p.communicate()
+        if p.returncode != 0:
+            if not verbose:
+                sys.stderr.write(out[1])
+            sys.exit(1)
 
 
 if __name__ == '__main__':

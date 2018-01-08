@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 from __future__ import unicode_literals
+import IPython
 
 from google.cloud import speech
 from google.cloud.speech import enums
 from google.cloud.speech import types
+from google.protobuf.json_format import MessageToJson
 import argparse
 import ffmpeg
 import logging
@@ -17,7 +19,10 @@ logger.setLevel(logging.INFO)
 
 
 parser = argparse.ArgumentParser(description='Convert speech audio to text using Google Speech API')
-parser.add_argument('in_filename', help='Input filename (`-` for stdin)')
+parser.add_argument('in_file', help='Input filename (`-` for stdin)')
+parser.add_argument('--out-file', type=argparse.FileType('w'), default='-',
+    help='Output filename (defaults to stdout)')
+parser.add_argument('--json', action='store_true', help='Output raw JSON response')
 
 
 def decode_audio(in_filename, **input_kwargs):
@@ -38,7 +43,7 @@ def decode_audio(in_filename, **input_kwargs):
     return out[0]
 
 
-def get_transcripts(audio_data):
+def transcribe_data(audio_data):
     client = speech.SpeechClient()
     audio = types.RecognitionAudio(content=audio_data)
     config = types.RecognitionConfig(
@@ -46,17 +51,25 @@ def get_transcripts(audio_data):
         sample_rate_hertz=16000,
         language_code='en-US'
     )
-    response = client.recognize(config, audio)
-    return [result.alternatives[0].transcript for result in response.results]
+    return client.recognize(config, audio)
 
 
 def transcribe(in_filename):
     audio_data = decode_audio(in_filename)
-    transcripts = get_transcripts(audio_data)
-    for transcript in transcripts:
-        print(repr(transcript.encode('utf-8')))
+    return transcribe_data(audio_data)
+
+
+def transcribe_to_file(in_filename, out_file=sys.stdout, as_json=False):
+    transcription = transcribe(in_filename)
+    if as_json:
+        out_file.write(MessageToJson(transcription).encode('utf-8'))
+    else:
+        transcripts = [result.alternatives[0].transcript for result in transcription.results]
+        for transcript in transcripts:
+            line = transcript + '\n'
+            out_file.write(line.encode('utf-8'))
 
 
 if __name__ == '__main__':
     args = parser.parse_args()
-    transcribe(args.in_filename)
+    transcribe_to_file(args.in_file, args.out_file, as_json=args.json)
