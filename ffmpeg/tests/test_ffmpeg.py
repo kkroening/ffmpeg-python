@@ -291,6 +291,11 @@ def test_merge_outputs():
     ]
 
 
+def test__input__start_time():
+    assert ffmpeg.input('in', ss=10.5).output('out').get_args() == ['-ss', '10.5', '-i', 'in', 'out']
+    assert ffmpeg.input('in', ss=0.0).output('out').get_args() == ['-ss', '0.0', '-i', 'in', 'out']
+
+
 def test_multi_passthrough():
     out1 = ffmpeg.input('in1.mp4').output('out1.mp4')
     out2 = ffmpeg.input('in2.mp4').output('out2.mp4')
