@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 from builtins import str
 from .dag import get_outgoing_edges
 from ._run import topo_sort
-import os
 import tempfile
 
 from ffmpeg.nodes import (
@@ -11,7 +10,6 @@ from ffmpeg.nodes import (
     get_stream_spec_nodes,
     InputNode,
     OutputNode,
-    Stream,
     stream_operator,
 )
 
