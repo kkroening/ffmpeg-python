@@ -16,7 +16,7 @@ from .nodes import (
     get_stream_spec_nodes,
     FilterNode,
     GlobalNode,
-    InputNode,   
+    InputNode,
     OutputNode,
     output_operator,
 )
@@ -54,11 +54,24 @@ def _get_input_args(input_node):
     return args
 
 
+def _format_input_stream_name(stream_name_map, edge):
+    prefix = stream_name_map[edge.upstream_node, edge.upstream_label]
+    if not edge.upstream_selector:
+        suffix = ""
+    else:
+        suffix = ":{}".format(edge.upstream_selector)
+    return "[{}{}]".format(prefix, suffix)
+
+
+def _format_output_stream_name(stream_name_map, edge):
+    return "[{}]".format(stream_name_map[edge.upstream_node, edge.upstream_label])
+
+
 def _get_filter_spec(node, outgoing_edge_map, stream_name_map):
     incoming_edges = node.incoming_edges
     outgoing_edges = get_outgoing_edges(node, outgoing_edge_map)
-    inputs = ["[{}{}]".format(stream_name_map[edge.upstream_node, edge.upstream_label], "" if not edge.upstream_selector else ":{}".format(edge.upstream_selector)) for edge in incoming_edges]
-    outputs = ["[{}]".format(stream_name_map[edge.upstream_node, edge.upstream_label]) for edge in outgoing_edges]
+    inputs = [_format_input_stream_name(stream_name_map, edge) for edge in incoming_edges]
+    outputs = [_format_output_stream_name(stream_name_map, edge) for edge in outgoing_edges]
     filter_spec = '{}{}{}'.format(''.join(inputs), node._get_filter(outgoing_edges), ''.join(outputs))
     return filter_spec
 
@@ -71,7 +84,7 @@ def _allocate_filter_stream_names(filter_nodes, outgoing_edge_maps, stream_name_
             if len(downstreams) > 1:
                 # TODO: automatically insert `splits` ahead of time via graph transformation.
                 raise ValueError('Encountered {} with multiple outgoing edges with same upstream label {!r}; a '
-                    '`split` filter is probably required'.format(upstream_node, upstream_label))
+                                 '`split` filter is probably required'.format(upstream_node, upstream_label))
             stream_name_map[upstream_node, upstream_label] = _get_stream_name('s{}'.format(stream_count))
             stream_count += 1
 
@@ -99,7 +112,7 @@ def _get_output_args(node, stream_name_map):
 
     for edge in node.incoming_edges:
         # edge = node.incoming_edges[0]
-        stream_name = "[{}{}]".format(stream_name_map[edge.upstream_node, edge.upstream_label], "" if not edge.upstream_selector else ":{}".format(edge.upstream_selector))
+        stream_name = _format_input_stream_name(stream_name_map, edge)
         if stream_name != '[0]' or len(node.incoming_edges) > 1:
             args += ['-map', stream_name]
 
