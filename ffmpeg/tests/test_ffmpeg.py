@@ -166,11 +166,12 @@ def test_map_same_effect_as_output():
     i1 = ffmpeg.input(TEST_INPUT_FILE1)
     i2 = ffmpeg.input(TEST_OVERLAY_FILE)
 
-    o_map = i1.output(TEST_OUTPUT_FILE1)
-    o_map.map(i2)
+    _o_map = i1.output(TEST_OUTPUT_FILE1)
+    o_map = _o_map.map(i2)
 
     o_nomap = ffmpeg.output(i1, i2, TEST_OUTPUT_FILE1)
 
+    assert id(o_map) != id(_o_map)  # Checks immutability
     assert o_map.node.incoming_edge_map == o_nomap.node.incoming_edge_map
     assert o_map.get_args() == o_nomap.get_args() == ['-i', TEST_INPUT_FILE1,
                                                       '-i', TEST_OVERLAY_FILE,

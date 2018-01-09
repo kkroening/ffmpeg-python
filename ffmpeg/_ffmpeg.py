@@ -83,9 +83,7 @@ def map(*streams):
     if not tail:
         return head
 
-    head.node._add_streams(tail)
-
-    return head
+    return OutputNode(head.node, tail).stream()
 
 
 __all__ = [
