@@ -13,6 +13,7 @@ from .nodes import (
 
 _py_map = map
 
+
 def input(filename, **kwargs):
     """Input file URL (ffmpeg ``-i`` option)
 
@@ -86,12 +87,6 @@ def map(*streams):
 
     return head
 
-# stream_map = get_stream_map(stream_spec)
-# self.__check_input_len(stream_map, min_inputs, max_inputs)
-# self.__check_input_types(stream_map, incoming_stream_types)
-# incoming_edge_map = self.__get_incoming_edge_map(stream_map)
-# super(Node, self).__init__(incoming_edge_map, name, args, kwargs)
-# self.__outgoing_stream_type = outgoing_stream_type
 
 __all__ = [
     'input',

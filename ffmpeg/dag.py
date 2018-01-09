@@ -75,7 +75,6 @@ DagEdge = namedtuple('DagEdge', ['downstream_node', 'downstream_label', 'upstrea
 
 def get_incoming_edges(downstream_node, incoming_edge_map):
     edges = []
-    # downstream_label, (upstream_node, upstream_label) in [(i[0], i[1][:2]) for i in self.incoming_edge_map.items()]
     for downstream_label, upstream_info in [(i[0], i[1]) for i in incoming_edge_map.items()]:
         upstream_node, upstream_label = upstream_info[:2]
         upstream_selector = None if len(upstream_info) < 3 else upstream_info[2]
