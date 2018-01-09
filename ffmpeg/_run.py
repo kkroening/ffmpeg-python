@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from .dag import get_outgoing_edges, topo_sort
 from functools import reduce
-from past.builtins import basestring
+from ._utils import basestring
 import copy
 import operator
 import subprocess as _subprocess
