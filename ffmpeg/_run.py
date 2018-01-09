@@ -22,10 +22,6 @@ from .nodes import (
 )
 
 
-def _get_stream_name(name):
-    return '{}'.format(name)
-
-
 def _convert_kwargs_to_cmd_line_args(kwargs):
     args = []
     for k in sorted(kwargs.keys()):
@@ -85,7 +81,7 @@ def _allocate_filter_stream_names(filter_nodes, outgoing_edge_maps, stream_name_
                 # TODO: automatically insert `splits` ahead of time via graph transformation.
                 raise ValueError('Encountered {} with multiple outgoing edges with same upstream label {!r}; a '
                                  '`split` filter is probably required'.format(upstream_node, upstream_label))
-            stream_name_map[upstream_node, upstream_label] = _get_stream_name('s{}'.format(stream_count))
+            stream_name_map[upstream_node, upstream_label] = 's{}'.format(stream_count)
             stream_count += 1
 
 
@@ -137,7 +133,7 @@ def get_args(stream_spec, overwrite_output=False):
     output_nodes = [node for node in sorted_nodes if isinstance(node, OutputNode)]
     global_nodes = [node for node in sorted_nodes if isinstance(node, GlobalNode)]
     filter_nodes = [node for node in sorted_nodes if isinstance(node, FilterNode)]
-    stream_name_map = {(node, None): _get_stream_name(i) for i, node in enumerate(input_nodes)}
+    stream_name_map = {(node, None): str(i) for i, node in enumerate(input_nodes)}
     filter_arg = _get_filter_arg(filter_nodes, outgoing_edge_maps, stream_name_map)
     args += reduce(operator.add, [_get_input_args(node) for node in input_nodes])
     if filter_arg:
