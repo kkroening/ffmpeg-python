@@ -1,7 +1,4 @@
 from __future__ import unicode_literals
-
-import warnings
-
 from .dag import KwargReprNode
 from ._utils import escape_chars, get_hash_int
 from builtins import object
@@ -199,7 +196,11 @@ class Node(KwargReprNode):
         # "1+" is for `self`
         argc = 1 + len(args) + len(kwargs)
 
-        first_arg = "old_node" in kwargs and kwargs["old_node"] or args[0]
+        first_arg = None
+        if "old_node" in kwargs:
+            first_arg = kwargs["old_node"]
+        elif len(args) > 0:
+            first_arg = args[0]
 
         if argc == _get_arg_count(self.__init_fromnode__) and type(first_arg) == type(self):
             self.__init_fromnode__(*args, **kwargs)
