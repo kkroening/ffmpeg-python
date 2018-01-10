@@ -54,7 +54,7 @@ def split(stream):
 
 @filter_operator()
 def asplit(stream):
-    return FilterNode(stream, split.__name__)
+    return FilterNode(stream, asplit.__name__)
 
 
 @filter_operator()
