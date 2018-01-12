@@ -5,12 +5,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
     <title>ffmpeg-python: Python bindings for FFmpeg &#8212; ffmpeg-python  documentation</title>
-    
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
@@ -60,14 +57,14 @@
 </div>
 <span class="target" id="module-ffmpeg"></span><dl class="function">
 <dt id="ffmpeg.colorchannelmixer">
-<code class="descclassname">ffmpeg.</code><code class="descname">colorchannelmixer</code><span class="sig-paren">(</span><em>parent_node</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.colorchannelmixer" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">ffmpeg.</code><code class="descname">colorchannelmixer</code><span class="sig-paren">(</span><em>stream</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.colorchannelmixer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adjust video input frames by re-mixing color channels.</p>
 <p>Official documentation: <a class="reference external" href="https://ffmpeg.org/ffmpeg-filters.html#colorchannelmixer">colorchannelmixer</a></p>
 </dd></dl>
 
 <dl class="function">
 <dt id="ffmpeg.concat">
-<code class="descclassname">ffmpeg.</code><code class="descname">concat</code><span class="sig-paren">(</span><em>*parent_nodes</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.concat" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">ffmpeg.</code><code class="descname">concat</code><span class="sig-paren">(</span><em>*streams</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.concat" title="Permalink to this definition">¶</a></dt>
 <dd><p>Concatenate audio and video streams, joining them together one after the other.</p>
 <p>The filter works on segments of synchronized video and audio streams. All segments must have the same number of
 streams of each type, and that will also be the number of streams at output.</p>
@@ -93,8 +90,31 @@ output file to handle it.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="ffmpeg.crop">
+<code class="descclassname">ffmpeg.</code><code class="descname">crop</code><span class="sig-paren">(</span><em>stream</em>, <em>x</em>, <em>y</em>, <em>width</em>, <em>height</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.crop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Crop the input video.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>x</strong> – The horizontal position, in the input video, of the left edge of
+the output video.</li>
+<li><strong>y</strong> – The vertical position, in the input video, of the top edge of the
+output video.</li>
+<li><strong>width</strong> – The width of the output video. Must be greater than 0.</li>
+<li><strong>heigth</strong> – The height of the output video. Must be greater than 0.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Official documentation: <a class="reference external" href="https://ffmpeg.org/ffmpeg-filters.html#crop">crop</a></p>
+</dd></dl>
+
+<dl class="function">
 <dt id="ffmpeg.drawbox">
-<code class="descclassname">ffmpeg.</code><code class="descname">drawbox</code><span class="sig-paren">(</span><em>parent_node</em>, <em>x</em>, <em>y</em>, <em>width</em>, <em>height</em>, <em>color</em>, <em>thickness=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.drawbox" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">ffmpeg.</code><code class="descname">drawbox</code><span class="sig-paren">(</span><em>stream</em>, <em>x</em>, <em>y</em>, <em>width</em>, <em>height</em>, <em>color</em>, <em>thickness=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.drawbox" title="Permalink to this definition">¶</a></dt>
 <dd><p>Draw a colored box on the input image.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -122,9 +142,155 @@ video with inverted luma.</li>
 </dd></dl>
 
 <dl class="function">
+<dt id="ffmpeg.drawtext">
+<code class="descclassname">ffmpeg.</code><code class="descname">drawtext</code><span class="sig-paren">(</span><em>stream</em>, <em>text=None</em>, <em>x=0</em>, <em>y=0</em>, <em>escape_text=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.drawtext" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw a text string or text from a specified file on top of a video, using the libfreetype library.</p>
+<p>To enable compilation of this filter, you need to configure FFmpeg with <code class="docutils literal"><span class="pre">--enable-libfreetype</span></code>. To enable default
+font fallback and the font option you need to configure FFmpeg with <code class="docutils literal"><span class="pre">--enable-libfontconfig</span></code>. To enable the
+text_shaping option, you need to configure FFmpeg with <code class="docutils literal"><span class="pre">--enable-libfribidi</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>box</strong> – Used to draw a box around text using the background color. The value must be either 1 (enable) or 0
+(disable). The default value of box is 0.</li>
+<li><strong>boxborderw</strong> – Set the width of the border to be drawn around the box using boxcolor. The default value of
+boxborderw is 0.</li>
+<li><strong>boxcolor</strong> – The color to be used for drawing box around text. For the syntax of this option, check the “Color”
+section in the ffmpeg-utils manual.  The default value of boxcolor is “white”.</li>
+<li><strong>line_spacing</strong> – Set the line spacing in pixels of the border to be drawn around the box using box. The default
+value of line_spacing is 0.</li>
+<li><strong>borderw</strong> – Set the width of the border to be drawn around the text using bordercolor. The default value of
+borderw is 0.</li>
+<li><strong>bordercolor</strong> – Set the color to be used for drawing border around text. For the syntax of this option, check the
+“Color” section in the ffmpeg-utils manual.  The default value of bordercolor is “black”.</li>
+<li><strong>expansion</strong> – Select how the text is expanded. Can be either none, strftime (deprecated) or normal (default). See
+the Text expansion section below for details.</li>
+<li><strong>basetime</strong> – Set a start time for the count. Value is in microseconds. Only applied in the deprecated strftime
+expansion mode. To emulate in normal expansion mode use the pts function, supplying the start time (in
+seconds) as the second argument.</li>
+<li><strong>fix_bounds</strong> – If true, check and fix text coords to avoid clipping.</li>
+<li><strong>fontcolor</strong> – The color to be used for drawing fonts. For the syntax of this option, check the “Color” section in
+the ffmpeg-utils manual.  The default value of fontcolor is “black”.</li>
+<li><strong>fontcolor_expr</strong> – String which is expanded the same way as text to obtain dynamic fontcolor value. By default
+this option has empty value and is not processed. When this option is set, it overrides fontcolor option.</li>
+<li><strong>font</strong> – The font family to be used for drawing text. By default Sans.</li>
+<li><strong>fontfile</strong> – The font file to be used for drawing text. The path must be included. This parameter is mandatory if
+the fontconfig support is disabled.</li>
+<li><strong>alpha</strong> – Draw the text applying alpha blending. The value can be a number between 0.0 and 1.0. The expression
+accepts the same variables x, y as well. The default value is 1. Please see fontcolor_expr.</li>
+<li><strong>fontsize</strong> – The font size to be used for drawing text. The default value of fontsize is 16.</li>
+<li><strong>text_shaping</strong> – If set to 1, attempt to shape the text (for example, reverse the order of right-to-left text and
+join Arabic characters) before drawing it. Otherwise, just draw the text exactly as given. By default 1 (if
+supported).</li>
+<li><strong>ft_load_flags</strong> – <p>The flags to be used for loading the fonts. The flags map the corresponding flags supported by
+libfreetype, and are a combination of the following values:</p>
+<ul>
+<li><code class="docutils literal"><span class="pre">default</span></code></li>
+<li><code class="docutils literal"><span class="pre">no_scale</span></code></li>
+<li><code class="docutils literal"><span class="pre">no_hinting</span></code></li>
+<li><code class="docutils literal"><span class="pre">render</span></code></li>
+<li><code class="docutils literal"><span class="pre">no_bitmap</span></code></li>
+<li><code class="docutils literal"><span class="pre">vertical_layout</span></code></li>
+<li><code class="docutils literal"><span class="pre">force_autohint</span></code></li>
+<li><code class="docutils literal"><span class="pre">crop_bitmap</span></code></li>
+<li><code class="docutils literal"><span class="pre">pedantic</span></code></li>
+<li><code class="docutils literal"><span class="pre">ignore_global_advance_width</span></code></li>
+<li><code class="docutils literal"><span class="pre">no_recurse</span></code></li>
+<li><code class="docutils literal"><span class="pre">ignore_transform</span></code></li>
+<li><code class="docutils literal"><span class="pre">monochrome</span></code></li>
+<li><code class="docutils literal"><span class="pre">linear_design</span></code></li>
+<li><code class="docutils literal"><span class="pre">no_autohint</span></code></li>
+</ul>
+<p>Default value is “default”.  For more information consult the documentation for the FT_LOAD_* libfreetype
+flags.</p>
+</li>
+<li><strong>shadowcolor</strong> – The color to be used for drawing a shadow behind the drawn text. For the syntax of this option,
+check the “Color” section in the ffmpeg-utils manual.  The default value of shadowcolor is “black”.</li>
+<li><strong>shadowx</strong> – The x offset for the text shadow position with respect to the position of the text. It can be either
+positive or negative values. The default value is “0”.</li>
+<li><strong>shadowy</strong> – The y offset for the text shadow position with respect to the position of the text. It can be either
+positive or negative values. The default value is “0”.</li>
+<li><strong>start_number</strong> – The starting frame number for the n/frame_num variable. The default value is “0”.</li>
+<li><strong>tabsize</strong> – The size in number of spaces to use for rendering the tab. Default value is 4.</li>
+<li><strong>timecode</strong> – Set the initial timecode representation in “hh:mm:ss[:;.]ff” format. It can be used with or without
+text parameter. timecode_rate option must be specified.</li>
+<li><strong>rate</strong> – Set the timecode frame rate (timecode only).</li>
+<li><strong>timecode_rate</strong> – Alias for <code class="docutils literal"><span class="pre">rate</span></code>.</li>
+<li><strong>r</strong> – Alias for <code class="docutils literal"><span class="pre">rate</span></code>.</li>
+<li><strong>tc24hmax</strong> – If set to 1, the output of the timecode option will wrap around at 24 hours. Default is 0 (disabled).</li>
+<li><strong>text</strong> – The text string to be drawn. The text must be a sequence of UTF-8 encoded characters. This parameter is
+mandatory if no file is specified with the parameter textfile.</li>
+<li><strong>textfile</strong> – A text file containing text to be drawn. The text must be a sequence of UTF-8 encoded characters.
+This parameter is mandatory if no text string is specified with the parameter text.  If both text and
+textfile are specified, an error is thrown.</li>
+<li><strong>reload</strong> – If set to 1, the textfile will be reloaded before each frame. Be sure to update it atomically, or it
+may be read partially, or even fail.</li>
+<li><strong>x</strong> – The expression which specifies the offset where text will be drawn within the video frame. It is relative to
+the left border of the output image. The default value is “0”.</li>
+<li><strong>y</strong> – The expression which specifies the offset where text will be drawn within the video frame. It is relative to
+the top border of the output image. The default value is “0”.  See below for the list of accepted constants
+and functions.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Expression constants:</dt>
+<dd><dl class="first docutils">
+<dt>The parameters for x and y are expressions containing the following constants and functions:</dt>
+<dd><ul class="first last simple">
+<li>dar: input display aspect ratio, it is the same as <code class="docutils literal"><span class="pre">(w</span> <span class="pre">/</span> <span class="pre">h)</span> <span class="pre">*</span> <span class="pre">sar</span></code></li>
+<li>hsub: horizontal chroma subsample values. For example for the pixel format “yuv422p” hsub is 2 and vsub
+is 1.</li>
+<li>vsub: vertical chroma subsample values. For example for the pixel format “yuv422p” hsub is 2 and vsub
+is 1.</li>
+<li>line_h: the height of each text line</li>
+<li>lh: Alias for <code class="docutils literal"><span class="pre">line_h</span></code>.</li>
+<li>main_h: the input height</li>
+<li>h: Alias for <code class="docutils literal"><span class="pre">main_h</span></code>.</li>
+<li>H: Alias for <code class="docutils literal"><span class="pre">main_h</span></code>.</li>
+<li>main_w: the input width</li>
+<li>w: Alias for <code class="docutils literal"><span class="pre">main_w</span></code>.</li>
+<li>W: Alias for <code class="docutils literal"><span class="pre">main_w</span></code>.</li>
+<li>ascent: the maximum distance from the baseline to the highest/upper grid coordinate used to place a glyph
+outline point, for all the rendered glyphs. It is a positive value, due to the grid’s orientation with the Y
+axis upwards.</li>
+<li>max_glyph_a: Alias for <code class="docutils literal"><span class="pre">ascent</span></code>.</li>
+<li>descent: the maximum distance from the baseline to the lowest grid coordinate used to place a glyph outline
+point, for all the rendered glyphs. This is a negative value, due to the grid’s orientation, with the Y axis
+upwards.</li>
+<li>max_glyph_d: Alias for <code class="docutils literal"><span class="pre">descent</span></code>.</li>
+<li>max_glyph_h: maximum glyph height, that is the maximum height for all the glyphs contained in the rendered
+text, it is equivalent to ascent - descent.</li>
+<li>max_glyph_w: maximum glyph width, that is the maximum width for all the glyphs contained in the rendered
+text.</li>
+<li>n: the number of input frame, starting from 0</li>
+<li>rand(min, max): return a random number included between min and max</li>
+<li>sar: The input sample aspect ratio.</li>
+<li>t: timestamp expressed in seconds, NAN if the input timestamp is unknown</li>
+<li>text_h: the height of the rendered text</li>
+<li>th: Alias for <code class="docutils literal"><span class="pre">text_h</span></code>.</li>
+<li>text_w: the width of the rendered text</li>
+<li>tw: Alias for <code class="docutils literal"><span class="pre">text_w</span></code>.</li>
+<li>x: the x offset coordinates where the text is drawn.</li>
+<li>y: the y offset coordinates where the text is drawn.</li>
+</ul>
+</dd>
+</dl>
+<p class="last">These parameters allow the x and y expressions to refer each other, so you can for example specify
+<code class="docutils literal"><span class="pre">y=x/dar</span></code>.</p>
+</dd>
+</dl>
+<p>Official documentation: <a class="reference external" href="https://ffmpeg.org/ffmpeg-filters.html#drawtext">drawtext</a></p>
+</dd></dl>
+
+<dl class="function">
 <dt id="ffmpeg.filter_">
-<code class="descclassname">ffmpeg.</code><code class="descname">filter_</code><span class="sig-paren">(</span><em>parent_node</em>, <em>filter_name</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.filter_" title="Permalink to this definition">¶</a></dt>
-<dd><p>Apply custom single-source filter.</p>
+<code class="descclassname">ffmpeg.</code><code class="descname">filter_</code><span class="sig-paren">(</span><em>stream_spec</em>, <em>filter_name</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.filter_" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply custom filter.</p>
 <p><code class="docutils literal"><span class="pre">filter_</span></code> is normally used by higher-level filter functions such as <code class="docutils literal"><span class="pre">hflip</span></code>, but if a filter implementation
 is missing from <code class="docutils literal"><span class="pre">fmpeg-python</span></code>, you can call <code class="docutils literal"><span class="pre">filter_</span></code> directly to have <code class="docutils literal"><span class="pre">fmpeg-python</span></code> pass the filter name
 and arguments to ffmpeg verbatim.</p>
@@ -133,7 +299,7 @@ and arguments to ffmpeg verbatim.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>parent_node</strong> – Source stream to apply filter to.</li>
+<li><strong>stream_spec</strong> – a Stream, list of Streams, or label-to-Stream dictionary mapping</li>
 <li><strong>filter_name</strong> – ffmpeg filter name, e.g. <cite>colorchannelmixer</cite></li>
 <li><strong>*args</strong> – list of args to pass to ffmpeg verbatim</li>
 <li><strong>**kwargs</strong> – list of keyword-args to pass to ffmpeg verbatim</li>
@@ -142,51 +308,21 @@ and arguments to ffmpeg verbatim.</p>
 </tr>
 </tbody>
 </table>
-<p>This function is used internally by all of the other single-source filters (e.g. <code class="docutils literal"><span class="pre">hflip</span></code>, <code class="docutils literal"><span class="pre">crop</span></code>, etc.).
-For custom multi-source filters, see <code class="docutils literal"><span class="pre">filter_multi</span></code> instead.</p>
 <p>The function name is suffixed with <code class="docutils literal"><span class="pre">_</span></code> in order avoid confusion with the standard python <code class="docutils literal"><span class="pre">filter</span></code> function.</p>
 <p class="rubric">Example</p>
 <p><code class="docutils literal"><span class="pre">ffmpeg.input('in.mp4').filter_('hflip').output('out.mp4').run()</span></code></p>
 </dd></dl>
 
 <dl class="function">
-<dt id="ffmpeg.filter_multi">
-<code class="descclassname">ffmpeg.</code><code class="descname">filter_multi</code><span class="sig-paren">(</span><em>parent_nodes</em>, <em>filter_name</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.filter_multi" title="Permalink to this definition">¶</a></dt>
-<dd><p>Apply custom multi-source filter.</p>
-<p>This is nearly identical to the <code class="docutils literal"><span class="pre">filter</span></code> function except that it allows filters to be applied to multiple
-streams.  It’s normally used by higher-level filter functions such as <code class="docutils literal"><span class="pre">concat</span></code>, but if a filter implementation
-is missing from <code class="docutils literal"><span class="pre">fmpeg-python</span></code>, you can call <code class="docutils literal"><span class="pre">filter_multi</span></code> directly.</p>
-<p>Note that because it applies to multiple streams, it can’t be used as an operator, unlike the <code class="docutils literal"><span class="pre">filter</span></code> function
-(e.g. <code class="docutils literal"><span class="pre">ffmpeg.input('in.mp4').filter_('hflip')</span></code>)</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>parent_nodes</strong> – List of source streams to apply filter to.</li>
-<li><strong>filter_name</strong> – ffmpeg filter name, e.g. <cite>concat</cite></li>
-<li><strong>*args</strong> – list of args to pass to ffmpeg verbatim</li>
-<li><strong>**kwargs</strong> – list of keyword-args to pass to ffmpeg verbatim</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<p>For custom single-source filters, see <code class="docutils literal"><span class="pre">filter_multi</span></code> instead.</p>
-<p class="rubric">Example</p>
-<p><code class="docutils literal"><span class="pre">ffmpeg.filter_multi(ffmpeg.input('in1.mp4'),</span> <span class="pre">ffmpeg.input('in2.mp4'),</span> <span class="pre">'concat',</span> <span class="pre">n=2).output('out.mp4').run()</span></code></p>
-</dd></dl>
-
-<dl class="function">
 <dt id="ffmpeg.hflip">
-<code class="descclassname">ffmpeg.</code><code class="descname">hflip</code><span class="sig-paren">(</span><em>parent_node</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.hflip" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">ffmpeg.</code><code class="descname">hflip</code><span class="sig-paren">(</span><em>stream</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.hflip" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flip the input video horizontally.</p>
 <p>Official documentation: <a class="reference external" href="https://ffmpeg.org/ffmpeg-filters.html#hflip">hflip</a></p>
 </dd></dl>
 
 <dl class="function">
 <dt id="ffmpeg.hue">
-<code class="descclassname">ffmpeg.</code><code class="descname">hue</code><span class="sig-paren">(</span><em>parent_node</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.hue" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">ffmpeg.</code><code class="descname">hue</code><span class="sig-paren">(</span><em>stream</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.hue" title="Permalink to this definition">¶</a></dt>
 <dd><p>Modify the hue and/or the saturation of the input.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -207,7 +343,7 @@ is missing from <code class="docutils literal"><span class="pre">fmpeg-python</s
 
 <dl class="function">
 <dt id="ffmpeg.overlay">
-<code class="descclassname">ffmpeg.</code><code class="descname">overlay</code><span class="sig-paren">(</span><em>main_parent_node</em>, <em>overlay_parent_node</em>, <em>eof_action=u’repeat’</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.overlay" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">ffmpeg.</code><code class="descname">overlay</code><span class="sig-paren">(</span><em>main_parent_node</em>, <em>overlay_parent_node</em>, <em>eof_action=u'repeat'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.overlay" title="Permalink to this definition">¶</a></dt>
 <dd><p>Overlay one video on top of another.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -266,7 +402,7 @@ the stream. A value of 0 disables this behavior. Default value is 1.</li>
 
 <dl class="function">
 <dt id="ffmpeg.setpts">
-<code class="descclassname">ffmpeg.</code><code class="descname">setpts</code><span class="sig-paren">(</span><em>parent_node</em>, <em>expr</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.setpts" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">ffmpeg.</code><code class="descname">setpts</code><span class="sig-paren">(</span><em>stream</em>, <em>expr</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.setpts" title="Permalink to this definition">¶</a></dt>
 <dd><p>Change the PTS (presentation timestamp) of the input frames.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -281,7 +417,7 @@ the stream. A value of 0 disables this behavior. Default value is 1.</li>
 
 <dl class="function">
 <dt id="ffmpeg.trim">
-<code class="descclassname">ffmpeg.</code><code class="descname">trim</code><span class="sig-paren">(</span><em>parent_node</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.trim" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">ffmpeg.</code><code class="descname">trim</code><span class="sig-paren">(</span><em>stream</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.trim" title="Permalink to this definition">¶</a></dt>
 <dd><p>Trim the input so that the output contains one continuous subpart of the input.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -309,14 +445,14 @@ seconds.</li>
 
 <dl class="function">
 <dt id="ffmpeg.vflip">
-<code class="descclassname">ffmpeg.</code><code class="descname">vflip</code><span class="sig-paren">(</span><em>parent_node</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.vflip" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">ffmpeg.</code><code class="descname">vflip</code><span class="sig-paren">(</span><em>stream</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.vflip" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flip the input video vertically.</p>
 <p>Official documentation: <a class="reference external" href="https://ffmpeg.org/ffmpeg-filters.html#vflip">vflip</a></p>
 </dd></dl>
 
 <dl class="function">
 <dt id="ffmpeg.zoompan">
-<code class="descclassname">ffmpeg.</code><code class="descname">zoompan</code><span class="sig-paren">(</span><em>parent_node</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.zoompan" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">ffmpeg.</code><code class="descname">zoompan</code><span class="sig-paren">(</span><em>stream</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.zoompan" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply Zoom &amp; Pan effect.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -348,35 +484,48 @@ for single input image.</li>
 
 <dl class="function">
 <dt id="ffmpeg.merge_outputs">
-<code class="descclassname">ffmpeg.</code><code class="descname">merge_outputs</code><span class="sig-paren">(</span><em>*parent_nodes</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.merge_outputs" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">ffmpeg.</code><code class="descname">merge_outputs</code><span class="sig-paren">(</span><em>*streams</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.merge_outputs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Include all given outputs in one ffmpeg command line</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="ffmpeg.output">
-<code class="descclassname">ffmpeg.</code><code class="descname">output</code><span class="sig-paren">(</span><em>parent_node</em>, <em>filename</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.output" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">ffmpeg.</code><code class="descname">output</code><span class="sig-paren">(</span><em>stream</em>, <em>filename</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.output" title="Permalink to this definition">¶</a></dt>
 <dd><p>Output file URL</p>
 <p>Official documentation: <a class="reference external" href="https://ffmpeg.org/ffmpeg.html#Synopsis">Synopsis</a></p>
 </dd></dl>
 
 <dl class="function">
 <dt id="ffmpeg.overwrite_output">
-<code class="descclassname">ffmpeg.</code><code class="descname">overwrite_output</code><span class="sig-paren">(</span><em>parent_node</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.overwrite_output" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">ffmpeg.</code><code class="descname">overwrite_output</code><span class="sig-paren">(</span><em>stream</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.overwrite_output" title="Permalink to this definition">¶</a></dt>
 <dd><p>Overwrite output files without asking (ffmpeg <code class="docutils literal"><span class="pre">-y</span></code> option)</p>
 <p>Official documentation: <a class="reference external" href="https://ffmpeg.org/ffmpeg.html#Main-options">Main options</a></p>
 </dd></dl>
 
 <dl class="function">
 <dt id="ffmpeg.get_args">
-<code class="descclassname">ffmpeg.</code><code class="descname">get_args</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.get_args" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">ffmpeg.</code><code class="descname">get_args</code><span class="sig-paren">(</span><em>stream_spec</em>, <em>overwrite_output=False</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.get_args" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get command-line arguments for ffmpeg.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="ffmpeg.run">
-<code class="descclassname">ffmpeg.</code><code class="descname">run</code><span class="sig-paren">(</span><em>node</em>, <em>cmd=u’ffmpeg’</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.run" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">ffmpeg.</code><code class="descname">run</code><span class="sig-paren">(</span><em>stream_spec</em>, <em>cmd=u'ffmpeg'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run ffmpeg on node graph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>**kwargs</strong> – keyword-arguments passed to <code class="docutils literal"><span class="pre">get_args()</span></code> (e.g. <code class="docutils literal"><span class="pre">overwrite_output=True</span></code>).</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
+
+<dl class="function">
+<dt id="ffmpeg.view">
+<code class="descclassname">ffmpeg.</code><code class="descname">view</code><span class="sig-paren">(</span><em>stream_spec</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.view" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </div>
 <div class="section" id="indices-and-tables">
@@ -435,7 +584,7 @@ for single input image.</li>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Karl Kroening.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.5.
     </div>
   </body>
 </html>

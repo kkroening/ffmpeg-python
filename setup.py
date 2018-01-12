@@ -2,7 +2,7 @@ from setuptools import setup
 from textwrap import dedent
 import subprocess
 
-version = '0.1.8'
+version = '0.1.9'
 download_url = 'https://github.com/kkroening/ffmpeg-python/archive/v{}.zip'.format(version)
 
 long_description = dedent("""\

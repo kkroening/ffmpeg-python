@@ -27,7 +27,7 @@ def _convert_kwargs_to_cmd_line_args(kwargs):
     for k in sorted(kwargs.keys()):
         v = kwargs[k]
         args.append('-{}'.format(k))
-        if v:
+        if v is not None:
             args.append('{}'.format(v))
     return args
 
@@ -146,21 +146,27 @@ def get_args(stream_spec, overwrite_output=False):
 
 
 @output_operator()
+def compile(stream_spec, cmd='ffmpeg', **kwargs):
+    """Build command-line for ffmpeg."""
+    if isinstance(cmd, basestring):
+        cmd = [cmd]
+    elif type(cmd) != list:
+        cmd = list(cmd)
+    return cmd + get_args(stream_spec, **kwargs)
+
+
+@output_operator()
 def run(stream_spec, cmd='ffmpeg', **kwargs):
     """Run ffmpeg on node graph.
 
     Args:
         **kwargs: keyword-arguments passed to ``get_args()`` (e.g. ``overwrite_output=True``).
     """
-    if isinstance(cmd, basestring):
-        cmd = [cmd]
-    elif type(cmd) != list:
-        cmd = list(cmd)
-    args = cmd + get_args(stream_spec, **kwargs)
-    _subprocess.check_call(args)
+    _subprocess.check_call(compile(stream_spec, cmd, **kwargs))
 
 
 __all__ = [
+    'compile',
     'get_args',
     'run',
 ]
