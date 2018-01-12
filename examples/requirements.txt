@@ -1,1 +1,2 @@
-ffmpeg
+ffmpeg-python
+google-cloud-speech
