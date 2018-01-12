@@ -12,7 +12,7 @@ There are tons of Python FFmpeg wrappers out there but they seem to lack complex
 ## Quickstart
 
 Flip a video horizontally:
-```
+```python
 import ffmpeg
 stream = ffmpeg.input('input.mp4')
 stream = ffmpeg.hflip(stream)
@@ -21,7 +21,7 @@ ffmpeg.run(stream)
 ```
 
 Or if you prefer a fluent interface:
-```
+```python
 import ffmpeg
 (ffmpeg
     .input('input.mp4')
@@ -39,7 +39,7 @@ Take for example a signal graph that looks like this:
 ![Signal graph](https://raw.githubusercontent.com/kkroening/ffmpeg-python/master/doc/graph1.png)
 
 The corresponding command-line arguments are pretty gnarly:
-```
+```bash
 ffmpeg -i input.mp4 \
     -filter_complex "\
         [0]trim=start_frame=10:end_frame=20[v0];\
@@ -54,7 +54,7 @@ ffmpeg -i input.mp4 \
 Maybe this looks great to you, but if you're not an FFmpeg command-line expert, it probably looks alien.
 
 If you're like me and find Python to be powerful and readable, it's easy with `ffmpeg-python`:
-```
+```python
 import ffmpeg
 
 in_file = ffmpeg.input('input.mp4')
@@ -87,7 +87,7 @@ pip install ffmpeg-python
 ```
 
 It's also possible to clone the source and put it on your python path (`$PYTHONPATH`, `sys.path`, etc.):
-```
+```bash
 $ git clone git@github.com:kkroening/ffmpeg-python.git
 $ export PYTHONPATH=${PYTHONPATH}:ffmpeg-python
 $ python
@@ -99,7 +99,7 @@ $ python
 API documentation is automatically generated from python docstrings and hosted on github pages: https://kkroening.github.io/ffmpeg-python/
 
 Alternatively, standard python help is available, such as at the python REPL prompt as follows:
-```
+```python
 >>> import ffmpeg
 >>> help(ffmpeg)
 ```
@@ -107,7 +107,7 @@ Alternatively, standard python help is available, such as at the python REPL pro
 ## Custom Filters
 
 Don't see the filter you're looking for?  `ffmpeg-python` is a work in progress, but it's easy to use any arbitrary ffmpeg filter:
-```
+```python
 stream = ffmpeg.input('dummy.mp4')
 stream = ffmpeg.filter_(stream, 'fps', fps=25, round='up')
 stream = ffmpeg.output(stream, 'dummy2.mp4')
@@ -115,7 +115,7 @@ ffmpeg.run(stream)
 ```
 
 Or fluently:
-```
+```python
 (ffmpeg
     .input('dummy.mp4')
     .filter_('fps', fps=25, round='up')
