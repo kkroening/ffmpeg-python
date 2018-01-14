@@ -48,7 +48,7 @@ def get_chunk_times(in_filename, silence_threshold, silence_duration, start_time
     if end_time is not None:
         input_kwargs['t'] = end_time - start_time
 
-    p = _logged_popen(
+    child = _logged_popen(
         (ffmpeg
             .input(in_filename, **input_kwargs)
             .filter_('silencedetect', n='{}dB'.format(silence_threshold), d=silence_duration)
@@ -57,8 +57,8 @@ def get_chunk_times(in_filename, silence_threshold, silence_duration, start_time
         ) + ['-nostats'],  # FIXME: use .nostats() once it's implemented in ffmpeg-python.
         stderr=subprocess.PIPE
     )
-    output = p.communicate()[1].decode('utf-8')
-    if p.returncode != 0:
+    output = child.communicate()[1].decode('utf-8')
+    if child.returncode != 0:
         sys.stderr.write(output)
         sys.exit(1)
     logger.debug(output)
@@ -127,25 +127,24 @@ def split_audio(
         input = ffmpeg.input(in_filename, ss=start_time, t=time)
 
         if padding > 0.:
-            silence = ffmpeg.input('aevalsrc=0:0::duration={}'.format(padding), format='lavfi')
-            input = ffmpeg.concat(silence, input, v=0, a=1)
+            silence = ffmpeg.input('anullsrc', format='lavfi', t=padding)
+            input = ffmpeg.concat(silence, input, silence, v=0, a=1)
 
         ffmpeg_cmd = (input
             .output(out_filename)
             .overwrite_output()
             .compile()
         )
-        print ffmpeg_cmd
 
-        p = _logged_popen(
+        child = _logged_popen(
             ffmpeg_cmd,
             stdout=subprocess.PIPE if not verbose else None,
             stderr=subprocess.PIPE if not verbose else None,
         )
-        out = p.communicate()
-        if p.returncode != 0:
+        out = child.communicate()
+        if child.returncode != 0:
             if not verbose:
-                sys.stderr.write(out[1])
+                sys.stderr.write(out[1].decode('utf-8'))
             sys.exit(1)
 
 
