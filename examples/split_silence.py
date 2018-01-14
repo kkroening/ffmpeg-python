@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import argparse
 import errno
 import ffmpeg
+import json
 import logging
 import os
 import re
@@ -16,7 +17,7 @@ logger = logging.getLogger(__file__)
 logger.setLevel(logging.INFO)
 
 DEFAULT_DURATION = 0.3
-DEFAULT_THRESHOLD = -60
+DEFAULT_THRESHOLD = -30
 
 parser = argparse.ArgumentParser(description='Split media into separate chunks wherever silence occurs')
 parser.add_argument('in_filename', help='Input filename (`-` for stdin)')
@@ -26,6 +27,8 @@ parser.add_argument('--silence-duration', default=DEFAULT_DURATION, type=float, 
 parser.add_argument('--start-time', type=float, help='Start time (seconds)')
 parser.add_argument('--end-time', type=float, help='End time (seconds)')
 parser.add_argument('-v', dest='verbose', action='store_true', help='Verbose mode')
+parser.add_argument('--metadata-filename', help='Optional metadata output file')
+
 
 silence_start_re = re.compile(' silence_start: (?P<start>[0-9]+(\.?[0-9]*))$')
 silence_end_re = re.compile(' silence_end: (?P<end>[0-9]+(\.?[0-9]*)) ')
@@ -97,7 +100,8 @@ def get_chunk_times(in_filename, silence_threshold, silence_duration, start_time
 def _makedirs(path):
     """Python2-compatible version of ``os.makedirs(path, exist_ok=True)``."""
     try:
-        os.makedirs(path)
+        if path:
+            os.makedirs(path)
     except OSError as exc:
         if exc.errno != errno.EEXIST or not os.path.isdir(path):
             raise
@@ -110,17 +114,28 @@ def split_audio(
     silence_duration=DEFAULT_DURATION,
     start_time=None,
     end_time=None,
+    metadata_filename=None,
     verbose=False,
 ):
     chunk_times = get_chunk_times(in_filename, silence_threshold, silence_duration, start_time, end_time)
 
+    metadata = []
     for i, (start_time, end_time) in enumerate(chunk_times):
         time = end_time - start_time
         out_filename = out_pattern.format(i, i=i)
         _makedirs(os.path.dirname(out_filename))
 
-        logger.info('{}: start={:.02f}, end={:.02f}, duration={:.02f}'.format(out_filename, start_time, end_time,
-            time))
+        start_text = '{:.02f}'.format(start_time)
+        end_text = '{:.02f}'.format(end_time)
+        duration_text = '{:.02f}'.format(time)
+        metadata.append({
+            'filename': out_filename,
+            'start': start_text,
+            'end': end_text,
+            'duration': duration_text,
+        })
+        logger.info('{}: start={}, end={}, duration={}'.format(out_filename, start_text, end_text, duration_text))
+
         _logged_popen(
             (ffmpeg
                 .input(in_filename, ss=start_time, t=time)
@@ -131,6 +146,11 @@ def split_audio(
             stdout=subprocess.PIPE if not verbose else None,
             stderr=subprocess.PIPE if not verbose else None,
         ).communicate()
+
+    if metadata_filename is not None:
+        _makedirs(os.path.dirname(metadata_filename))
+        with open(metadata_filename, 'w') as f:
+            json.dump(metadata, f)
 
 
 if __name__ == '__main__':
