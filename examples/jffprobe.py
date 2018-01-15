@@ -17,7 +17,7 @@ class ExecException(Exception):
 
 
 def run_ffprobe(filename):
-    args = ['ffprobe', '-show_format', '-of', 'json', filename]
+    args = ['ffprobe', '-show_format', '-show_streams', '-of', 'json', filename]
     p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = p.communicate()
     if p.returncode != 0:
