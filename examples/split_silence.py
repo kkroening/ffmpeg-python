@@ -26,8 +26,9 @@ parser.add_argument('--silence-threshold', default=DEFAULT_THRESHOLD, type=int, 
 parser.add_argument('--silence-duration', default=DEFAULT_DURATION, type=float, help='Silence duration')
 parser.add_argument('--start-time', type=float, help='Start time (seconds)')
 parser.add_argument('--end-time', type=float, help='End time (seconds)')
-parser.add_argument('-v', dest='verbose', action='store_true', help='Verbose mode')
+parser.add_argument('--padding', type=float, default=0., help='Output silence padding (seconds)')
 parser.add_argument('--metadata-filename', help='Optional metadata output file')
+parser.add_argument('-v', dest='verbose', action='store_true', help='Verbose mode')
 
 
 silence_start_re = re.compile(' silence_start: (?P<start>[0-9]+(\.?[0-9]*))$')
@@ -50,7 +51,7 @@ def get_chunk_times(in_filename, silence_threshold, silence_duration, start_time
     if end_time is not None:
         input_kwargs['t'] = end_time - start_time
 
-    p = _logged_popen(
+    child = _logged_popen(
         (ffmpeg
             .input(in_filename, **input_kwargs)
             .filter_('silencedetect', n='{}dB'.format(silence_threshold), d=silence_duration)
@@ -59,8 +60,8 @@ def get_chunk_times(in_filename, silence_threshold, silence_duration, start_time
         ) + ['-nostats'],  # FIXME: use .nostats() once it's implemented in ffmpeg-python.
         stderr=subprocess.PIPE
     )
-    output = p.communicate()[1].decode('utf-8')
-    if p.returncode != 0:
+    output = child.communicate()[1].decode('utf-8')
+    if child.returncode != 0:
         sys.stderr.write(output)
         sys.exit(1)
     logger.debug(output)
@@ -114,6 +115,7 @@ def split_audio(
     silence_duration=DEFAULT_DURATION,
     start_time=None,
     end_time=None,
+    padding=0.,
     metadata_filename=None,
     verbose=False,
 ):
@@ -125,9 +127,9 @@ def split_audio(
         out_filename = out_pattern.format(i, i=i)
         _makedirs(os.path.dirname(out_filename))
 
-        start_text = '{:.02f}'.format(start_time)
-        end_text = '{:.02f}'.format(end_time)
-        duration_text = '{:.02f}'.format(time)
+        start_text = '{:.04f}'.format(start_time)
+        end_text = '{:.04f}'.format(end_time)
+        duration_text = '{:.04f}'.format(time)
         metadata.append({
             'filename': out_filename,
             'start': start_text,
@@ -136,16 +138,24 @@ def split_audio(
         })
         logger.info('{}: start={}, end={}, duration={}'.format(out_filename, start_text, end_text, duration_text))
 
-        _logged_popen(
-            (ffmpeg
-                .input(in_filename, ss=start_time, t=time)
+        input = ffmpeg.input(in_filename, ss=start_time, t=time)
+        if padding > 0.:
+            silence = ffmpeg.input('anullsrc', format='lavfi', t=padding)
+            input = ffmpeg.concat(silence, input, silence, v=0, a=1)
+
+        child = _logged_popen(
+            (input
                 .output(out_filename)
                 .overwrite_output()
                 .compile()
             ),
             stdout=subprocess.PIPE if not verbose else None,
             stderr=subprocess.PIPE if not verbose else None,
-        ).communicate()
+        )
+        out = child.communicate()
+        if child.returncode != 0:
+            if not verbose:
+                sys.stderr.write(out[1].decode('utf-8'))
 
     if metadata_filename is not None:
         _makedirs(os.path.dirname(metadata_filename))
