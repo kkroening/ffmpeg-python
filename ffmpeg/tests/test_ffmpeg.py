@@ -265,6 +265,18 @@ def test_custom_filter():
     ]
 
 
+def test_custom_filter_escaped():
+    stream = ffmpeg.input('dummy.mp4')
+    stream = ffmpeg.filter_(stream, 'bogus=stuff', 'a=b\'', **{'c\\d': 'e=f'})
+    stream = ffmpeg.output(stream, 'dummy2.mp4')
+    assert stream.get_args() == [
+        '-i', 'dummy.mp4',
+        '-filter_complex', '[0]bogus\\\\=stuff=a\\\\\\\\\\\\=b\\\\\\\\\\\\\\\':c\\\\\\\\d=e\\\\=f[s0]',
+        '-map', '[s0]',
+        'dummy2.mp4'
+    ]
+
+
 def test_custom_filter_fluent():
     stream = (ffmpeg
         .input('dummy.mp4')

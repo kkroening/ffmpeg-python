@@ -148,22 +148,31 @@ class FilterNode(Node):
             kwargs=kwargs
         )
 
-    """FilterNode"""
-    def _get_filter(self, outgoing_edges):
-        args = self.args
-        kwargs = self.kwargs
-        if self.name == 'split':
-            args = [len(outgoing_edges)]
+    @classmethod
+    def _get_item_param(cls, item):
+        return escape_chars(item, '\\\'=:')
 
-        out_args = [escape_chars(x, '\\\'=:') for x in args]
+    @classmethod
+    def _get_dict_params(cls, d):
         out_kwargs = {}
-        for k, v in list(kwargs.items()):
+        for k, v in list(d.items()):
             k = escape_chars(k, '\\\'=:')
             v = escape_chars(v, '\\\'=:')
             out_kwargs[k] = v
+        return ['{}={}'.format(k, out_kwargs[k]) for k in sorted(out_kwargs)]
 
-        arg_params = [escape_chars(v, '\\\'=:') for v in out_args]
-        kwarg_params = ['{}={}'.format(k, out_kwargs[k]) for k in sorted(out_kwargs)]
+    @classmethod
+    def _get_list_params(cls, l):
+        out_args = [cls._get_item_param(x) for x in l]
+        return [escape_chars(v, '\\\'=:') for v in out_args]
+
+    def _get_filter(self, outgoing_edges):
+        args = self.args
+        if self.name == 'split':
+            args = [len(outgoing_edges)]
+
+        arg_params = self._get_list_params(args)
+        kwarg_params = self._get_dict_params(self.kwargs)
         params = arg_params + kwarg_params
 
         params_text = escape_chars(self.name, '\\\'=:')
