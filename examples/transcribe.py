@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from __future__ import unicode_literals
 
+from google.protobuf.json_format import MessageToJson
 from google.cloud import speech
 from google.cloud.speech import enums
 from google.cloud.speech import types
@@ -9,6 +10,7 @@ import ffmpeg
 import logging
 import subprocess
 import sys
+import IPython
 
 
 logging.basicConfig(level=logging.INFO, format='%(message)s')
@@ -18,6 +20,7 @@ logger.setLevel(logging.INFO)
 
 parser = argparse.ArgumentParser(description='Convert speech audio to text using Google Speech API')
 parser.add_argument('in_filename', help='Input filename (`-` for stdin)')
+parser.add_argument('--timing', action='store_true', help='Include timing info')
 
 
 def decode_audio(in_filename, **input_kwargs):
@@ -38,25 +41,24 @@ def decode_audio(in_filename, **input_kwargs):
     return out[0]
 
 
-def get_transcripts(audio_data):
+def get_transcripts(audio_data, include_timing_info=False):
     client = speech.SpeechClient()
     audio = types.RecognitionAudio(content=audio_data)
     config = types.RecognitionConfig(
         encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16,
         sample_rate_hertz=16000,
-        language_code='en-US'
+        language_code='en-US',
+        enable_word_time_offsets=include_timing_info,
     )
-    response = client.recognize(config, audio)
-    return [result.alternatives[0].transcript for result in response.results]
+    return client.recognize(config, audio)
 
 
-def transcribe(in_filename):
+def transcribe(in_filename, include_timing_info=False):
     audio_data = decode_audio(in_filename)
-    transcripts = get_transcripts(audio_data)
-    for transcript in transcripts:
-        print(repr(transcript.encode('utf-8')))
+    response = get_transcripts(audio_data, include_timing_info)
+    print(MessageToJson(response, sort_keys=True))
 
 
 if __name__ == '__main__':
     args = parser.parse_args()
-    transcribe(args.in_filename)
+    transcribe(args.in_filename, args.timing)
