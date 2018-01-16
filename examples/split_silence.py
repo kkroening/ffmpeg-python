@@ -29,6 +29,7 @@ parser.add_argument('--start-time', type=float, help='Start time (seconds)')
 parser.add_argument('--end-time', type=float, help='End time (seconds)')
 parser.add_argument('--padding', type=float, default=0., help='Output silence padding (seconds)')
 parser.add_argument('--min-chunk-time', type=float, default=0., help='Minimum chunk duration')
+parser.add_argument('--max-silence-time', type=float, help='Maximum silence time before guaranteed chunk splitting')
 parser.add_argument('--metadata-filename', help='Optional metadata output file')
 parser.add_argument('-v', dest='verbose', action='store_true', help='Verbose mode')
 
@@ -110,7 +111,7 @@ def _makedirs(path):
             raise
 
 
-def combine_chunks(chunk_times, min_chunk_time):
+def combine_chunks(chunk_times, min_chunk_time, max_silence_time=None):
     chunk_times = copy.copy(chunk_times)
     pop_chunk = lambda chunk_times: (chunk_times[0][0], chunk_times[0][1], chunk_times[1:])
     new_chunk_times = []
@@ -120,7 +121,11 @@ def combine_chunks(chunk_times, min_chunk_time):
         time = end_time - start_time
         while time < min_chunk_time and len(chunk_times) != 0:
             # Combine with next chunk.
-            _, end_time, chunk_times = pop_chunk(chunk_times)
+            next_start_time, next_end_time, chunk_times = pop_chunk(chunk_times)
+            if max_silence_time is not None and next_start_time - end_time > max_silence_time:
+                new_chunk_times.append((start_time, end_time))
+                start_time = next_start_time
+            end_time = next_end_time
             time = end_time - start_time
         new_chunk_times.append((start_time, end_time))
     return new_chunk_times
@@ -135,12 +140,13 @@ def split_audio(
     end_time=None,
     padding=0.,
     min_chunk_time=0.,
+    max_silence_time=None,
     metadata_filename=None,
     verbose=False,
 ):
     chunk_times = get_chunk_times(in_filename, silence_threshold, silence_duration, start_time, end_time)
     if min_chunk_time > 0.:
-        chunk_times = combine_chunks(chunk_times, min_chunk_time)
+        chunk_times = combine_chunks(chunk_times, min_chunk_time, max_silence_time)
 
     metadata = []
     for i, (start_time, end_time) in enumerate(chunk_times):
