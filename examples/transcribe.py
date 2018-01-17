@@ -10,7 +10,6 @@ import ffmpeg
 import logging
 import subprocess
 import sys
-import IPython
 
 
 logging.basicConfig(level=logging.INFO, format='%(message)s')
@@ -20,6 +19,8 @@ logger.setLevel(logging.INFO)
 
 parser = argparse.ArgumentParser(description='Convert speech audio to text using Google Speech API')
 parser.add_argument('in_filename', help='Input filename (`-` for stdin)')
+parser.add_argument('--out-file', type=argparse.FileType('w'), default='-',
+    help='Output filename (defaults to stdout)')
 parser.add_argument('--timing', action='store_true', help='Include timing info')
 
 
@@ -53,12 +54,12 @@ def get_transcripts(audio_data, include_timing_info=False):
     return client.recognize(config, audio)
 
 
-def transcribe(in_filename, include_timing_info=False):
+def transcribe(in_filename, out_file=sys.stdout, include_timing_info=False):
     audio_data = decode_audio(in_filename)
     response = get_transcripts(audio_data, include_timing_info)
-    print(MessageToJson(response, sort_keys=True))
+    out_file.write(MessageToJson(response, sort_keys=True).encode('utf-8'))
 
 
 if __name__ == '__main__':
     args = parser.parse_args()
-    transcribe(args.in_filename, args.timing)
+    transcribe(args.in_filename, args.out_file, args.timing)
