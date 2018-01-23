@@ -89,6 +89,7 @@ pip install ffmpeg-python
 It's also possible to clone the source and put it on your python path (`$PYTHONPATH`, `sys.path`, etc.):
 ```bash
 $ git clone git@github.com:kkroening/ffmpeg-python.git
+$ pip install ffmpeg-python
 $ export PYTHONPATH=${PYTHONPATH}:ffmpeg-python
 $ python
 >>> import ffmpeg
