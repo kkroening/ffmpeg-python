@@ -16,7 +16,7 @@ from .nodes import (
     InputNode,
     OutputNode,
     output_operator,
-)
+    SourceNode)
 
 
 class Error(Exception):
@@ -156,10 +156,11 @@ def get_args(stream_spec, overwrite_output=False):
     input_nodes = [node for node in sorted_nodes if isinstance(node, InputNode)]
     output_nodes = [node for node in sorted_nodes if isinstance(node, OutputNode)]
     global_nodes = [node for node in sorted_nodes if isinstance(node, GlobalNode)]
-    filter_nodes = [node for node in sorted_nodes if isinstance(node, FilterNode)]
+    filter_nodes = [node for node in sorted_nodes if isinstance(node, (FilterNode, SourceNode))]
     stream_name_map = {(node, None): str(i) for i, node in enumerate(input_nodes)}
     filter_arg = _get_filter_arg(filter_nodes, outgoing_edge_maps, stream_name_map)
-    args += reduce(operator.add, [_get_input_args(node) for node in input_nodes])
+    if len(input_nodes) > 0:
+        args += reduce(operator.add, [_get_input_args(node) for node in input_nodes])
     if filter_arg:
         args += ['-filter_complex', filter_arg]
     args += reduce(
