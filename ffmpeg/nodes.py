@@ -21,6 +21,7 @@ def _get_types_str(types):
 
 class Stream(object):
     """Represents the outgoing edge of an upstream node; may be used to create more downstream nodes."""
+
     def __init__(self, upstream_node, upstream_label, node_types):
         if not _is_of_types(upstream_node, node_types):
             raise TypeError('Expected upstream node to be of one of the following type(s): {}; got {}'.format(
@@ -68,6 +69,7 @@ def get_stream_spec_nodes(stream_spec):
 
 class Node(KwargReprNode):
     """Node base"""
+
     @classmethod
     def __check_input_len(cls, stream_map, min_inputs, max_inputs):
         if min_inputs is not None and len(stream_map) < min_inputs:
@@ -80,7 +82,7 @@ class Node(KwargReprNode):
         for stream in list(stream_map.values()):
             if not _is_of_types(stream, incoming_stream_types):
                 raise TypeError('Expected incoming stream(s) to be of one of the following types: {}; got {}'
-                    .format(_get_types_str(incoming_stream_types), type(stream)))
+                                .format(_get_types_str(incoming_stream_types), type(stream)))
 
     @classmethod
     def __get_incoming_edge_map(cls, stream_map):
@@ -90,7 +92,7 @@ class Node(KwargReprNode):
         return incoming_edge_map
 
     def __init__(self, stream_spec, name, incoming_stream_types, outgoing_stream_type, min_inputs, max_inputs, args=[],
-            kwargs={}):
+                 kwargs={}):
         stream_map = get_stream_map(stream_spec)
         self.__check_input_len(stream_map, min_inputs, max_inputs)
         self.__check_input_types(stream_map, incoming_stream_types)
@@ -113,11 +115,12 @@ class Node(KwargReprNode):
 
 class FilterableStream(Stream):
     def __init__(self, upstream_node, upstream_label):
-        super(FilterableStream, self).__init__(upstream_node, upstream_label, {InputNode, FilterNode})
+        super(FilterableStream, self).__init__(upstream_node, upstream_label, {InputNode, FilterNode, SourceNode})
 
 
 class InputNode(Node):
     """InputNode type"""
+
     def __init__(self, name, args=[], kwargs={}):
         super(InputNode, self).__init__(
             stream_spec=None,
@@ -135,20 +138,9 @@ class InputNode(Node):
         return os.path.basename(self.kwargs['filename'])
 
 
-class FilterNode(Node):
-    def __init__(self, stream_spec, name, max_inputs=1, args=[], kwargs={}):
-        super(FilterNode, self).__init__(
-            stream_spec=stream_spec,
-            name=name,
-            incoming_stream_types={FilterableStream},
-            outgoing_stream_type=FilterableStream,
-            min_inputs=1,
-            max_inputs=max_inputs,
-            args=args,
-            kwargs=kwargs
-        )
+class FilterableNode(Node):
+    """FilterableNode"""
 
-    """FilterNode"""
     def _get_filter(self, outgoing_edges):
         args = self.args
         kwargs = self.kwargs
@@ -171,6 +163,34 @@ class FilterNode(Node):
         if params:
             params_text += '={}'.format(':'.join(params))
         return escape_chars(params_text, '\\\'[],;')
+
+
+class FilterNode(FilterableNode):
+    def __init__(self, stream_spec, name, max_inputs=1, args=[], kwargs={}):
+        super(FilterNode, self).__init__(
+            stream_spec=stream_spec,
+            name=name,
+            incoming_stream_types={FilterableStream},
+            outgoing_stream_type=FilterableStream,
+            min_inputs=1,
+            max_inputs=max_inputs,
+            args=args,
+            kwargs=kwargs
+        )
+
+
+class SourceNode(FilterableNode):
+    def __init__(self, name, args=[], kwargs={}):
+        super(SourceNode, self).__init__(
+            stream_spec=None,
+            name=name,
+            incoming_stream_types={},
+            outgoing_stream_type=FilterableStream,
+            min_inputs=0,
+            max_inputs=0,
+            args=args,
+            kwargs=kwargs
+        )
 
 
 class OutputNode(Node):
@@ -227,6 +247,7 @@ def stream_operator(stream_classes={Stream}, name=None):
         func_name = name or func.__name__
         [setattr(stream_class, func_name, func) for stream_class in stream_classes]
         return func
+
     return decorator
 
 

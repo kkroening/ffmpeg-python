@@ -7,7 +7,7 @@ from .nodes import (
     MergeOutputsNode,
     OutputNode,
     output_operator,
-)
+    SourceNode)
 
 
 def input(filename, **kwargs):
@@ -22,6 +22,30 @@ def input(filename, **kwargs):
             raise ValueError("Can't specify both `format` and `f` kwargs")
         kwargs['format'] = fmt
     return InputNode(input.__name__, kwargs=kwargs).stream()
+
+
+
+def source_multi_output(filter_name, *args, **kwargs):
+    """Apply custom filter with one or more outputs.
+
+    This is the same as ``filter_`` except that the filter can produce more than one output.
+
+    To reference an output stream, use either the ``.stream`` operator or bracket shorthand:
+
+    Example:
+
+        ```
+        split = ffmpeg.input('in.mp4').filter_multi_output('split')
+        split0 = split.stream(0)
+        split1 = split[1]
+        ffmpeg.concat(split0, split1).output('out.mp4').run()
+        ```
+    """
+    return SourceNode(filter_name, args=args, kwargs=kwargs)
+
+
+def source(filter_name, *args, **kwargs):
+    return source_multi_output(filter_name, *args, **kwargs).stream()
 
 
 @output_operator()
@@ -58,6 +82,8 @@ def output(stream, filename, **kwargs):
 
 __all__ = [
     'input',
+    'source_multi_output',
+    'source',
     'merge_outputs',
     'output',
     'overwrite_output',
