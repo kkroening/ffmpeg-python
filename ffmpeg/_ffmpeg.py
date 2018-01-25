@@ -34,25 +34,22 @@ def input(filename, **kwargs):
 
 
 def source_multi_output(filter_name, *args, **kwargs):
-    """Apply custom filter with one or more outputs.
+    """Source filter with one or more outputs.
 
-    This is the same as ``filter_`` except that the filter can produce more than one output.
+    This is the same as ``source`` except that the filter can produce more than one output.
 
-    To reference an output stream, use either the ``.stream`` operator or bracket shorthand:
-
-    Example:
-
-        ```
-        split = ffmpeg.input('in.mp4').filter_multi_output('split')
-        split0 = split.stream(0)
-        split1 = split[1]
-        ffmpeg.concat(split0, split1).output('out.mp4').run()
-        ```
+    To reference an output stream, use either the ``.stream`` operator or bracket shorthand.
     """
     return SourceNode(filter_name, args=args, kwargs=kwargs)
 
 
 def source(filter_name, *args, **kwargs):
+    """Source filter.
+
+    It works like `input`, but takes a source filter name instead of a file URL as the first argument.
+
+    Official documentation: `Sources <https://ffmpeg.org/ffmpeg-filters.html#Video-Sources>`__
+    """
     return source_multi_output(filter_name, *args, **kwargs).stream()
 
 
