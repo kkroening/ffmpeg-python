@@ -650,6 +650,29 @@ def test_mixed_passthrough_selectors():
     ]
 
 
+def test_sources():
+    out = (ffmpeg
+        .overlay(
+            ffmpeg.source("testsrc"),
+            ffmpeg.source("color", color="red@.3"),
+        )
+        .trim(end=5)
+        .output(TEST_OUTPUT_FILE1)
+    )
+
+    assert out.get_args() == [
+        '-filter_complex',
+        'testsrc[s0];'
+        'color=color=red@.3[s1];'
+        '[s0][s1]overlay=eof_action=repeat[s2];'
+        '[s2]trim=end=5[s3]',
+        '-map',
+        '[s3]',
+        TEST_OUTPUT_FILE1
+    ]
+
+
+
 def test_pipe():
     width = 32
     height = 32
