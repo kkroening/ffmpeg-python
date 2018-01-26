@@ -27,6 +27,7 @@ def get_hash(item):
     repr_ = _recursive_repr(item).encode('utf-8')
     return hashlib.md5(repr_).hexdigest()
 
+
 def get_hash_int(item):
     return int(get_hash(item), base=16)
 
@@ -41,3 +42,8 @@ def escape_chars(text, chars):
     for ch in chars:
         text = text.replace(ch, '\\' + ch)
     return text
+
+
+def sort_ordereddict(d):
+    for key in sorted(d.keys()):
+        d.move_to_end(key)

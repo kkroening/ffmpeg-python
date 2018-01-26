@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from ._utils import get_hash, get_hash_int
+from ._utils import get_hash, get_hash_int, sort_ordereddict
 from builtins import object
 from collections import namedtuple, OrderedDict
 
@@ -177,7 +177,6 @@ def topo_sort(downstream_nodes):
 
     # Sort outgoing edge maps by upstream label
     for map in outgoing_edge_maps.values():
-        for label in sorted(map.keys()):
-            map.move_to_end(label)
+        sort_ordereddict(map)
 
     return sorted_nodes, outgoing_edge_maps
