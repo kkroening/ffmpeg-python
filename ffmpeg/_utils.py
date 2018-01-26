@@ -46,4 +46,4 @@ def escape_chars(text, chars):
 
 def sort_ordereddict(d):
     for key in sorted(d.keys()):
-        d.move_to_end(key)
+        d[key] = d.pop(key)
