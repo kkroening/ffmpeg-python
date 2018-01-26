@@ -421,6 +421,7 @@ __all__ = [
     'drawbox',
     'drawtext',
     'filter_',
+    'filter_multi_output',
     'hflip',
     'hue',
     'overlay',
