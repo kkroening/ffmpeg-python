@@ -16,6 +16,7 @@ TEST_INPUT_FILE1 = os.path.join(SAMPLE_DATA_DIR, 'in1.mp4')
 TEST_OVERLAY_FILE = os.path.join(SAMPLE_DATA_DIR, 'overlay.png')
 TEST_OUTPUT_FILE1 = os.path.join(SAMPLE_DATA_DIR, 'out1.mp4')
 TEST_OUTPUT_FILE2 = os.path.join(SAMPLE_DATA_DIR, 'out2.mp4')
+BOGUS_INPUT_FILE = os.path.join(SAMPLE_DATA_DIR, 'bogus')
 
 
 subprocess.check_call(['ffmpeg', '-version'])
@@ -359,3 +360,10 @@ def test_ffprobe():
     data = ffmpeg.probe(TEST_INPUT_FILE1)
     assert set(data.keys()) == {'format', 'streams'}
     assert data['format']['duration'] == '7.036000'
+
+
+def test_ffprobe_exception():
+    with pytest.raises(ffmpeg.ProbeException) as excinfo:
+        ffmpeg.probe(BOGUS_INPUT_FILE)
+    assert excinfo.value.message == 'ffprobe error'
+    assert 'No such file or directory' in excinfo.value.stderr_output
