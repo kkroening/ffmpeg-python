@@ -353,3 +353,9 @@ def test_pipe():
     out_data = p.stdout.read()
     assert len(out_data) == frame_size * (frame_count - start_frame)
     assert out_data == in_data[start_frame*frame_size:]
+
+
+def test_ffprobe():
+    data = ffmpeg.probe(TEST_INPUT_FILE1)
+    assert set(data.keys()) == {'format', 'streams'}
+    assert data['format']['duration'] == '7.036000'
