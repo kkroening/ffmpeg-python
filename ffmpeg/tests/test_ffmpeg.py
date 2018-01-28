@@ -147,6 +147,41 @@ def test_get_args_complex_filter():
     ]
 
 
+def _get_complex_filter_asplit_example():
+    split = (ffmpeg
+        .input(TEST_INPUT_FILE1)
+        .vflip()
+        .asplit()
+    )
+    split0 = split[0]
+    split1 = split[1]
+
+    return (ffmpeg
+        .concat(
+            split0.filter_("atrim", start=10, end=20),
+            split1.filter_("atrim", start=30, end=40),
+        )
+        .output(TEST_OUTPUT_FILE1)
+        .overwrite_output()
+    )
+
+
+def test_filter_asplit():
+    out = _get_complex_filter_asplit_example()
+    args = out.get_args()
+    assert args == [
+        '-i',
+        TEST_INPUT_FILE1,
+        '-filter_complex',
+        '[0]vflip[s0];[s0]asplit=2[s1][s2];[s1]atrim=end=20:start=10[s3];[s2]atrim=end=40:start=30[s4];[s3]'
+        '[s4]concat=n=2[s5]',
+        '-map',
+        '[s5]',
+        TEST_OUTPUT_FILE1,
+        '-y'
+    ]
+
+
 def test_filter_normal_arg_escape():
     """Test string escaping of normal filter args (e.g. ``font`` param of ``drawtext`` filter)."""
     def _get_drawtext_font_repr(font):

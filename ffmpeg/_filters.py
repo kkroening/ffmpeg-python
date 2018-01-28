@@ -53,6 +53,11 @@ def split(stream):
 
 
 @filter_operator()
+def asplit(stream):
+    return FilterNode(stream, asplit.__name__)
+
+
+@filter_operator()
 def setpts(stream, expr):
     """Change the PTS (presentation timestamp) of the input frames.
 
@@ -421,6 +426,7 @@ __all__ = [
     'drawbox',
     'drawtext',
     'filter_',
+    'filter_multi_output',
     'hflip',
     'hue',
     'overlay',
