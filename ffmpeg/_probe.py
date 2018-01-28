@@ -20,7 +20,7 @@ def probe(filename):
     out, err = p.communicate()
     if p.returncode != 0:
         raise ExecException(err)
-    return json.loads(out)
+    return json.loads(out.decode('utf-8'))
 
 
 __all__ = [
