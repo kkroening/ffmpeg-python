@@ -366,4 +366,4 @@ def test_ffprobe_exception():
     with pytest.raises(ffmpeg.ProbeException) as excinfo:
         ffmpeg.probe(BOGUS_INPUT_FILE)
     assert str(excinfo.value) == 'ffprobe error'
-    assert 'No such file or directory' in excinfo.value.stderr_output
+    assert b'No such file or directory' in excinfo.value.stderr_output
