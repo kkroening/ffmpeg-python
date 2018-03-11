@@ -280,7 +280,7 @@ class FilterNode(Node):
     def _get_filter(self, outgoing_edges):
         args = self.args
         kwargs = self.kwargs
-        if self.name == 'split':
+        if self.name in ('split', 'asplit'):
             args = [len(outgoing_edges)]
 
         out_args = [escape_chars(x, '\\\'=:') for x in args]

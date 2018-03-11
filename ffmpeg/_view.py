@@ -78,7 +78,7 @@ def view(stream_spec, **kwargs):
             downstream_node_id = str(hash(edge.downstream_node))
             graph.edge(upstream_node_id, downstream_node_id, **kwargs)
 
-    graph.view(filename)
+    graph.view(filename, cleanup=True)
 
     return stream_spec
 
