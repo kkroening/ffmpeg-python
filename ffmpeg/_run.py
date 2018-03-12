@@ -53,14 +53,14 @@ def _get_input_args(input_node):
 def _format_input_stream_name(stream_name_map, edge):
     prefix = stream_name_map[edge.upstream_node, edge.upstream_label]
     if not edge.upstream_selector:
-        suffix = ""
+        suffix = ''
     else:
-        suffix = ":{}".format(edge.upstream_selector)
-    return "[{}{}]".format(prefix, suffix)
+        suffix = ':{}'.format(edge.upstream_selector)
+    return '[{}{}]'.format(prefix, suffix)
 
 
 def _format_output_stream_name(stream_name_map, edge):
-    return "[{}]".format(stream_name_map[edge.upstream_node, edge.upstream_label])
+    return '[{}]'.format(stream_name_map[edge.upstream_node, edge.upstream_label])
 
 
 def _get_filter_spec(node, outgoing_edge_map, stream_name_map):
@@ -104,7 +104,7 @@ def _get_output_args(node, stream_name_map):
     args = []
 
     if len(node.incoming_edges) == 0:
-        raise ValueError("Output node {} has no mapped streams")
+        raise ValueError('Output node {} has no mapped streams'.format(node))
 
     for edge in node.incoming_edges:
         # edge = node.incoming_edges[0]

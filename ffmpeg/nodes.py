@@ -46,22 +46,22 @@ class Stream(object):
 
     def __repr__(self):
         node_repr = self.node.long_repr(include_hash=False)
-        selector = ""
+        selector = ''
         if self.selector:
-            selector = ":{}".format(self.selector)
+            selector = ':{}'.format(self.selector)
         out = '{}[{!r}{}] <{}>'.format(node_repr, self.label, selector, self.node.short_hash)
         return out
 
-    def __getitem__(self, item):
+    def __getitem__(self, index):
         """
         Select a component of the stream. `stream[:X]` is analogous to `stream.node.stream(select=X)`.
         Please note that this can only be used to select a substream that already exist. If you want to split
         the stream, use the `split` filter.
         """
-        if not isinstance(item, slice) or item.start is not None:
-            raise ValueError("Invalid syntax. Use 'stream[:\"something\"]', not 'stream[\"something\"]'.")
+        if not isinstance(index, slice) or index.start is not None:
+            raise ValueError("Invalid syntax. Use `stream[:\'something\']`, not `stream[\'something\']`.")
 
-        return self.node.stream(select=item.stop)
+        return self.node.stream(select=index.stop)
 
 
 def get_stream_map(stream_spec):
@@ -147,7 +147,7 @@ class Node(KwargReprNode):
     def __init_fromnode__(self, old_node, stream_spec):
         # Make sure old node and new node are of the same type
         if type(self) != type(old_node):
-            raise ValueError("'old_node' should be of type {}".format(self.__class__.__name__))
+            raise TypeError('`old_node` should be of type {}'.format(self.__class__.__name__))
 
         # Copy needed data from old node
         name = old_node.name
@@ -197,8 +197,8 @@ class Node(KwargReprNode):
         argc = 1 + len(args) + len(kwargs)
 
         first_arg = None
-        if "old_node" in kwargs:
-            first_arg = kwargs["old_node"]
+        if 'old_node' in kwargs:
+            first_arg = kwargs['old_node']
         elif len(args) > 0:
             first_arg = args[0]
 
@@ -207,8 +207,8 @@ class Node(KwargReprNode):
         else:
             if isinstance(first_arg, Node):
                 raise ValueError(
-                    "{}.__init__() received an instance of {} as the first argument. If you want to create a "
-                    "copy of an existing node, the types must match and you must provide an additional stream_spec."
+                    '{}.__init__() received an instance of {} as the first argument. If you want to create a '
+                    'copy of an existing node, the types must match and you must provide an additional stream_spec.'
                     .format(self.__class__.__name__, first_arg.__class__.__name__)
                 )
             self.__init_fromscratch__(*args, **kwargs)
@@ -222,8 +222,8 @@ class Node(KwargReprNode):
 
     def __getitem__(self, item):
         """Create an outgoing stream originating from this node; syntactic sugar for ``self.stream(label)``.
-        It can also be used to apply a selector: e.g. node[0:"audio"] returns a stream with label 0 and
-        selector "audio", which is the same as ``node.stream(label=0, select="audio")``.
+        It can also be used to apply a selector: e.g. ``node[0:'audio']`` returns a stream with label 0 and
+        selector ``'audio'``, which is the same as ``node.stream(label=0, select='audio')``.
         """
         if isinstance(item, slice):
             return self.stream(label=item.start, select=item.stop)

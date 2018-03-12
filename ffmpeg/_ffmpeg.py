@@ -11,8 +11,6 @@ from .nodes import (
     output_operator,
     OutputStream)
 
-_py_map = map
-
 
 def input(filename, **kwargs):
     """Input file URL (ffmpeg ``-i`` option)
@@ -56,9 +54,9 @@ def output(*streams_and_filename, **kwargs):
     Official documentation: `Synopsis <https://ffmpeg.org/ffmpeg.html#Synopsis>`__
     """
     streams_and_filename = list(streams_and_filename)
-    if "filename" not in kwargs:
+    if 'filename' not in kwargs:
         if not isinstance(streams_and_filename[-1], basestring):
-            raise ValueError("You must provide a filename")
+            raise ValueError('A filename must be provided')
         kwargs['filename'] = streams_and_filename.pop(-1)
     streams = streams_and_filename
 
@@ -78,7 +76,7 @@ def map(*streams):
     tail = streams[1:]
 
     if not isinstance(head, OutputStream):
-        raise ValueError("First argument must be an output stream")
+        raise ValueError('First argument must be an output stream')
 
     if not tail:
         return head
