@@ -9,7 +9,7 @@ from .nodes import (
     MergeOutputsNode,
     OutputNode,
     output_operator,
-    OutputStream)
+)
 
 
 def input(filename, **kwargs):
@@ -68,26 +68,9 @@ def output(*streams_and_filename, **kwargs):
     return OutputNode(streams, output.__name__, kwargs=kwargs).stream()
 
 
-@output_operator()
-def map(*streams):
-    """Map multiple streams to the same output
-    """
-    head = streams[0]
-    tail = streams[1:]
-
-    if not isinstance(head, OutputStream):
-        raise ValueError('First argument must be an output stream')
-
-    if not tail:
-        return head
-
-    return OutputNode(head.node, tail).stream()
-
-
 __all__ = [
     'input',
     'merge_outputs',
     'output',
-    'map',
     'overwrite_output',
 ]

@@ -1,9 +1,9 @@
 from __future__ import unicode_literals
+
 from .dag import KwargReprNode
 from ._utils import escape_chars, get_hash_int
 from builtins import object
-import os, sys
-import inspect
+import os
 
 
 def _is_of_types(obj, types):
@@ -19,13 +19,6 @@ def _get_types_str(types):
     return ', '.join(['{}.{}'.format(x.__module__, x.__name__) for x in types])
 
 
-def _get_arg_count(callable):
-    if sys.version_info.major >= 3:
-        return len(inspect.getfullargspec(callable).args)
-    else:
-        return len(inspect.getargspec(callable).args)
-
-
 class Stream(object):
     """Represents the outgoing edge of an upstream node; may be used to create more downstream nodes."""
 
@@ -36,7 +29,6 @@ class Stream(object):
         self.node = upstream_node
         self.label = upstream_label
         self.selector = upstream_selector
-
 
     def __hash__(self):
         return get_hash_int([hash(self.node), hash(self.label)])
@@ -54,14 +46,22 @@ class Stream(object):
 
     def __getitem__(self, index):
         """
-        Select a component of the stream. `stream[:X]` is analogous to `stream.node.stream(select=X)`.
-        Please note that this can only be used to select a substream that already exist. If you want to split
-        the stream, use the `split` filter.
-        """
-        if not isinstance(index, slice) or index.start is not None:
-            raise ValueError("Invalid syntax. Use `stream[:\'something\']`, not `stream[\'something\']`.")
+        Select a component (audio, video) of the stream.
 
-        return self.node.stream(select=index.stop)
+        Example:
+
+            Process the audio and video portions of a stream independently::
+
+                in = ffmpeg.input('in.mp4')
+                audio = in['a'].filter_("aecho", 0.8, 0.9, 1000, 0.3)
+                video = in['v'].hflip()
+                ffmpeg.output(audio, video, 'out.mp4')
+        """
+        if self.selector is not None:
+            raise ValueError('Stream already has a selector: {}'.format(self))
+        elif not isinstance(index, basestring):
+            raise TypeError("Expected string index (e.g. 'v'); got {!r}".format(index))
+        return self.node.stream(label=self.label, selector=index)
 
 
 def get_stream_map(stream_spec):
@@ -93,22 +93,6 @@ def get_stream_spec_nodes(stream_spec):
 class Node(KwargReprNode):
     """Node base"""
 
-    @property
-    def min_inputs(self):
-        return self.__min_inputs
-
-    @property
-    def max_inputs(self):
-        return self.__max_inputs
-
-    @property
-    def incoming_stream_types(self):
-        return self.__incoming_stream_types
-
-    @property
-    def outgoing_stream_type(self):
-        return self.__outgoing_stream_type
-
     @classmethod
     def __check_input_len(cls, stream_map, min_inputs, max_inputs):
         if min_inputs is not None and len(stream_map) < min_inputs:
@@ -130,9 +114,8 @@ class Node(KwargReprNode):
             incoming_edge_map[downstream_label] = (upstream.node, upstream.label, upstream.selector)
         return incoming_edge_map
 
-    def __init_fromscratch__(self, stream_spec, name, incoming_stream_types, outgoing_stream_type, min_inputs,
-                             max_inputs, args=[],
-                             kwargs={}):
+    def __init__(self, stream_spec, name, incoming_stream_types, outgoing_stream_type, min_inputs,
+                 max_inputs, args=[], kwargs={}):
         stream_map = get_stream_map(stream_spec)
         self.__check_input_len(stream_map, min_inputs, max_inputs)
         self.__check_input_types(stream_map, incoming_stream_types)
@@ -141,92 +124,21 @@ class Node(KwargReprNode):
         super(Node, self).__init__(incoming_edge_map, name, args, kwargs)
         self.__outgoing_stream_type = outgoing_stream_type
         self.__incoming_stream_types = incoming_stream_types
-        self.__min_inputs = min_inputs
-        self.__max_inputs = max_inputs
 
-    def __init_fromnode__(self, old_node, stream_spec):
-        # Make sure old node and new node are of the same type
-        if type(self) != type(old_node):
-            raise TypeError('`old_node` should be of type {}'.format(self.__class__.__name__))
-
-        # Copy needed data from old node
-        name = old_node.name
-        incoming_stream_types = old_node.incoming_stream_types
-        outgoing_stream_type = old_node.outgoing_stream_type
-        min_inputs = old_node.min_inputs
-        max_inputs = old_node.max_inputs
-        prev_edges = old_node.incoming_edge_map.values()
-        args = old_node.args
-        kwargs = old_node.kwargs
-
-        # Check new stream spec - the old spec should have already been checked
-        new_stream_map = get_stream_map(stream_spec)
-        self.__check_input_types(new_stream_map, incoming_stream_types)
-
-        # Generate new edge map
-        new_inc_edge_map = self.__get_incoming_edge_map(new_stream_map)
-        new_edges = new_inc_edge_map.values()
-
-        # Rename all edges
-        new_edge_map = dict(enumerate(list(prev_edges) + list(new_edges)))
-
-        # Check new length
-        self.__check_input_len(new_edge_map, min_inputs, max_inputs)
-
-        super(Node, self).__init__(new_edge_map, name, args, kwargs)
-        self.__outgoing_stream_type = outgoing_stream_type
-        self.__incoming_stream_types = incoming_stream_types
-        self.__min_inputs = min_inputs
-        self.__max_inputs = max_inputs
-
-    # noinspection PyMissingConstructor
-    def __init__(self, *args, **kwargs):
-        """
-        If called with the following arguments, the new Node is created from scratch:
-        - stream_spec, name, incoming_stream_types, outgoing_stream_type, min_inputs, max_inputs, args=[], kwargs={}
-
-        If called with the following arguments, the new node is a copy of `old_node` that includes the additional
-        `stream_spec`:
-        - old_node, stream_spec
-        """
-        # Python doesn't support constructor overloading. This hacky code detects how we want to construct the object
-        # based on the number of arguments and the type of the first argument, then calls the appropriate constructor
-        # helper method
-
-        # "1+" is for `self`
-        argc = 1 + len(args) + len(kwargs)
-
-        first_arg = None
-        if 'old_node' in kwargs:
-            first_arg = kwargs['old_node']
-        elif len(args) > 0:
-            first_arg = args[0]
-
-        if argc == _get_arg_count(self.__init_fromnode__) and type(first_arg) == type(self):
-            self.__init_fromnode__(*args, **kwargs)
-        else:
-            if isinstance(first_arg, Node):
-                raise ValueError(
-                    '{}.__init__() received an instance of {} as the first argument. If you want to create a '
-                    'copy of an existing node, the types must match and you must provide an additional stream_spec.'
-                    .format(self.__class__.__name__, first_arg.__class__.__name__)
-                )
-            self.__init_fromscratch__(*args, **kwargs)
-
-    def stream(self, label=None, select=None):
+    def stream(self, label=None, selector=None):
         """Create an outgoing stream originating from this node.
 
         More nodes may be attached onto the outgoing stream.
         """
-        return self.__outgoing_stream_type(self, label, upstream_selector=select)
+        return self.__outgoing_stream_type(self, label, upstream_selector=selector)
 
     def __getitem__(self, item):
         """Create an outgoing stream originating from this node; syntactic sugar for ``self.stream(label)``.
         It can also be used to apply a selector: e.g. ``node[0:'audio']`` returns a stream with label 0 and
-        selector ``'audio'``, which is the same as ``node.stream(label=0, select='audio')``.
+        selector ``'audio'``, which is the same as ``node.stream(label=0, selector='audio')``.
         """
         if isinstance(item, slice):
-            return self.stream(label=item.start, select=item.stop)
+            return self.stream(label=item.start, selector=item.stop)
         else:
             return self.stream(label=item)
 
@@ -241,8 +153,8 @@ class FilterableStream(Stream):
 class InputNode(Node):
     """InputNode type"""
 
-    def __init_fromscratch__(self, name, args=[], kwargs={}):
-        super(InputNode, self).__init_fromscratch__(
+    def __init__(self, name, args=[], kwargs={}):
+        super(InputNode, self).__init__(
             stream_spec=None,
             name=name,
             incoming_stream_types={},
@@ -253,9 +165,6 @@ class InputNode(Node):
             kwargs=kwargs
         )
 
-    def __init_fromnode__(self, old_node, stream_spec):
-        raise TypeError("{} can't be constructed from an existing node".format(self.__class__.__name__))
-
     @property
     def short_repr(self):
         return os.path.basename(self.kwargs['filename'])
@@ -263,8 +172,8 @@ class InputNode(Node):
 
 # noinspection PyMethodOverriding
 class FilterNode(Node):
-    def __init_fromscratch__(self, stream_spec, name, max_inputs=1, args=[], kwargs={}):
-        super(FilterNode, self).__init_fromscratch__(
+    def __init__(self, stream_spec, name, max_inputs=1, args=[], kwargs={}):
+        super(FilterNode, self).__init__(
             stream_spec=stream_spec,
             name=name,
             incoming_stream_types={FilterableStream},
@@ -303,13 +212,13 @@ class FilterNode(Node):
 
 # noinspection PyMethodOverriding
 class OutputNode(Node):
-    def __init_fromscratch__(self, stream, name, args=[], kwargs={}):
-        super(OutputNode, self).__init_fromscratch__(
+    def __init__(self, stream, name, args=[], kwargs={}):
+        super(OutputNode, self).__init__(
             stream_spec=stream,
             name=name,
             incoming_stream_types={FilterableStream},
             outgoing_stream_type=OutputStream,
-            min_inputs=0,  # Allow streams to be mapped afterwards
+            min_inputs=1,
             max_inputs=None,
             args=args,
             kwargs=kwargs
@@ -328,8 +237,8 @@ class OutputStream(Stream):
 
 # noinspection PyMethodOverriding
 class MergeOutputsNode(Node):
-    def __init_fromscratch__(self, streams, name):
-        super(MergeOutputsNode, self).__init_fromscratch__(
+    def __init__(self, streams, name):
+        super(MergeOutputsNode, self).__init__(
             stream_spec=streams,
             name=name,
             incoming_stream_types={OutputStream},
@@ -341,8 +250,8 @@ class MergeOutputsNode(Node):
 
 # noinspection PyMethodOverriding
 class GlobalNode(Node):
-    def __init_fromscratch__(self, stream, name, args=[], kwargs={}):
-        super(GlobalNode, self).__init_fromscratch__(
+    def __init__(self, stream, name, args=[], kwargs={}):
+        super(GlobalNode, self).__init__(
             stream_spec=stream,
             name=name,
             incoming_stream_types={OutputStream},
@@ -352,9 +261,6 @@ class GlobalNode(Node):
             args=args,
             kwargs=kwargs
         )
-
-    def __init_fromnode__(self, old_node, stream_spec):
-        raise TypeError("{} can't be constructed from an existing node".format(self.__class__.__name__))
 
 
 def stream_operator(stream_classes={Stream}, name=None):

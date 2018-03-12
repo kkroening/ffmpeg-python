@@ -147,41 +147,30 @@ def test_get_args_complex_filter():
     ]
 
 
-def _get_filter_with_select_example():
+def test_combined_output():
+    i1 = ffmpeg.input(TEST_INPUT_FILE1)
+    i2 = ffmpeg.input(TEST_OVERLAY_FILE)
+    out = ffmpeg.output(i1, i2, TEST_OUTPUT_FILE1)
+    assert out.get_args() == [
+        '-i', TEST_INPUT_FILE1,
+        '-i', TEST_OVERLAY_FILE,
+        '-map', '[0]',
+        '-map', '[1]',
+        TEST_OUTPUT_FILE1
+    ]
+
+
+def test_filter_with_selector():
     i = ffmpeg.input(TEST_INPUT_FILE1)
-    v1 = i[:'v'].hflip()
-    a1 = i[:'a'].filter_('aecho', 0.8, 0.9, 1000, 0.3)
-
-    return ffmpeg.output(a1, v1, TEST_OUTPUT_FILE1)
-
-
-def test_filter_with_select():
-    assert _get_filter_with_select_example().get_args() == [
+    v1 = i['v'].hflip()
+    a1 = i['a'].filter_('aecho', 0.8, 0.9, 1000, 0.3)
+    out = ffmpeg.output(a1, v1, TEST_OUTPUT_FILE1)
+    assert out.get_args() == [
         '-i', TEST_INPUT_FILE1,
         '-filter_complex',
         '[0:a]aecho=0.8:0.9:1000:0.3[s0];' \
         '[0:v]hflip[s1]',
         '-map', '[s0]', '-map', '[s1]',
-        TEST_OUTPUT_FILE1
-    ]
-
-
-def test_map_same_effect_as_output():
-    i1 = ffmpeg.input(TEST_INPUT_FILE1)
-    i2 = ffmpeg.input(TEST_OVERLAY_FILE)
-
-    _o_map = i1.output(TEST_OUTPUT_FILE1)
-    o_map = _o_map.map(i2)
-
-    o_nomap = ffmpeg.output(i1, i2, TEST_OUTPUT_FILE1)
-
-    assert id(o_map) != id(_o_map)  # Checks immutability
-    assert o_map.node.incoming_edge_map == o_nomap.node.incoming_edge_map
-    assert o_map.get_args() == o_nomap.get_args() == [
-        '-i', TEST_INPUT_FILE1,
-        '-i', TEST_OVERLAY_FILE,
-        '-map', '[0]',
-        '-map', '[1]',
         TEST_OUTPUT_FILE1
     ]
 

@@ -76,10 +76,7 @@ DagEdge = namedtuple('DagEdge', ['downstream_node', 'downstream_label', 'upstrea
 def get_incoming_edges(downstream_node, incoming_edge_map):
     edges = []
     for downstream_label, upstream_info in incoming_edge_map.items():
-        # `upstream_info` may contain the upstream_selector. [:2] trims it away
-        upstream_node, upstream_label = upstream_info[:2]
-        # Take into account the stream selector if it's present (i.e. len(upstream_info) >= 3)
-        upstream_selector = None if len(upstream_info) < 3 else upstream_info[2]
+        upstream_node, upstream_label, upstream_selector = upstream_info
         edges += [DagEdge(downstream_node, downstream_label, upstream_node, upstream_label, upstream_selector)]
     return edges
 
@@ -88,10 +85,7 @@ def get_outgoing_edges(upstream_node, outgoing_edge_map):
     edges = []
     for upstream_label, downstream_infos in list(outgoing_edge_map.items()):
         for downstream_info in downstream_infos:
-            # `downstream_info` may contain the downstream_selector. [:2] trims it away
-            downstream_node, downstream_label = downstream_info[:2]
-            # Take into account the stream selector if it's present
-            downstream_selector = None if len(downstream_info) < 3 else downstream_info[2]
+            downstream_node, downstream_label, downstream_selector = downstream_info
             edges += [DagEdge(downstream_node, downstream_label, upstream_node, upstream_label, downstream_selector)]
     return edges
 
@@ -104,10 +98,8 @@ class KwargReprNode(DagNode):
     def __upstream_hashes(self):
         hashes = []
         for downstream_label, upstream_info in self.incoming_edge_map.items():
-            # `upstream_info` may contain the upstream_selector. [:2] trims it away
-            upstream_node, upstream_label = upstream_info[:2]
-            # The stream selector is discarded when calculating the hash: the stream "as a whole" is still the same
-            hashes += [hash(x) for x in [downstream_label, upstream_node, upstream_label]]
+            upstream_node, upstream_label, upstream_selector = upstream_info
+            hashes += [hash(x) for x in [downstream_label, upstream_node, upstream_label, upstream_selector]]
         return hashes
 
     @property
