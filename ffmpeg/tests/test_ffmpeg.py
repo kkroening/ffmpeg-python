@@ -175,6 +175,22 @@ def test_filter_with_selector():
     ]
 
 
+def test_filter_with_bad_selectors():
+    input = ffmpeg.input(TEST_INPUT_FILE1)
+
+    with pytest.raises(ValueError) as excinfo:
+        input['a']['a']
+    assert str(excinfo.value).startswith('Stream already has a selector:')
+
+    with pytest.raises(TypeError) as excinfo:
+        input[:'a']
+    assert str(excinfo.value).startswith("Expected string index (e.g. 'a')")
+
+    with pytest.raises(TypeError) as excinfo:
+        input[5]
+    assert str(excinfo.value).startswith("Expected string index (e.g. 'a')")
+
+
 def _get_complex_filter_asplit_example():
     split = (ffmpeg
         .input(TEST_INPUT_FILE1)

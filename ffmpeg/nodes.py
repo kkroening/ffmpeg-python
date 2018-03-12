@@ -52,15 +52,15 @@ class Stream(object):
 
             Process the audio and video portions of a stream independently::
 
-                in = ffmpeg.input('in.mp4')
-                audio = in['a'].filter_("aecho", 0.8, 0.9, 1000, 0.3)
-                video = in['v'].hflip()
-                ffmpeg.output(audio, video, 'out.mp4')
+                input = ffmpeg.input('in.mp4')
+                audio = input['a'].filter_("aecho", 0.8, 0.9, 1000, 0.3)
+                video = input['v'].hflip()
+                out = ffmpeg.output(audio, video, 'out.mp4')
         """
         if self.selector is not None:
             raise ValueError('Stream already has a selector: {}'.format(self))
         elif not isinstance(index, basestring):
-            raise TypeError("Expected string index (e.g. 'v'); got {!r}".format(index))
+            raise TypeError("Expected string index (e.g. 'a'); got {!r}".format(index))
         return self.node.stream(label=self.label, selector=index)
 
 
