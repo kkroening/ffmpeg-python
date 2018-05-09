@@ -82,21 +82,21 @@ def test_node_repr():
     trim3 = ffmpeg.trim(in_file, start_frame=50, end_frame=60)
     concatted = ffmpeg.concat(trim1, trim2, trim3)
     output = ffmpeg.output(concatted, 'dummy2.mp4')
-    assert repr(in_file.node) == "input(filename={!r}) <{}>".format('dummy.mp4', in_file.node.short_hash)
-    assert repr(trim1.node) == "trim(end_frame=20, start_frame=10) <{}>".format(trim1.node.short_hash)
-    assert repr(trim2.node) == "trim(end_frame=40, start_frame=30) <{}>".format(trim2.node.short_hash)
-    assert repr(trim3.node) == "trim(end_frame=60, start_frame=50) <{}>".format(trim3.node.short_hash)
-    assert repr(concatted.node) == "concat(n=3) <{}>".format(concatted.node.short_hash)
-    assert repr(output.node) == "output(filename={!r}) <{}>".format('dummy2.mp4', output.node.short_hash)
+    assert repr(in_file.node) == 'input(filename={!r}) <{}>'.format('dummy.mp4', in_file.node.short_hash)
+    assert repr(trim1.node) == 'trim(end_frame=20, start_frame=10) <{}>'.format(trim1.node.short_hash)
+    assert repr(trim2.node) == 'trim(end_frame=40, start_frame=30) <{}>'.format(trim2.node.short_hash)
+    assert repr(trim3.node) == 'trim(end_frame=60, start_frame=50) <{}>'.format(trim3.node.short_hash)
+    assert repr(concatted.node) == 'concat(n=3) <{}>'.format(concatted.node.short_hash)
+    assert repr(output.node) == 'output(filename={!r}) <{}>'.format('dummy2.mp4', output.node.short_hash)
 
 
 def test_stream_repr():
     in_file = ffmpeg.input('dummy.mp4')
-    assert repr(in_file) == "input(filename={!r})[None] <{}>".format('dummy.mp4', in_file.node.short_hash)
+    assert repr(in_file) == 'input(filename={!r})[None] <{}>'.format('dummy.mp4', in_file.node.short_hash)
     split0 = in_file.filter_multi_output('split')[0]
-    assert repr(split0) == "split()[0] <{}>".format(split0.node.short_hash)
+    assert repr(split0) == 'split()[0] <{}>'.format(split0.node.short_hash)
     dummy_out = in_file.filter_multi_output('dummy')['out']
-    assert repr(dummy_out) == "dummy()[{!r}] <{}>".format(dummy_out.label, dummy_out.node.short_hash)
+    assert repr(dummy_out) == 'dummy()[{!r}] <{}>'.format(dummy_out.label, dummy_out.node.short_hash)
 
 
 def test_get_args_simple():
@@ -147,6 +147,50 @@ def test_get_args_complex_filter():
     ]
 
 
+def test_combined_output():
+    i1 = ffmpeg.input(TEST_INPUT_FILE1)
+    i2 = ffmpeg.input(TEST_OVERLAY_FILE)
+    out = ffmpeg.output(i1, i2, TEST_OUTPUT_FILE1)
+    assert out.get_args() == [
+        '-i', TEST_INPUT_FILE1,
+        '-i', TEST_OVERLAY_FILE,
+        '-map', '[0]',
+        '-map', '[1]',
+        TEST_OUTPUT_FILE1
+    ]
+
+
+def test_filter_with_selector():
+    i = ffmpeg.input(TEST_INPUT_FILE1)
+    v1 = i['v'].hflip()
+    a1 = i['a'].filter_('aecho', 0.8, 0.9, 1000, 0.3)
+    out = ffmpeg.output(a1, v1, TEST_OUTPUT_FILE1)
+    assert out.get_args() == [
+        '-i', TEST_INPUT_FILE1,
+        '-filter_complex',
+        '[0:a]aecho=0.8:0.9:1000:0.3[s0];' \
+        '[0:v]hflip[s1]',
+        '-map', '[s0]', '-map', '[s1]',
+        TEST_OUTPUT_FILE1
+    ]
+
+
+def test_get_item_with_bad_selectors():
+    input = ffmpeg.input(TEST_INPUT_FILE1)
+
+    with pytest.raises(ValueError) as excinfo:
+        input['a']['a']
+    assert str(excinfo.value).startswith('Stream already has a selector:')
+
+    with pytest.raises(TypeError) as excinfo:
+        input[:'a']
+    assert str(excinfo.value).startswith("Expected string index (e.g. 'a')")
+
+    with pytest.raises(TypeError) as excinfo:
+        input[5]
+    assert str(excinfo.value).startswith("Expected string index (e.g. 'a')")
+
+
 def _get_complex_filter_asplit_example():
     split = (ffmpeg
         .input(TEST_INPUT_FILE1)
@@ -158,8 +202,8 @@ def _get_complex_filter_asplit_example():
 
     return (ffmpeg
         .concat(
-            split0.filter_("atrim", start=10, end=20),
-            split1.filter_("atrim", start=30, end=40),
+            split0.filter_('atrim', start=10, end=20),
+            split1.filter_('atrim', start=30, end=40),
         )
         .output(TEST_OUTPUT_FILE1)
         .overwrite_output()

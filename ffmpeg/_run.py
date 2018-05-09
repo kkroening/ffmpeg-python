@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from .dag import get_outgoing_edges, topo_sort
 from functools import reduce
-from past.builtins import basestring
+from ._utils import basestring
 import copy
 import operator
 import subprocess as _subprocess
@@ -20,10 +20,6 @@ from .nodes import (
     OutputNode,
     output_operator,
 )
-
-
-def _get_stream_name(name):
-    return '[{}]'.format(name)
 
 
 def _convert_kwargs_to_cmd_line_args(kwargs):
@@ -54,11 +50,24 @@ def _get_input_args(input_node):
     return args
 
 
+def _format_input_stream_name(stream_name_map, edge):
+    prefix = stream_name_map[edge.upstream_node, edge.upstream_label]
+    if not edge.upstream_selector:
+        suffix = ''
+    else:
+        suffix = ':{}'.format(edge.upstream_selector)
+    return '[{}{}]'.format(prefix, suffix)
+
+
+def _format_output_stream_name(stream_name_map, edge):
+    return '[{}]'.format(stream_name_map[edge.upstream_node, edge.upstream_label])
+
+
 def _get_filter_spec(node, outgoing_edge_map, stream_name_map):
     incoming_edges = node.incoming_edges
     outgoing_edges = get_outgoing_edges(node, outgoing_edge_map)
-    inputs = [stream_name_map[edge.upstream_node, edge.upstream_label] for edge in incoming_edges]
-    outputs = [stream_name_map[edge.upstream_node, edge.upstream_label] for edge in outgoing_edges]
+    inputs = [_format_input_stream_name(stream_name_map, edge) for edge in incoming_edges]
+    outputs = [_format_output_stream_name(stream_name_map, edge) for edge in outgoing_edges]
     filter_spec = '{}{}{}'.format(''.join(inputs), node._get_filter(outgoing_edges), ''.join(outputs))
     return filter_spec
 
@@ -71,8 +80,8 @@ def _allocate_filter_stream_names(filter_nodes, outgoing_edge_maps, stream_name_
             if len(downstreams) > 1:
                 # TODO: automatically insert `splits` ahead of time via graph transformation.
                 raise ValueError('Encountered {} with multiple outgoing edges with same upstream label {!r}; a '
-                    '`split` filter is probably required'.format(upstream_node, upstream_label))
-            stream_name_map[upstream_node, upstream_label] = _get_stream_name('s{}'.format(stream_count))
+                                 '`split` filter is probably required'.format(upstream_node, upstream_label))
+            stream_name_map[upstream_node, upstream_label] = 's{}'.format(stream_count)
             stream_count += 1
 
 
@@ -93,11 +102,16 @@ def _get_output_args(node, stream_name_map):
     if node.name != output.__name__:
         raise ValueError('Unsupported output node: {}'.format(node))
     args = []
-    assert len(node.incoming_edges) == 1
-    edge = node.incoming_edges[0]
-    stream_name = stream_name_map[edge.upstream_node, edge.upstream_label]
-    if stream_name != '[0]':
-        args += ['-map', stream_name]
+
+    if len(node.incoming_edges) == 0:
+        raise ValueError('Output node {} has no mapped streams'.format(node))
+
+    for edge in node.incoming_edges:
+        # edge = node.incoming_edges[0]
+        stream_name = _format_input_stream_name(stream_name_map, edge)
+        if stream_name != '[0]' or len(node.incoming_edges) > 1:
+            args += ['-map', stream_name]
+
     kwargs = copy.copy(node.kwargs)
     filename = kwargs.pop('filename')
     fmt = kwargs.pop('format', None)
@@ -119,7 +133,7 @@ def get_args(stream_spec, overwrite_output=False):
     output_nodes = [node for node in sorted_nodes if isinstance(node, OutputNode)]
     global_nodes = [node for node in sorted_nodes if isinstance(node, GlobalNode)]
     filter_nodes = [node for node in sorted_nodes if isinstance(node, FilterNode)]
-    stream_name_map = {(node, None): _get_stream_name(i) for i, node in enumerate(input_nodes)}
+    stream_name_map = {(node, None): str(i) for i, node in enumerate(input_nodes)}
     filter_arg = _get_filter_arg(filter_nodes, outgoing_edge_maps, stream_name_map)
     args += reduce(operator.add, [_get_input_args(node) for node in input_nodes])
     if filter_arg:

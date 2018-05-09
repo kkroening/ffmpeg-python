@@ -42,6 +42,7 @@ class DagNode(object):
 
         Again, because nodes are immutable, the string representations should remain constant.
     """
+
     def __hash__(self):
         """Return an integer hash of the node."""
         raise NotImplementedError()
@@ -69,32 +70,36 @@ class DagNode(object):
         raise NotImplementedError()
 
 
-DagEdge = namedtuple('DagEdge', ['downstream_node', 'downstream_label', 'upstream_node', 'upstream_label'])
+DagEdge = namedtuple('DagEdge', ['downstream_node', 'downstream_label', 'upstream_node', 'upstream_label', 'upstream_selector'])
 
 
 def get_incoming_edges(downstream_node, incoming_edge_map):
     edges = []
-    for downstream_label, (upstream_node, upstream_label) in list(incoming_edge_map.items()):
-        edges += [DagEdge(downstream_node, downstream_label, upstream_node, upstream_label)]
+    for downstream_label, upstream_info in incoming_edge_map.items():
+        upstream_node, upstream_label, upstream_selector = upstream_info
+        edges += [DagEdge(downstream_node, downstream_label, upstream_node, upstream_label, upstream_selector)]
     return edges
 
 
 def get_outgoing_edges(upstream_node, outgoing_edge_map):
     edges = []
     for upstream_label, downstream_infos in list(outgoing_edge_map.items()):
-        for (downstream_node, downstream_label) in downstream_infos:
-            edges += [DagEdge(downstream_node, downstream_label, upstream_node, upstream_label)]
+        for downstream_info in downstream_infos:
+            downstream_node, downstream_label, downstream_selector = downstream_info
+            edges += [DagEdge(downstream_node, downstream_label, upstream_node, upstream_label, downstream_selector)]
     return edges
 
 
 class KwargReprNode(DagNode):
     """A DagNode that can be represented as a set of args+kwargs.
     """
+
     @property
     def __upstream_hashes(self):
         hashes = []
-        for downstream_label, (upstream_node, upstream_label) in list(self.incoming_edge_map.items()):
-            hashes += [hash(x) for x in [downstream_label, upstream_node, upstream_label]]
+        for downstream_label, upstream_info in self.incoming_edge_map.items():
+            upstream_node, upstream_label, upstream_selector = upstream_info
+            hashes += [hash(x) for x in [downstream_label, upstream_node, upstream_label, upstream_selector]]
         return hashes
 
     @property
@@ -152,21 +157,21 @@ def topo_sort(downstream_nodes):
     sorted_nodes = []
     outgoing_edge_maps = {}
 
-    def visit(upstream_node, upstream_label, downstream_node, downstream_label):
+    def visit(upstream_node, upstream_label, downstream_node, downstream_label, downstream_selector=None):
         if upstream_node in marked_nodes:
             raise RuntimeError('Graph is not a DAG')
 
         if downstream_node is not None:
             outgoing_edge_map = outgoing_edge_maps.get(upstream_node, {})
             outgoing_edge_infos = outgoing_edge_map.get(upstream_label, [])
-            outgoing_edge_infos += [(downstream_node, downstream_label)]
+            outgoing_edge_infos += [(downstream_node, downstream_label, downstream_selector)]
             outgoing_edge_map[upstream_label] = outgoing_edge_infos
             outgoing_edge_maps[upstream_node] = outgoing_edge_map
 
         if upstream_node not in sorted_nodes:
             marked_nodes.append(upstream_node)
             for edge in upstream_node.incoming_edges:
-                visit(edge.upstream_node, edge.upstream_label, edge.downstream_node, edge.downstream_label)
+                visit(edge.upstream_node, edge.upstream_label, edge.downstream_node, edge.downstream_label, edge.upstream_selector)
             marked_nodes.remove(upstream_node)
             sorted_nodes.append(upstream_node)
 

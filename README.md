@@ -87,6 +87,7 @@ pip install ffmpeg-python
 ```
 
 It's also possible to clone the source and put it on your python path (`$PYTHONPATH`, `sys.path`, etc.):
+
 ```bash
 $ git clone git@github.com:kkroening/ffmpeg-python.git
 $ export PYTHONPATH=${PYTHONPATH}:ffmpeg-python
@@ -99,6 +100,7 @@ $ python
 API documentation is automatically generated from python docstrings and hosted on github pages: https://kkroening.github.io/ffmpeg-python/
 
 Alternatively, standard python help is available, such as at the python REPL prompt as follows:
+
 ```python
 >>> import ffmpeg
 >>> help(ffmpeg)
