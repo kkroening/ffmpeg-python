@@ -49,12 +49,11 @@ class Stream(object):
         Select a component (audio, video) of the stream.
 
         Example:
-
             Process the audio and video portions of a stream independently::
 
                 input = ffmpeg.input('in.mp4')
-                audio = input['a'].filter_("aecho", 0.8, 0.9, 1000, 0.3)
-                video = input['v'].hflip()
+                audio = input[:'a'].filter_("aecho", 0.8, 0.9, 1000, 0.3)
+                video = input[:'v'].hflip()
                 out = ffmpeg.output(audio, video, 'out.mp4')
         """
         if self.selector is not None:
@@ -134,8 +133,16 @@ class Node(KwargReprNode):
 
     def __getitem__(self, item):
         """Create an outgoing stream originating from this node; syntactic sugar for ``self.stream(label)``.
-        It can also be used to apply a selector: e.g. ``node[0:'audio']`` returns a stream with label 0 and
-        selector ``'audio'``, which is the same as ``node.stream(label=0, selector='audio')``.
+        It can also be used to apply a selector: e.g. ``node[0:'a']`` returns a stream with label 0 and
+        selector ``'a'``, which is the same as ``node.stream(label=0, selector='a')``.
+
+        Example:
+            Process the audio and video portions of a stream independently::
+
+                input = ffmpeg.input('in.mp4')
+                audio = input[:'a'].filter_("aecho", 0.8, 0.9, 1000, 0.3)
+                video = input[:'v'].hflip()
+                out = ffmpeg.output(audio, video, 'out.mp4')
         """
         if isinstance(item, slice):
             return self.stream(label=item.start, selector=item.stop)

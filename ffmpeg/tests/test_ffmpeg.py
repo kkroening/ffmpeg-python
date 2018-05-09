@@ -175,7 +175,7 @@ def test_filter_with_selector():
     ]
 
 
-def test_filter_with_bad_selectors():
+def test_get_item_with_bad_selectors():
     input = ffmpeg.input(TEST_INPUT_FILE1)
 
     with pytest.raises(ValueError) as excinfo:
