@@ -75,7 +75,7 @@ DagEdge = namedtuple('DagEdge', ['downstream_node', 'downstream_label', 'upstrea
 
 def get_incoming_edges(downstream_node, incoming_edge_map):
     edges = []
-    for downstream_label, upstream_info in incoming_edge_map.items():
+    for downstream_label, upstream_info in list(incoming_edge_map.items()):
         upstream_node, upstream_label, upstream_selector = upstream_info
         edges += [DagEdge(downstream_node, downstream_label, upstream_node, upstream_label, upstream_selector)]
     return edges
@@ -97,7 +97,7 @@ class KwargReprNode(DagNode):
     @property
     def __upstream_hashes(self):
         hashes = []
-        for downstream_label, upstream_info in self.incoming_edge_map.items():
+        for downstream_label, upstream_info in list(self.incoming_edge_map.items()):
             upstream_node, upstream_label, upstream_selector = upstream_info
             hashes += [hash(x) for x in [downstream_label, upstream_node, upstream_label, upstream_selector]]
         return hashes

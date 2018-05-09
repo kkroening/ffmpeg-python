@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from builtins import str
 from builtins import bytes
 from builtins import range
 import ffmpeg
@@ -103,6 +104,11 @@ def test_stream_repr():
 def test_get_args_simple():
     out_file = ffmpeg.input('dummy.mp4').output('dummy2.mp4')
     assert out_file.get_args() == ['-i', 'dummy.mp4', 'dummy2.mp4']
+
+
+def test_global_args():
+    out_file = ffmpeg.input('dummy.mp4').output('dummy2.mp4').global_args('-progress', 'someurl')
+    assert out_file.get_args() == ['-i', 'dummy.mp4', 'dummy2.mp4', '-progress', 'someurl']
 
 
 def _get_complex_filter_example():
