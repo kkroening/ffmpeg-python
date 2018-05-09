@@ -105,6 +105,11 @@ def test_get_args_simple():
     assert out_file.get_args() == ['-i', 'dummy.mp4', 'dummy2.mp4']
 
 
+def test_global_args():
+    out_file = ffmpeg.input('dummy.mp4').output('dummy2.mp4').global_args('-progress', 'someurl')
+    assert out_file.get_args() == ['-i', 'dummy.mp4', 'dummy2.mp4', '-progress', 'someurl']
+
+
 def _get_complex_filter_example():
     split = (ffmpeg
         .input(TEST_INPUT_FILE1)

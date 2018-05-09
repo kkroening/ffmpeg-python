@@ -27,12 +27,19 @@ def input(filename, **kwargs):
 
 
 @output_operator()
+def global_args(stream, *args):
+    """Add extra global command-line argument(s), e.g. ``-progress``.
+    """
+    return GlobalNode(stream, global_args.__name__, args).stream()
+
+
+@output_operator()
 def overwrite_output(stream):
     """Overwrite output files without asking (ffmpeg ``-y`` option)
 
     Official documentation: `Main options <https://ffmpeg.org/ffmpeg.html#Main-options>`__
     """
-    return GlobalNode(stream, overwrite_output.__name__).stream()
+    return GlobalNode(stream, overwrite_output.__name__, ['-y']).stream()
 
 
 @output_operator()

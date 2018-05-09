@@ -10,7 +10,6 @@ import subprocess as _subprocess
 from ._ffmpeg import (
     input,
     output,
-    overwrite_output,
 )
 from .nodes import (
     get_stream_spec_nodes,
@@ -92,10 +91,7 @@ def _get_filter_arg(filter_nodes, outgoing_edge_maps, stream_name_map):
 
 
 def _get_global_args(node):
-    if node.name == overwrite_output.__name__:
-        return ['-y']
-    else:
-        raise ValueError('Unsupported global node: {}'.format(node))
+    return list(node.args)
 
 
 def _get_output_args(node, stream_name_map):
