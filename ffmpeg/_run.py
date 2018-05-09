@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+from builtins import str
+from past.builtins import basestring
 from .dag import get_outgoing_edges, topo_sort
 from functools import reduce
 from ._utils import basestring

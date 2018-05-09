@@ -1,10 +1,12 @@
 from __future__ import unicode_literals
+from builtins import str
+from past.builtins import basestring
 import hashlib
 import sys
 
 if sys.version_info.major == 2:
     # noinspection PyUnresolvedReferences,PyShadowingBuiltins
-    str = unicode
+    str = str
 
 
 # `past.builtins.basestring` module can't be imported on Python3 in some environments (Ubuntu).
