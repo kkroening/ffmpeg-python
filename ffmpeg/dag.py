@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
 
-from ._utils import get_hash, get_hash_int
+from ._utils import get_hash, get_hash_int, sort_ordereddict
 from builtins import object
-from collections import namedtuple
+from collections import namedtuple, OrderedDict
 
 
 class DagNode(object):
@@ -162,7 +162,7 @@ def topo_sort(downstream_nodes):
             raise RuntimeError('Graph is not a DAG')
 
         if downstream_node is not None:
-            outgoing_edge_map = outgoing_edge_maps.get(upstream_node, {})
+            outgoing_edge_map = outgoing_edge_maps.get(upstream_node, OrderedDict())
             outgoing_edge_infos = outgoing_edge_map.get(upstream_label, [])
             outgoing_edge_infos += [(downstream_node, downstream_label, downstream_selector)]
             outgoing_edge_map[upstream_label] = outgoing_edge_infos
@@ -179,4 +179,9 @@ def topo_sort(downstream_nodes):
     while unmarked_nodes:
         upstream_node, upstream_label = unmarked_nodes.pop()
         visit(upstream_node, upstream_label, None, None)
+
+    # Sort outgoing edge maps by upstream label
+    for map in outgoing_edge_maps.values():
+        sort_ordereddict(map)
+
     return sorted_nodes, outgoing_edge_maps

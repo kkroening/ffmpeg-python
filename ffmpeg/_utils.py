@@ -76,3 +76,8 @@ def escape_chars(text, chars):
     for ch in chars:
         text = text.replace(ch, '\\' + ch)
     return text
+
+
+def sort_ordereddict(d):
+    for key in sorted(d.keys()):
+        d[key] = d.pop(key)

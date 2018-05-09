@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+from collections import OrderedDict
+
 from .dag import KwargReprNode
 from ._utils import escape_chars, get_hash_int
 from builtins import object
@@ -69,7 +71,7 @@ def get_stream_map(stream_spec):
     elif isinstance(stream_spec, Stream):
         stream_map = {None: stream_spec}
     elif isinstance(stream_spec, (list, tuple)):
-        stream_map = dict(enumerate(stream_spec))
+        stream_map = OrderedDict(enumerate(stream_spec))
     elif isinstance(stream_spec, dict):
         stream_map = stream_spec
     return stream_map
@@ -108,7 +110,7 @@ class Node(KwargReprNode):
 
     @classmethod
     def __get_incoming_edge_map(cls, stream_map):
-        incoming_edge_map = {}
+        incoming_edge_map = OrderedDict()
         for downstream_label, upstream in list(stream_map.items()):
             incoming_edge_map[downstream_label] = (upstream.node, upstream.label, upstream.selector)
         return incoming_edge_map
