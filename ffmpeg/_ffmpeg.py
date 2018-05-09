@@ -4,7 +4,6 @@ from ._utils import basestring
 
 from .nodes import (
     filter_operator,
-    GlobalNode,
     InputNode,
     MergeOutputsNode,
     OutputNode,
@@ -28,11 +27,10 @@ def input(filename, **kwargs):
 
 @output_operator()
 def overwrite_output(stream):
-    """Overwrite output files without asking (ffmpeg ``-y`` option)
-
-    Official documentation: `Main options <https://ffmpeg.org/ffmpeg.html#Main-options>`__
+    """No longer supported; see ``overwrite_output`` parameter of ``get_args`` function instead.
     """
-    return GlobalNode(stream, overwrite_output.__name__).stream()
+    raise NameError('`overwrite_output` operator is no longer supported; see `overwrite_output` parameter of '
+        '`get_args` function instead')
 
 
 @output_operator()

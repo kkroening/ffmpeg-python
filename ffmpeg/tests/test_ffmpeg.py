@@ -100,9 +100,16 @@ def test_stream_repr():
     assert repr(dummy_out) == 'dummy()[{!r}] <{}>'.format(dummy_out.label, dummy_out.node.short_hash)
 
 
+def test_overwrite_output():
+    with pytest.raises(NameError):
+        ffmpeg.input('dummy.mp4').output('dummy2.mp4').overwrite_output()
+
+
 def test_get_args_simple():
     out_file = ffmpeg.input('dummy.mp4').output('dummy2.mp4')
-    assert out_file.get_args() == ['-i', 'dummy.mp4', 'dummy2.mp4']
+    assert out_file.get_args() == ['-i', 'dummy.mp4', 'dummy2.mp4', '-y']
+    assert out_file.get_args(overwrite_output=False) == ['-i', 'dummy.mp4', 'dummy2.mp4', '-n']
+    assert out_file.get_args(overwrite_output=None) == ['-i', 'dummy.mp4', 'dummy2.mp4']
 
 
 def _get_complex_filter_example():
@@ -124,7 +131,6 @@ def _get_complex_filter_example():
         .overlay(overlay_file.hflip())
         .drawbox(50, 50, 120, 120, color='red', thickness=5)
         .output(TEST_OUTPUT_FILE1)
-        .overwrite_output()
     )
 
 
@@ -238,7 +244,7 @@ def test_filter_normal_arg_escape():
             .get_args()
         )
         assert args[:3] == ['-i', 'in', '-filter_complex']
-        assert args[4:] == ['-map', '[s0]', 'out']
+        assert args[4:] == ['-map', '[s0]', 'out', '-y']
         match = re.match(r'\[0\]drawtext=font=a((.|\n)*)b:text=test\[s0\]', args[3], re.MULTILINE)
         assert match is not None, 'Invalid -filter_complex arg: {!r}'.format(args[3])
         return match.group(1)
@@ -272,7 +278,7 @@ def test_filter_text_arg_str_escape():
             .get_args()
         )
         assert args[:3] == ['-i', 'in', '-filter_complex']
-        assert args[4:] == ['-map', '[s0]', 'out']
+        assert args[4:] == ['-map', '[s0]', 'out', '-y']
         match = re.match(r'\[0\]drawtext=text=a((.|\n)*)b\[s0\]', args[3], re.MULTILINE)
         assert match is not None, 'Invalid -filter_complex arg: {!r}'.format(args[3])
         return match.group(1)
@@ -314,7 +320,7 @@ def test_run_multi_output():
     in_ = ffmpeg.input(TEST_INPUT_FILE1)
     out1 = in_.output(TEST_OUTPUT_FILE1)
     out2 = in_.output(TEST_OUTPUT_FILE2)
-    ffmpeg.run([out1, out2], overwrite_output=True)
+    ffmpeg.run([out1, out2])
 
 
 def test_run_dummy_cmd():
@@ -341,7 +347,8 @@ def test_custom_filter():
         '-i', 'dummy.mp4',
         '-filter_complex', '[0]custom_filter=a:b:kwarg1=c[s0]',
         '-map', '[s0]',
-        'dummy2.mp4'
+        'dummy2.mp4',
+        '-y',
     ]
 
 
@@ -355,7 +362,8 @@ def test_custom_filter_fluent():
         '-i', 'dummy.mp4',
         '-filter_complex', '[0]custom_filter=a:b:kwarg1=c[s0]',
         '-map', '[s0]',
-        'dummy2.mp4'
+        'dummy2.mp4',
+        '-y',
     ]
 
 
@@ -364,10 +372,10 @@ def test_merge_outputs():
     out1 = in_.output('out1.mp4')
     out2 = in_.output('out2.mp4')
     assert ffmpeg.merge_outputs(out1, out2).get_args() == [
-        '-i', 'in.mp4', 'out1.mp4', 'out2.mp4'
+        '-i', 'in.mp4', 'out1.mp4', 'out2.mp4', '-y'
     ]
     assert ffmpeg.get_args([out1, out2]) == [
-        '-i', 'in.mp4', 'out2.mp4', 'out1.mp4'
+        '-i', 'in.mp4', 'out2.mp4', 'out1.mp4', '-y'
     ]
 
 
@@ -385,14 +393,16 @@ def test_multi_passthrough():
         '-i', 'in2.mp4',
         'out1.mp4',
         '-map', '[1]',  # FIXME: this should not be here (see #23)
-        'out2.mp4'
+        'out2.mp4',
+        '-y',
     ]
     assert ffmpeg.get_args([out1, out2]) == [
         '-i', 'in2.mp4',
         '-i', 'in1.mp4',
         'out2.mp4',
         '-map', '[1]',  # FIXME: this should not be here (see #23)
-        'out1.mp4'
+        'out1.mp4',
+        '-y',
     ]
 
 
@@ -420,7 +430,8 @@ def test_pipe():
             '[0]trim=start_frame=2[s0]',
         '-map', '[s0]',
         '-f', 'rawvideo',
-        'pipe:1'
+        'pipe:1',
+        '-y',
     ]
 
     cmd = ['ffmpeg'] + args
