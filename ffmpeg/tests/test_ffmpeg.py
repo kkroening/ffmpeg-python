@@ -101,7 +101,7 @@ def test_stream_repr():
     assert repr(dummy_out) == 'dummy()[{!r}] <{}>'.format(dummy_out.label, dummy_out.node.short_hash)
 
 
-def test_get_args_simple():
+def test__get_args__simple():
     out_file = ffmpeg.input('dummy.mp4').output('dummy2.mp4')
     assert out_file.get_args() == ['-i', 'dummy.mp4', 'dummy2.mp4']
 
@@ -138,7 +138,7 @@ def _get_complex_filter_example():
     )
 
 
-def test_get_args_complex_filter():
+def test__get_args__complex_filter():
     out = _get_complex_filter_example()
     args = ffmpeg.get_args(out)
     assert args == ['-i', TEST_INPUT_FILE1,
@@ -309,13 +309,13 @@ def test_filter_text_arg_str_escape():
 #    subprocess.check_call(['ffmpeg', '-version'])
 
 
-def test_compile():
+def test__compile():
     out_file = ffmpeg.input('dummy.mp4').output('dummy2.mp4')
     assert out_file.compile() == ['ffmpeg', '-i', 'dummy.mp4', 'dummy2.mp4']
     assert out_file.compile(cmd='ffmpeg.old') == ['ffmpeg.old', '-i', 'dummy.mp4', 'dummy2.mp4']
 
 
-def test_run():
+def test__run():
     stream = _get_complex_filter_example()
     out, err = ffmpeg.run(stream)
     assert out is None
@@ -324,7 +324,7 @@ def test_run():
 
 @pytest.mark.parametrize('capture_stdout', [True, False])
 @pytest.mark.parametrize('capture_stderr', [True, False])
-def test_run__capture_out(mocker, capture_stdout, capture_stderr):
+def test__run__capture_out(mocker, capture_stdout, capture_stderr):
     mocker.patch.object(ffmpeg._run, 'compile', return_value=['echo', 'test'])
     stream = _get_simple_example()
     out, err = ffmpeg.run(stream, capture_stdout=capture_stdout, capture_stderr=capture_stderr)
@@ -338,7 +338,7 @@ def test_run__capture_out(mocker, capture_stdout, capture_stderr):
         assert err is None
 
 
-def test_run__input_output(mocker):
+def test__run__input_output(mocker):
     mocker.patch.object(ffmpeg._run, 'compile', return_value=['cat'])
     stream = _get_simple_example()
     out, err = ffmpeg.run(stream, input='test', capture_stdout=True)
@@ -348,11 +348,12 @@ def test_run__input_output(mocker):
 
 @pytest.mark.parametrize('capture_stdout', [True, False])
 @pytest.mark.parametrize('capture_stderr', [True, False])
-def test_run__error(mocker, capture_stdout, capture_stderr):
+def test__run__error(mocker, capture_stdout, capture_stderr):
     mocker.patch.object(ffmpeg._run, 'compile', return_value=['ffmpeg'])
     stream = _get_complex_filter_example()
     with pytest.raises(ffmpeg.Error) as excinfo:
         out, err = ffmpeg.run(stream, capture_stdout=capture_stdout, capture_stderr=capture_stderr)
+    assert str(excinfo.value) == 'ffmpeg error (see stderr output for detail)'
     out = excinfo.value.stdout
     err = excinfo.value.stderr
     if capture_stdout:
@@ -365,24 +366,24 @@ def test_run__error(mocker, capture_stdout, capture_stderr):
         assert err is None
 
 
-def test_run__multi_output():
+def test__run__multi_output():
     in_ = ffmpeg.input(TEST_INPUT_FILE1)
     out1 = in_.output(TEST_OUTPUT_FILE1)
     out2 = in_.output(TEST_OUTPUT_FILE2)
     ffmpeg.run([out1, out2], overwrite_output=True)
 
 
-def test_run__dummy_cmd():
+def test__run__dummy_cmd():
     stream = _get_complex_filter_example()
     ffmpeg.run(stream, cmd='true')
 
 
-def test_run__dummy_cmd_list():
+def test__run__dummy_cmd_list():
     stream = _get_complex_filter_example()
     ffmpeg.run(stream, cmd=['true', 'ignored'])
 
 
-def test_filter__custom():
+def test__filter__custom():
     stream = ffmpeg.input('dummy.mp4')
     stream = ffmpeg.filter_(stream, 'custom_filter', 'a', 'b', kwarg1='c')
     stream = ffmpeg.output(stream, 'dummy2.mp4')
@@ -394,7 +395,7 @@ def test_filter__custom():
     ]
 
 
-def test_filter__custom_fluent():
+def test__filter__custom_fluent():
     stream = (ffmpeg
         .input('dummy.mp4')
         .filter_('custom_filter', 'a', 'b', kwarg1='c')
@@ -408,7 +409,7 @@ def test_filter__custom_fluent():
     ]
 
 
-def test_merge_outputs():
+def test__merge_outputs():
     in_ = ffmpeg.input('in.mp4')
     out1 = in_.output('out1.mp4')
     out2 = in_.output('out2.mp4')
@@ -484,14 +485,14 @@ def test_pipe():
     assert out_data == in_data[start_frame*frame_size:]
 
 
-def test_ffprobe():
+def test__probe():
     data = ffmpeg.probe(TEST_INPUT_FILE1)
     assert set(data.keys()) == {'format', 'streams'}
     assert data['format']['duration'] == '7.036000'
 
 
-def test_ffprobe_exception():
+def test__probe__exception():
     with pytest.raises(ffmpeg.Error) as excinfo:
         ffmpeg.probe(BOGUS_INPUT_FILE)
-    assert str(excinfo.value) == 'ffprobe error'
+    assert str(excinfo.value) == 'ffprobe error (see stderr output for detail)'
     assert 'No such file or directory'.encode() in excinfo.value.stderr

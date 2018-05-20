@@ -24,9 +24,8 @@ from .nodes import (
 
 
 class Error(Exception):
-    def __init__(self, stream_spec, stdout, stderr):
-        super(Error, self).__init__('ffmpeg error (see stderr output for detail)')
-        self.stream_spec = stream_spec
+    def __init__(self, cmd, stdout, stderr):
+        super(Error, self).__init__('{} error (see stderr output for detail)'.format(cmd))
         self.stdout = stdout
         self.stderr = stderr
 
@@ -197,7 +196,7 @@ def run(
     out, err = p.communicate(input)
     retcode = p.poll()
     if retcode:
-        raise Error(stream_spec, out, err)
+        raise Error('ffmpeg', out, err)
     return out, err
 
 

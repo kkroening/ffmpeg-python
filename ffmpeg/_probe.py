@@ -16,7 +16,7 @@ def probe(filename):
     p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = p.communicate()
     if p.returncode != 0:
-        raise Error(err)
+        raise Error('ffprobe', out, err)
     return json.loads(out.decode('utf-8'))
 
 
