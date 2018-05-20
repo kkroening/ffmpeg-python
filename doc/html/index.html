@@ -314,6 +314,21 @@ and arguments to ffmpeg verbatim.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="ffmpeg.filter_multi_output">
+<code class="descclassname">ffmpeg.</code><code class="descname">filter_multi_output</code><span class="sig-paren">(</span><em>stream_spec</em>, <em>filter_name</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.filter_multi_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply custom filter with one or more outputs.</p>
+<p>This is the same as <code class="docutils literal"><span class="pre">filter_</span></code> except that the filter can produce more than one output.</p>
+<p>To reference an output stream, use either the <code class="docutils literal"><span class="pre">.stream</span></code> operator or bracket shorthand:</p>
+<p class="rubric">Example</p>
+<p><code class="docutils literal"><span class="pre">`</span>
+<span class="pre">split</span> <span class="pre">=</span> <span class="pre">ffmpeg.input('in.mp4').filter_multi_output('split')</span>
+<span class="pre">split0</span> <span class="pre">=</span> <span class="pre">split.stream(0)</span>
+<span class="pre">split1</span> <span class="pre">=</span> <span class="pre">split[1]</span>
+<span class="pre">ffmpeg.concat(split0,</span> <span class="pre">split1).output('out.mp4').run()</span>
+<span class="pre">`</span></code></p>
+</dd></dl>
+
+<dl class="function">
 <dt id="ffmpeg.hflip">
 <code class="descclassname">ffmpeg.</code><code class="descname">hflip</code><span class="sig-paren">(</span><em>stream</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.hflip" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flip the input video horizontally.</p>
@@ -479,6 +494,9 @@ for single input image.</li>
 <dt id="ffmpeg.input">
 <code class="descclassname">ffmpeg.</code><code class="descname">input</code><span class="sig-paren">(</span><em>filename</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.input" title="Permalink to this definition">¶</a></dt>
 <dd><p>Input file URL (ffmpeg <code class="docutils literal"><span class="pre">-i</span></code> option)</p>
+<p>Any supplied kwargs are passed to ffmpeg verbatim (e.g. <code class="docutils literal"><span class="pre">t=20</span></code>,
+<code class="docutils literal"><span class="pre">f='mp4'</span></code>, <code class="docutils literal"><span class="pre">acodec='pcm'</span></code>, etc.).</p>
+<p>To tell ffmpeg to read from stdin, use <code class="docutils literal"><span class="pre">pipe:</span></code> as the filename.</p>
 <p>Official documentation: <a class="reference external" href="https://ffmpeg.org/ffmpeg.html#Main-options">Main options</a></p>
 </dd></dl>
 
@@ -490,8 +508,17 @@ for single input image.</li>
 
 <dl class="function">
 <dt id="ffmpeg.output">
-<code class="descclassname">ffmpeg.</code><code class="descname">output</code><span class="sig-paren">(</span><em>stream</em>, <em>filename</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.output" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">ffmpeg.</code><code class="descname">output</code><span class="sig-paren">(</span><em>*streams_and_filename</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.output" title="Permalink to this definition">¶</a></dt>
 <dd><p>Output file URL</p>
+<dl class="docutils">
+<dt>Syntax:</dt>
+<dd><cite>ffmpeg.output(stream1[, stream2, stream3…], filename, **ffmpeg_args)</cite></dd>
+</dl>
+<p>If multiple streams are provided, they are mapped to the same
+output.</p>
+<p>Any supplied kwargs are passed to ffmpeg verbatim (e.g. <code class="docutils literal"><span class="pre">t=20</span></code>,
+<code class="docutils literal"><span class="pre">f='mp4'</span></code>, <code class="docutils literal"><span class="pre">acodec='pcm'</span></code>, etc.).</p>
+<p>To tell ffmpeg to write to stdout, use <code class="docutils literal"><span class="pre">pipe:</span></code> as the filename.</p>
 <p>Official documentation: <a class="reference external" href="https://ffmpeg.org/ffmpeg.html#Synopsis">Synopsis</a></p>
 </dd></dl>
 
@@ -503,29 +530,75 @@ for single input image.</li>
 </dd></dl>
 
 <dl class="function">
+<dt id="ffmpeg.compile">
+<code class="descclassname">ffmpeg.</code><code class="descname">compile</code><span class="sig-paren">(</span><em>stream_spec</em>, <em>cmd=u'ffmpeg'</em>, <em>overwrite_output=False</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.compile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build command-line for invoking ffmpeg.</p>
+<p>The <a class="reference internal" href="#ffmpeg.run" title="ffmpeg.run"><code class="xref py py-meth docutils literal"><span class="pre">run()</span></code></a> function uses this to build the commnad line
+arguments and should work in most cases, but calling this function
+directly is useful for debugging or if you need to invoke ffmpeg
+manually for whatever reason.</p>
+<p>This is the same as calling <a class="reference internal" href="#ffmpeg.get_args" title="ffmpeg.get_args"><code class="xref py py-meth docutils literal"><span class="pre">get_args()</span></code></a> except that it also
+includes the <code class="docutils literal"><span class="pre">ffmpeg</span></code> command as the first argument.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ffmpeg.Error">
+<em class="property">exception </em><code class="descclassname">ffmpeg.</code><code class="descname">Error</code><span class="sig-paren">(</span><em>stream_spec</em>, <em>stdout</em>, <em>stderr</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.Error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+</dd></dl>
+
+<dl class="function">
 <dt id="ffmpeg.get_args">
 <code class="descclassname">ffmpeg.</code><code class="descname">get_args</code><span class="sig-paren">(</span><em>stream_spec</em>, <em>overwrite_output=False</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.get_args" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get command-line arguments for ffmpeg.</p>
+<dd><p>Build command-line arguments to be passed to ffmpeg.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="ffmpeg.run">
-<code class="descclassname">ffmpeg.</code><code class="descname">run</code><span class="sig-paren">(</span><em>stream_spec</em>, <em>cmd=u'ffmpeg'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.run" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run ffmpeg on node graph.</p>
+<code class="descclassname">ffmpeg.</code><code class="descname">run</code><span class="sig-paren">(</span><em>stream_spec</em>, <em>cmd=u'ffmpeg'</em>, <em>capture_stdout=False</em>, <em>capture_stderr=False</em>, <em>input=None</em>, <em>quiet=False</em>, <em>overwrite_output=False</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ivoke ffmpeg for the supplied node graph.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>**kwargs</strong> – keyword-arguments passed to <code class="docutils literal"><span class="pre">get_args()</span></code> (e.g. <code class="docutils literal"><span class="pre">overwrite_output=True</span></code>).</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>capture_stdout</strong> – if True, capture stdout (to be used with
+<code class="docutils literal"><span class="pre">pipe:</span></code> ffmpeg outputs).</li>
+<li><strong>capture_stderr</strong> – if True, capture stderr.</li>
+<li><strong>quiet</strong> – shorthand for setting <code class="docutils literal"><span class="pre">capture_stdout</span></code> and <code class="docutils literal"><span class="pre">capture_stderr</span></code>.</li>
+<li><strong>input</strong> – text to be sent to stdin (to be used with <code class="docutils literal"><span class="pre">pipe:</span></code>
+ffmpeg inputs)</li>
+<li><strong>**kwargs</strong> – keyword-arguments passed to <code class="docutils literal"><span class="pre">get_args()</span></code> (e.g.
+<code class="docutils literal"><span class="pre">overwrite_output=True</span></code>).</li>
+</ul>
+</td>
 </tr>
 </tbody>
 </table>
+<p>Returns: (out, err) tuple containing captured stdout and stderr data.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="ffmpeg.view">
 <code class="descclassname">ffmpeg.</code><code class="descname">view</code><span class="sig-paren">(</span><em>stream_spec</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.view" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="function">
+<dt id="ffmpeg.probe">
+<code class="descclassname">ffmpeg.</code><code class="descname">probe</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.probe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run ffprobe on the specified file and return a JSON representation of the output.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#ffmpeg.Error" title="ffmpeg.Error"><code class="xref py py-class docutils literal"><span class="pre">ffmpeg.Error</span></code></a> – if ffprobe returns a non-zero exit code,
+an <a class="reference internal" href="#ffmpeg.Error" title="ffmpeg.Error"><code class="xref py py-class docutils literal"><span class="pre">Error</span></code></a> is returned with a generic error message.
+The stderr output can be retrieved by accessing the
+<code class="docutils literal"><span class="pre">stderr</span></code> property of the exception.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </div>
 <div class="section" id="indices-and-tables">
