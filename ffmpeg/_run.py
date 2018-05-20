@@ -1,13 +1,13 @@
 from __future__ import unicode_literals
 
-from builtins import str
-from past.builtins import basestring
 from .dag import get_outgoing_edges, topo_sort
-from functools import reduce
 from ._utils import basestring
+from builtins import str
+from functools import reduce
+from past.builtins import basestring
 import copy
 import operator
-import subprocess as _subprocess
+import subprocess
 
 from ._ffmpeg import (
     input,
@@ -21,6 +21,13 @@ from .nodes import (
     OutputNode,
     output_operator,
 )
+
+
+class Error(Exception):
+    def __init__(self, cmd, stdout, stderr):
+        super(Error, self).__init__('{} error (see stderr output for detail)'.format(cmd))
+        self.stdout = stdout
+        self.stderr = stderr
 
 
 def _convert_kwargs_to_cmd_line_args(kwargs):
@@ -80,8 +87,9 @@ def _allocate_filter_stream_names(filter_nodes, outgoing_edge_maps, stream_name_
         for upstream_label, downstreams in list(outgoing_edge_map.items()):
             if len(downstreams) > 1:
                 # TODO: automatically insert `splits` ahead of time via graph transformation.
-                raise ValueError('Encountered {} with multiple outgoing edges with same upstream label {!r}; a '
-                                 '`split` filter is probably required'.format(upstream_node, upstream_label))
+                raise ValueError(
+                    'Encountered {} with multiple outgoing edges with same upstream label {!r}; a '
+                    '`split` filter is probably required'.format(upstream_node, upstream_label))
             stream_name_map[upstream_node, upstream_label] = 's{}'.format(stream_count)
             stream_count += 1
 
@@ -122,7 +130,7 @@ def _get_output_args(node, stream_name_map):
 
 @output_operator()
 def get_args(stream_spec, overwrite_output=False):
-    """Get command-line arguments for ffmpeg."""
+    """Build command-line arguments to be passed to ffmpeg."""
     nodes = get_stream_spec_nodes(stream_spec)
     args = []
     # TODO: group nodes together, e.g. `-i somefile -r somerate`.
@@ -144,27 +152,57 @@ def get_args(stream_spec, overwrite_output=False):
 
 
 @output_operator()
-def compile(stream_spec, cmd='ffmpeg', **kwargs):
-    """Build command-line for ffmpeg."""
+def compile(stream_spec, cmd='ffmpeg', overwrite_output=False):
+    """Build command-line for invoking ffmpeg.
+
+    The :meth:`run` function uses this to build the commnad line
+    arguments and should work in most cases, but calling this function
+    directly is useful for debugging or if you need to invoke ffmpeg
+    manually for whatever reason.
+
+    This is the same as calling :meth:`get_args` except that it also
+    includes the ``ffmpeg`` command as the first argument.
+    """
     if isinstance(cmd, basestring):
         cmd = [cmd]
     elif type(cmd) != list:
         cmd = list(cmd)
-    return cmd + get_args(stream_spec, **kwargs)
+    return cmd + get_args(stream_spec, overwrite_output=overwrite_output)
 
 
 @output_operator()
-def run(stream_spec, cmd='ffmpeg', **kwargs):
-    """Run ffmpeg on node graph.
+def run(
+        stream_spec, cmd='ffmpeg', capture_stdout=False, capture_stderr=False, input=None,
+        quiet=False, overwrite_output=False):
+    """Ivoke ffmpeg for the supplied node graph.
 
     Args:
-        **kwargs: keyword-arguments passed to ``get_args()`` (e.g. ``overwrite_output=True``).
+        capture_stdout: if True, capture stdout (to be used with
+            ``pipe:`` ffmpeg outputs).
+        capture_stderr: if True, capture stderr.
+        quiet: shorthand for setting ``capture_stdout`` and ``capture_stderr``.
+        input: text to be sent to stdin (to be used with ``pipe:``
+            ffmpeg inputs)
+        **kwargs: keyword-arguments passed to ``get_args()`` (e.g.
+            ``overwrite_output=True``).
+
+    Returns: (out, err) tuple containing captured stdout and stderr data.
     """
-    _subprocess.check_call(compile(stream_spec, cmd, **kwargs))
+    args = compile(stream_spec, cmd, overwrite_output=overwrite_output)
+    stdin_stream = subprocess.PIPE if input else None
+    stdout_stream = subprocess.PIPE if capture_stdout or quiet else None
+    stderr_stream = subprocess.PIPE if capture_stderr or quiet else None
+    p = subprocess.Popen(args, stdin=stdin_stream, stdout=stdout_stream, stderr=stderr_stream)
+    out, err = p.communicate(input)
+    retcode = p.poll()
+    if retcode:
+        raise Error('ffmpeg', out, err)
+    return out, err
 
 
 __all__ = [
     'compile',
+    'Error',
     'get_args',
     'run',
 ]
