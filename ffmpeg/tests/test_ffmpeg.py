@@ -329,11 +329,11 @@ def test__run__capture_out(mocker, capture_stdout, capture_stderr):
     stream = _get_simple_example()
     out, err = ffmpeg.run(stream, capture_stdout=capture_stdout, capture_stderr=capture_stderr)
     if capture_stdout:
-        assert out == 'test\n'
+        assert out == 'test\n'.encode()
     else:
         assert out is None
     if capture_stderr:
-        assert err == ''
+        assert err == ''.encode()
     else:
         assert err is None
 
@@ -341,8 +341,8 @@ def test__run__capture_out(mocker, capture_stdout, capture_stderr):
 def test__run__input_output(mocker):
     mocker.patch.object(ffmpeg._run, 'compile', return_value=['cat'])
     stream = _get_simple_example()
-    out, err = ffmpeg.run(stream, input='test', capture_stdout=True)
-    assert out == 'test'
+    out, err = ffmpeg.run(stream, input='test'.encode(), capture_stdout=True)
+    assert out == 'test'.encode()
     assert err is None
 
 
@@ -357,11 +357,11 @@ def test__run__error(mocker, capture_stdout, capture_stderr):
     out = excinfo.value.stdout
     err = excinfo.value.stderr
     if capture_stdout:
-        assert out == ''
+        assert out == ''.encode()
     else:
         assert out is None
     if capture_stderr:
-        assert err.startswith('ffmpeg version')
+        assert err.decode().startswith('ffmpeg version')
     else:
         assert err is None
 
