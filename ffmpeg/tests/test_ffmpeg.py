@@ -237,6 +237,17 @@ def test_filter_asplit():
     ]
 
 
+@pytest.mark.parametrize('video_size', [(320, 240), '320x240'])
+def test__output__video_size(video_size):
+    args = (
+        ffmpeg
+        .input('in')
+        .output('out', video_size=video_size)
+        .get_args()
+    )
+    assert args == ['-i', 'in', '-video_size', '320x240', 'out']
+
+
 def test_filter_normal_arg_escape():
     """Test string escaping of normal filter args (e.g. ``font`` param of ``drawtext`` filter)."""
     def _get_drawtext_font_repr(font):
