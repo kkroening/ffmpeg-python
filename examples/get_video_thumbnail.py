@@ -5,7 +5,7 @@ import ffmpeg
 import sys
 
 
-parser = argparse.ArgumentParser(description='Extract video thumbnail')
+parser = argparse.ArgumentParser(description='Generate video thumbnail')
 parser.add_argument('in_filename', help='Input filename')
 parser.add_argument('out_filename', help='Output filename')
 parser.add_argument(
@@ -21,7 +21,7 @@ def generate_thumbnail(in_filename, out_filename, time, width):
             ffmpeg
             .input(in_filename, ss=time)
             .filter_('scale', width, -1)
-            .output(out_filename, vframes=1, format='image2', vcodec='mjpeg')
+            .output(out_filename, vframes=1)
             .run(capture_stdout=True, capture_stderr=True, overwrite_output=True)
         )
     except ffmpeg.Error as e:
