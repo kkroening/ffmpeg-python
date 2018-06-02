@@ -59,7 +59,5 @@ out, _ = (ffmpeg
 
 ## [JupyterLab/Notebook widgets](https://github.com/kkroening/ffmpeg-python/blob/master/examples/ffmpeg-numpy.ipynb)
 
-![Jupyter screenshot](
-
 <img src="https://raw.githubusercontent.com/kkroening/ffmpeg-python/master/doc/jupyter-screenshot.png" alt="jupyter screenshot" width="75%" />
 
