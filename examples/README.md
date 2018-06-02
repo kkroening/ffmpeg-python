@@ -56,3 +56,7 @@ out, _ = (ffmpeg
     .run(capture_stdout=True)
 )
 ```
+
+## [JupyterLab/Notebook widgets](https://github.com/kkroening/ffmpeg-python/blob/master/examples/ffmpeg-numpy.ipynb)
+
+![Signal graph](https://raw.githubusercontent.com/kkroening/ffmpeg-python/master/doc/jupyter-screenshot.png)
