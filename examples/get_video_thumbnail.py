@@ -22,10 +22,12 @@ def generate_thumbnail(in_filename, out_filename, time, width):
             .input(in_filename, ss=time)
             .filter_('scale', width, -1)
             .output(out_filename, vframes=1)
-            .run(capture_stdout=True, capture_stderr=True, overwrite_output=True)
+            .overwrite_output()
+            .run(capture_stdout=True, capture_stderr=True)
         )
     except ffmpeg.Error as e:
         print(e.stderr.decode(), file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == '__main__':

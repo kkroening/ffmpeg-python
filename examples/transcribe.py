@@ -1,13 +1,11 @@
 #!/usr/bin/env python
-from __future__ import unicode_literals
-
+from __future__ import unicode_literals, print_function
 from google.cloud import speech
 from google.cloud.speech import enums
 from google.cloud.speech import types
 import argparse
 import ffmpeg
 import logging
-import subprocess
 import sys
 
 
@@ -21,21 +19,17 @@ parser.add_argument('in_filename', help='Input filename (`-` for stdin)')
 
 
 def decode_audio(in_filename, **input_kwargs):
-    p = subprocess.Popen(
-        (ffmpeg
+    try:
+        out, err = (ffmpeg
             .input(in_filename, **input_kwargs)
             .output('-', format='s16le', acodec='pcm_s16le', ac=1, ar='16k')
             .overwrite_output()
-            .compile()
-        ),
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE
-    )
-    out = p.communicate()
-    if p.returncode != 0:
-        sys.stderr.write(out[1])
+            .run(capture_stdout=True, capture_stderr=True)
+        )
+    except ffmpeg.Error as e:
+        print(e.stderr, file=sys.stderr)
         sys.exit(1)
-    return out[0]
+    return out
 
 
 def get_transcripts(audio_data):
