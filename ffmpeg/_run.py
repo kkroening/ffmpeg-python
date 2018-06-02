@@ -120,9 +120,12 @@ def _get_output_args(node, stream_name_map):
 
     kwargs = copy.copy(node.kwargs)
     filename = kwargs.pop('filename')
-    fmt = kwargs.pop('format', None)
-    if fmt:
-        args += ['-f', fmt]
+    if 'format' in kwargs:
+        args += ['-f', kwargs.pop('format')]
+    if 'video_bitrate' in kwargs:
+        args += ['-b:v', str(kwargs.pop('video_bitrate'))]
+    if 'audio_bitrate' in kwargs:
+        args += ['-b:a', str(kwargs.pop('audio_bitrate'))]
     args += _convert_kwargs_to_cmd_line_args(kwargs)
     args += [filename]
     return args
