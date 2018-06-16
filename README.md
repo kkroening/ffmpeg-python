@@ -146,9 +146,10 @@ Pull requests are welcome as well.
 
 ### Special thanks
 
-- Davide Depau (@Depau)
-- Dim (@lloti)
-- Noah Stier (@noahstier)
+- [Arne de Laat](https://github.com/153957)
+- [Davide Depau](https://github.com/depau)
+- [Dim](https://github.com/lloti)
+- [Noah Stier](https://github.com/noahstier)
 
 ## Additional Resources
 
