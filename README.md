@@ -144,6 +144,12 @@ Pull requests are welcome as well.
 
 <br />
 
+### Special thanks
+
+- Davide Depau (@Depau)
+- Dim (@lloti)
+- Noah Stier (@noahstier)
+
 ## Additional Resources
 
 - [API Reference](https://kkroening.github.io/ffmpeg-python/)
