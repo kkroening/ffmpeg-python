@@ -237,7 +237,6 @@ def test_filter_asplit():
     ]
 
 
-
 def test__output__bitrate():
     args = (
         ffmpeg
@@ -246,6 +245,17 @@ def test__output__bitrate():
         .get_args()
     )
     assert args == ['-i', 'in', '-b:v', '1000', '-b:a', '200', 'out']
+
+
+@pytest.mark.parametrize('video_size', [(320, 240), '320x240'])
+def test__output__video_size(video_size):
+    args = (
+        ffmpeg
+        .input('in')
+        .output('out', video_size=video_size)
+        .get_args()
+    )
+    assert args == ['-i', 'in', '-video_size', '320x240', 'out']
 
 
 def test_filter_normal_arg_escape():

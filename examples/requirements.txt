@@ -1,2 +1,4 @@
 ffmpeg-python
+gevent
 google-cloud-speech
+tqdm

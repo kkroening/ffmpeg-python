@@ -95,6 +95,10 @@ $ python
 >>> import ffmpeg
 ```
 
+## [Examples](https://github.com/kkroening/ffmpeg-python/tree/master/examples)
+
+When in doubt, take a look at the [examples](https://github.com/kkroening/ffmpeg-python/tree/master/examples) to see if there's something that's close to whatever you're trying to do.
+
 ## [API Reference](https://kkroening.github.io/ffmpeg-python/)
 
 API documentation is automatically generated from python docstrings and hosted on github pages: https://kkroening.github.io/ffmpeg-python/
@@ -139,6 +143,13 @@ It should be fairly easy to use filters that aren't explicitly built into `ffmpe
 Pull requests are welcome as well.
 
 <br />
+
+### Special thanks
+
+- [Arne de Laat](https://github.com/153957)
+- [Davide Depau](https://github.com/depau)
+- [Dim](https://github.com/lloti)
+- [Noah Stier](https://github.com/noahstier)
 
 ## Additional Resources
 

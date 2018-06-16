@@ -1,10 +1,9 @@
 from __future__ import unicode_literals
-
 from .dag import get_outgoing_edges, topo_sort
 from ._utils import basestring
 from builtins import str
 from functools import reduce
-from past.builtins import basestring
+import collections
 import copy
 import operator
 import subprocess
@@ -126,6 +125,11 @@ def _get_output_args(node, stream_name_map):
         args += ['-b:v', str(kwargs.pop('video_bitrate'))]
     if 'audio_bitrate' in kwargs:
         args += ['-b:a', str(kwargs.pop('audio_bitrate'))]
+    if 'video_size' in kwargs:
+        video_size = kwargs.pop('video_size')
+        if not isinstance(video_size, basestring) and isinstance(video_size, collections.Iterable):
+            video_size = '{}x{}'.format(video_size[0], video_size[1])
+        args += ['-video_size', video_size]
     args += _convert_kwargs_to_cmd_line_args(kwargs)
     args += [filename]
     return args
