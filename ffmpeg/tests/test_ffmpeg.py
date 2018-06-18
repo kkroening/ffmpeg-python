@@ -237,6 +237,16 @@ def test_filter_asplit():
     ]
 
 
+def test__output__bitrate():
+    args = (
+        ffmpeg
+        .input('in')
+        .output('out', video_bitrate=1000, audio_bitrate=200)
+        .get_args()
+    )
+    assert args == ['-i', 'in', '-b:v', '1000', '-b:a', '200', 'out']
+
+
 @pytest.mark.parametrize('video_size', [(320, 240), '320x240'])
 def test__output__video_size(video_size):
     args = (
