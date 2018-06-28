@@ -99,11 +99,11 @@ $ python
 
 When in doubt, take a look at the [examples](https://github.com/kkroening/ffmpeg-python/tree/master/examples) to see if there's something that's close to whatever you're trying to do.
 
-Here are a few of the examples:
+Here are a few:
 - [Convert video to numpy array](https://github.com/kkroening/ffmpeg-python/blob/master/examples/README.md#convert-video-to-numpy-array)
 - [Generate thumbnail for video](https://github.com/kkroening/ffmpeg-python/blob/master/examples/README.md#generate-thumbnail-for-video)
 - [Read raw PCM audio via pipe](https://github.com/kkroening/ffmpeg-python/blob/master/examples/README.md#convert-sound-to-raw-pcm-audio)
-- [Jupyter Stream Editor](https://github.com/kkroening/ffmpeg-python/blob/master/examples/README.md#jupyter-stream-editor)
+- [Jupyter stream editor](https://github.com/kkroening/ffmpeg-python/blob/master/examples/README.md#jupyter-stream-editor)
 
 <img src="https://raw.githubusercontent.com/kkroening/ffmpeg-python/master/doc/jupyter-demo.gif" alt="jupyter demo" width="75%" />
 
