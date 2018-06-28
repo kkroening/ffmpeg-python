@@ -59,7 +59,7 @@ setup(
     setup_requires=['pytest-runner'],
     tests_require=['pytest', 'pytest-mock'],
     version=version,
-    description='Python bindings for FFmpeg - with support for complex filtering',
+    description='Python bindings for FFmpeg - with complex filtering support',
     author='Karl Kroening',
     author_email='karlk@kralnet.us',
     url='https://github.com/kkroening/ffmpeg-python',
