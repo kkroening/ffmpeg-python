@@ -1,4 +1,9 @@
 ffmpeg-python
 gevent
 google-cloud-speech
+graphviz
+ipywidgets
+jupyter
+matplotlib
+Pillow
 tqdm
