@@ -103,7 +103,7 @@ Here are a few:
 - [Convert video to numpy array](https://github.com/kkroening/ffmpeg-python/blob/master/examples/README.md#convert-video-to-numpy-array)
 - [Generate thumbnail for video](https://github.com/kkroening/ffmpeg-python/blob/master/examples/README.md#generate-thumbnail-for-video)
 - [Read raw PCM audio via pipe](https://github.com/kkroening/ffmpeg-python/blob/master/examples/README.md#convert-sound-to-raw-pcm-audio)
-- [Jupyter stream editor](https://github.com/kkroening/ffmpeg-python/blob/master/examples/README.md#jupyter-stream-editor)
+- [JupyterLab/Notebook stream editor](https://github.com/kkroening/ffmpeg-python/blob/master/examples/README.md#jupyter-stream-editor)
 
 <img src="https://raw.githubusercontent.com/kkroening/ffmpeg-python/master/doc/jupyter-demo.gif" alt="jupyter demo" width="75%" />
 
