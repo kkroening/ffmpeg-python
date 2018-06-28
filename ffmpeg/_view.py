@@ -30,22 +30,23 @@ def _get_node_color(node):
 
 
 @stream_operator()
-def view(stream_spec, **kwargs):
+def view(stream_spec, detail=False, filename=None, pipe=False, **kwargs):
     try:
         import graphviz
     except ImportError:
         raise ImportError('failed to import graphviz; please make sure graphviz is installed (e.g. `pip install '
             'graphviz`)')
 
-    filename = kwargs.pop('filename', None)
     show_labels = kwargs.pop('show_labels', True)
-    if filename is None:
+    if pipe and filename is not None:
+        raise ValueError('Can\'t specify both `filename` and `pipe`')
+    elif not pipe and filename is None:
         filename = tempfile.mktemp()
 
     nodes = get_stream_spec_nodes(stream_spec)
 
     sorted_nodes, outgoing_edge_maps = topo_sort(nodes)
-    graph = graphviz.Digraph()
+    graph = graphviz.Digraph(format='png')
     graph.attr(rankdir='LR')
     if len(list(kwargs.keys())) != 0:
         raise ValueError('Invalid kwargs key(s): {}'.format(', '.join(list(kwargs.keys()))))
@@ -53,7 +54,14 @@ def view(stream_spec, **kwargs):
     for node in sorted_nodes:
         color = _get_node_color(node)
 
-        graph.node(str(hash(node)), node.short_repr, shape='box', style='filled', fillcolor=color)
+        if detail:
+            lines = [node.short_repr]
+            lines += ['{!r}'.format(arg) for arg in node.args]
+            lines += ['{}={!r}'.format(key, node.kwargs[key]) for key in sorted(node.kwargs)]
+            node_text = '\n'.join(lines)
+        else:
+            node_text = node.short_repr
+        graph.node(str(hash(node)), node_text, shape='box', style='filled', fillcolor=color)
         outgoing_edge_map = outgoing_edge_maps.get(node, {})
 
         for edge in get_outgoing_edges(node, outgoing_edge_map):
@@ -78,9 +86,11 @@ def view(stream_spec, **kwargs):
             downstream_node_id = str(hash(edge.downstream_node))
             graph.edge(upstream_node_id, downstream_node_id, **kwargs)
 
-    graph.view(filename, cleanup=True)
-
-    return stream_spec
+    if pipe:
+        return graph.pipe()
+    else:
+        graph.view(filename, cleanup=True)
+        return stream_spec
 
 
 __all__ = [
