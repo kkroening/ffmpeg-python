@@ -75,7 +75,7 @@ Real-world signal graphs can get a heck of a lot more complex, but `ffmpeg-pytho
 
 ## Installation
 
-The easiest way to acquire the latest version of `ffmpeg-python` is through pip:
+The latest version of `ffmpeg-python` can be acquired via pip:
 
 ```
 pip install ffmpeg-python
@@ -117,7 +117,7 @@ Alternatively, standard python help is available, such as at the python REPL pro
 
 ## Custom Filters
 
-Don't see the filter you're looking for?  `ffmpeg-python` is a work in progress, but it's easy to use any arbitrary ffmpeg filter:
+Don't see the filter you're looking for?  `ffmpeg-python` includes , but it's easy to use any arbitrary ffmpeg filter:
 ```python
 stream = ffmpeg.input('dummy.mp4')
 stream = ffmpeg.filter_(stream, 'fps', fps=25, round='up')
@@ -152,7 +152,7 @@ When in doubt, refer to the [existing filters](https://github.com/kkroening/ffmp
 
 Feel free to report any bugs or submit feature requests.
 
-It should be fairly easy to use filters that aren't explicitly built into `ffmpeg-python` but if there's a feature or filter you'd really like to see included in the library, don't hesitate to open a feature request.
+It's generally straightforward to use filters that aren't explicitly built into `ffmpeg-python` but if there's a feature you'd like to see included in the library, head over to the [issue tracker](https://github.com/kkroening/ffmpeg-python/issues).
 
 Pull requests are welcome as well.
 
