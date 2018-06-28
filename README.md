@@ -40,15 +40,10 @@ Take for example a signal graph that looks like this:
 
 The corresponding command-line arguments are pretty gnarly:
 ```bash
-ffmpeg -i input.mp4 \
-    -filter_complex "\
-        [0]trim=start_frame=10:end_frame=20[v0];\
-        [0]trim=start_frame=30:end_frame=40[v1];\
-        [v0][v1]concat=n=2[v2];\
-        [1]hflip[v3];\
-        [v2][v3]overlay=eof_action=repeat[v4];\
-        [v4]drawbox=50:50:120:120:red:t=5[v5]"\
-     -map [v5] output.mp4
+ffmpeg -i input.mp4 -filter_complex "[0]trim=start_frame=10:end_frame=20[v0];\
+    [0]trim=start_frame=30:end_frame=40[v1];[v0][v1]concat=n=2[v2];[1]hflip[v3];\
+    [v2][v3]overlay=eof_action=repeat[v4];[v4]drawbox=50:50:120:120:red:t=5[v5]"\
+    -map [v5] output.mp4
 ```
 
 Maybe this looks great to you, but if you're not an FFmpeg command-line expert, it probably looks alien.
@@ -140,13 +135,22 @@ Or fluently:
 )
 ```
 
-When in doubt, refer to the [existing filters](https://github.com/kkroening/ffmpeg-python/blob/master/ffmpeg/_filters.py) and/or the [official ffmpeg documentation](https://ffmpeg.org/ffmpeg-filters.html).
+Arguments with special names such as `-qscale:v` can be specified as a keyword-args dictionary as follows:
+```python
+(ffmpeg
+    .input('dummy.mp4')
+    .output('dummy2.mp4', **{'qscale:v': 3})
+    .run()
+)
+```
+
+When in doubt, refer to the [existing filters](https://github.com/kkroening/ffmpeg-python/blob/master/ffmpeg/_filters.py), [examples](https://github.com/kkroening/ffmpeg-python/tree/master/examples), and/or the [official ffmpeg documentation](https://ffmpeg.org/ffmpeg-filters.html).
 
 ## Contributing
 
 <img align="right" src="https://raw.githubusercontent.com/kkroening/ffmpeg-python/master/doc/logo.png" alt="ffmpeg-python logo" width="20%" />
 
-Feel free to report any bugs or feature requests.
+Feel free to report any bugs or submit feature requests.
 
 It should be fairly easy to use filters that aren't explicitly built into `ffmpeg-python` but if there's a feature or filter you'd really like to see included in the library, don't hesitate to open a feature request.
 
