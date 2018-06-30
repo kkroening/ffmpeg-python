@@ -221,6 +221,83 @@ def _get_complex_filter_asplit_example():
     )
 
 
+def test_filter_concat__video_only():
+    in1 = ffmpeg.input('in1.mp4')
+    in2 = ffmpeg.input('in2.mp4')
+    args = (
+        ffmpeg
+        .concat(in1, in2)
+        .output('out.mp4')
+        .get_args()
+    )
+    assert args == [
+        '-i',
+        'in1.mp4',
+        '-i',
+        'in2.mp4',
+        '-filter_complex',
+        '[0][1]concat=n=2[s0]',
+        '-map',
+        '[s0]',
+        'out.mp4',
+    ]
+
+
+def test_filter_concat__audio_only():
+    in1 = ffmpeg.input('in1.mp4')
+    in2 = ffmpeg.input('in2.mp4')
+    args = (
+        ffmpeg
+        .concat(in1, in2, v=0, a=1)
+        .output('out.mp4')
+        .get_args()
+    )
+    assert args == [
+        '-i',
+        'in1.mp4',
+        '-i',
+        'in2.mp4',
+        '-filter_complex',
+        '[0][1]concat=a=1:n=2:v=0[s0]',
+        '-map',
+        '[s0]',
+        'out.mp4'
+    ]
+
+
+def test_filter_concat__audio_video():
+    in1 = ffmpeg.input('in1.mp4')
+    in2 = ffmpeg.input('in2.mp4')
+    joined = ffmpeg.concat(in1['v'], in1['a'], in2.hflip(), in2['a'], v=1, a=1).node
+    args = (
+        ffmpeg
+        .output(joined[0], joined[1], 'out.mp4')
+        .get_args()
+    )
+    assert args == [
+        '-i',
+        'in1.mp4',
+        '-i',
+        'in2.mp4',
+        '-filter_complex',
+        '[1]hflip[s0];[0:v][0:a][s0][1:a]concat=a=1:n=2:v=1[s1][s2]',
+        '-map',
+        '[s1]',
+        '-map',
+        '[s2]',
+        'out.mp4',
+    ]
+
+
+def test_filter_concat__wrong_stream_count():
+    in1 = ffmpeg.input('in1.mp4')
+    in2 = ffmpeg.input('in2.mp4')
+    with pytest.raises(ValueError) as excinfo:
+        ffmpeg.concat(in1['v'], in1['a'], in2.hflip(), v=1, a=1).node
+    assert str(excinfo.value) == \
+        'Expected concat input streams to have length multiple of 2 (v=1, a=1); got 3'
+
+
 def test_filter_asplit():
     out = _get_complex_filter_asplit_example()
     args = out.get_args()
