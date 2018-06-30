@@ -372,7 +372,14 @@ def concat(*streams, **kwargs):
 
     Official documentation: `concat <https://ffmpeg.org/ffmpeg-filters.html#concat>`__
     """
-    kwargs['n'] = len(streams)
+    video_stream_count = kwargs.get('v', 1)
+    audio_stream_count = kwargs.get('a', 0)
+    stream_count = video_stream_count + audio_stream_count
+    if len(streams) % stream_count != 0:
+        raise ValueError(
+            'Expected concat input streams to have length multiple of {} (v={}, a={}); got {}'
+                .format(stream_count, video_stream_count, audio_stream_count, len(streams)))
+    kwargs['n'] = int(len(streams) / stream_count)
     return FilterNode(streams, concat.__name__, kwargs=kwargs, max_inputs=None).stream()
 
 
