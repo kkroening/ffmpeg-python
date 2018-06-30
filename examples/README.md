@@ -1,6 +1,6 @@
 # Examples
 
-## [Get video info](https://github.com/kkroening/ffmpeg-python/blob/master/examples/video_info.py#L15)
+## [Get video info (ffprobe)](https://github.com/kkroening/ffmpeg-python/blob/master/examples/video_info.py#L15)
 
 ```python
 probe = ffmpeg.probe(args.in_filename)
