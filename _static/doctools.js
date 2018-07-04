@@ -4,7 +4,7 @@
  *
  * Sphinx JavaScript utilities for all documentation.
  *
- * :copyright: Copyright 2007-2017 by the Sphinx team, see AUTHORS.
+ * :copyright: Copyright 2007-2018 by the Sphinx team, see AUTHORS.
  * :license: BSD, see LICENSE for details.
  *
  */
@@ -70,7 +70,9 @@ jQuery.fn.highlightText = function(text, className) {
     if (node.nodeType === 3) {
       var val = node.nodeValue;
       var pos = val.toLowerCase().indexOf(text);
-      if (pos >= 0 && !jQuery(node.parentNode).hasClass(className)) {
+      if (pos >= 0 &&
+          !jQuery(node.parentNode).hasClass(className) &&
+          !jQuery(node.parentNode).hasClass("nohighlight")) {
         var span;
         var isInSVG = jQuery(node).closest("body, svg, foreignObject").is("svg");
         if (isInSVG) {
@@ -204,7 +206,7 @@ var Documentation = {
    * see: https://bugzilla.mozilla.org/show_bug.cgi?id=645075
    */
   fixFirefoxAnchorBug : function() {
-    if (document.location.hash)
+    if (document.location.hash && $.browser.mozilla)
       window.setTimeout(function() {
         document.location.href += '';
       }, 10);

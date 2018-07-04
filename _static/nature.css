@@ -4,7 +4,7 @@
  *
  * Sphinx stylesheet -- nature theme.
  *
- * :copyright: Copyright 2007-2017 by the Sphinx team, see AUTHORS.
+ * :copyright: Copyright 2007-2018 by the Sphinx team, see AUTHORS.
  * :license: BSD, see LICENSE for details.
  *
  */
@@ -125,14 +125,11 @@ div.sphinxsidebar input {
     font-size: 1em;
 }
 
-div.sphinxsidebar input[type=text]{
+div.sphinxsidebar .searchformwrapper {
     margin-left: 20px;
+    margin-right: 20px;
 }
 
-div.sphinxsidebar input[type=submit]{
-    margin-left: 20px;
-}
- 
 /* -- body styles ----------------------------------------------------------- */
  
 a {
