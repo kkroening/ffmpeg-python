@@ -23,24 +23,6 @@ height = int(video_stream['height'])
 )
 ```
 
-## Process audio and video simultaneously
-
-<img src="https://raw.githubusercontent.com/kkroening/ffmpeg-python/master/examples/graphs/av-pipeline.png" alt="av-pipeline graph" width="80%" />
-
-```python
-in1 = ffmpeg.input('in1.mp4')
-in2 = ffmpeg.input('in2.mp4')
-v1 = in1['v'].hflip()
-a1 = in1['a']
-v2 = in2['v'].filter_('reverse').filter_('hue', s=0)
-a2 = in2['a'].filter_('areverse').filter_('aphaser')
-joined = ffmpeg.concat(v1, a1, v2, a2, v=1, a=1).node
-v3 = joined[0]
-a3 = joined[1].filter_('volume', 0.8)
-out = ffmpeg.output(v3, a3, 'out.mp4')
-out.run()
-```
-
 ## [Convert video to numpy array](https://github.com/kkroening/ffmpeg-python/blob/master/examples/ffmpeg-numpy.ipynb)
 
 <img src="https://raw.githubusercontent.com/kkroening/ffmpeg-python/master/examples/graphs/ffmpeg-numpy.png" alt="ffmpeg-numpy graph" width="20%" />
@@ -84,6 +66,24 @@ out, _ = (ffmpeg
     .overwrite_output()
     .run(capture_stdout=True)
 )
+```
+
+## Audio/video pipeline
+
+<img src="https://raw.githubusercontent.com/kkroening/ffmpeg-python/master/examples/graphs/av-pipeline.png" alt="av-pipeline graph" width="80%" />
+
+```python
+in1 = ffmpeg.input('in1.mp4')
+in2 = ffmpeg.input('in2.mp4')
+v1 = in1['v'].hflip()
+a1 = in1['a']
+v2 = in2['v'].filter_('reverse').filter_('hue', s=0)
+a2 = in2['a'].filter_('areverse').filter_('aphaser')
+joined = ffmpeg.concat(v1, a1, v2, a2, v=1, a=1).node
+v3 = joined[0]
+a3 = joined[1].filter_('volume', 0.8)
+out = ffmpeg.output(v3, a3, 'out.mp4')
+out.run()
 ```
 
 ## [Jupyter Frame Viewer](https://github.com/kkroening/ffmpeg-python/blob/master/examples/ffmpeg-numpy.ipynb)
