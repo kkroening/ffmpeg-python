@@ -117,7 +117,7 @@ Alternatively, standard python help is available, such as at the python REPL pro
 
 ## Custom Filters
 
-Don't see the filter you're looking for?  `ffmpeg-python` includes , but it's easy to use any arbitrary ffmpeg filter:
+Don't see the filter you're looking for?  `ffmpeg-python` includes shorthand notation for some of the most commonly used filters (such as `concat`), but it's easy to use any arbitrary ffmpeg filter:
 ```python
 stream = ffmpeg.input('dummy.mp4')
 stream = ffmpeg.filter_(stream, 'fps', fps=25, round='up')
