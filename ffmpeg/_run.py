@@ -121,6 +121,10 @@ def _get_output_args(node, stream_name_map):
     filename = kwargs.pop('filename')
     if 'format' in kwargs:
         args += ['-f', kwargs.pop('format')]
+    if 'video_codec' in kwargs:
+        args += ['-c:v', str(kwargs.pop('video_codec'))]
+    if 'audio_codec' in kwargs:
+        args += ['-c:a', str(kwargs.pop('audio_codec'))]
     if 'video_bitrate' in kwargs:
         args += ['-b:v', str(kwargs.pop('video_bitrate'))]
     if 'audio_bitrate' in kwargs:
