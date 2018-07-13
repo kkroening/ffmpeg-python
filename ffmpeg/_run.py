@@ -57,13 +57,19 @@ def _get_input_args(input_node):
     return args
 
 
-def _format_input_stream_name(stream_name_map, edge):
+def _format_input_stream_name(stream_name_map, edge, is_final_arg=False):
     prefix = stream_name_map[edge.upstream_node, edge.upstream_label]
     if not edge.upstream_selector:
         suffix = ''
     else:
         suffix = ':{}'.format(edge.upstream_selector)
-    return '[{}{}]'.format(prefix, suffix)
+    if is_final_arg and isinstance(edge.upstream_node, InputNode):
+        ## Special case: `-map` args should not have brackets for input
+        ## nodes.
+        fmt = '{}{}'
+    else:
+        fmt = '[{}{}]'
+    return fmt.format(prefix, suffix)
 
 
 def _format_output_stream_name(stream_name_map, edge):
@@ -113,8 +119,8 @@ def _get_output_args(node, stream_name_map):
 
     for edge in node.incoming_edges:
         # edge = node.incoming_edges[0]
-        stream_name = _format_input_stream_name(stream_name_map, edge)
-        if stream_name != '[0]' or len(node.incoming_edges) > 1:
+        stream_name = _format_input_stream_name(stream_name_map, edge, is_final_arg=True)
+        if stream_name != '0' or len(node.incoming_edges) > 1:
             args += ['-map', stream_name]
 
     kwargs = copy.copy(node.kwargs)

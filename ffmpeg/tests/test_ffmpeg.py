@@ -165,8 +165,8 @@ def test_combined_output():
     assert out.get_args() == [
         '-i', TEST_INPUT_FILE1,
         '-i', TEST_OVERLAY_FILE,
-        '-map', '[0]',
-        '-map', '[1]',
+        '-map', '0',
+        '-map', '1',
         TEST_OUTPUT_FILE1
     ]
 
@@ -184,6 +184,7 @@ def test_filter_with_selector():
         '-map', '[s0]', '-map', '[s1]',
         TEST_OUTPUT_FILE1
     ]
+
 
 
 def test_get_item_with_bad_selectors():
@@ -532,15 +533,47 @@ def test_multi_passthrough():
         '-i', 'in1.mp4',
         '-i', 'in2.mp4',
         'out1.mp4',
-        '-map', '[1]',  # FIXME: this should not be here (see #23)
+        '-map', '1',
         'out2.mp4'
     ]
     assert ffmpeg.get_args([out1, out2]) == [
         '-i', 'in2.mp4',
         '-i', 'in1.mp4',
         'out2.mp4',
-        '-map', '[1]',  # FIXME: this should not be here (see #23)
+        '-map', '1',
         'out1.mp4'
+    ]
+
+
+def test_passthrough_selectors():
+    i1 = ffmpeg.input(TEST_INPUT_FILE1)
+    args = (
+        ffmpeg
+        .output(i1['1'], i1['2'], TEST_OUTPUT_FILE1)
+        .get_args()
+    )
+    assert args == [
+        '-i', TEST_INPUT_FILE1,
+        '-map', '0:1',
+        '-map', '0:2',
+        TEST_OUTPUT_FILE1,
+    ]
+
+
+def test_mixed_passthrough_selectors():
+    i1 = ffmpeg.input(TEST_INPUT_FILE1)
+    args = (
+        ffmpeg
+        .output(i1['1'].hflip(), i1['2'], TEST_OUTPUT_FILE1)
+        .get_args()
+    )
+    assert args == [
+        '-i', TEST_INPUT_FILE1,
+        '-filter_complex',
+        '[0:1]hflip[s0]',
+        '-map', '[s0]',
+        '-map', '0:2',
+        TEST_OUTPUT_FILE1,
     ]
 
 
