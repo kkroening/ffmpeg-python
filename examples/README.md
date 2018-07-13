@@ -68,6 +68,35 @@ out, _ = (ffmpeg
 )
 ```
 
+## Assemble video from sequence of frames
+
+<img src="https://raw.githubusercontent.com/kkroening/ffmpeg-python/master/examples/graphs/glob.png" alt="glob" width="25%" />
+
+```python
+(
+    ffmpeg
+    .input('/path/to/jpegs/*.jpg', pattern_type='glob', framerate=25)
+    .output('movie.mp4')
+    .run()
+)
+```
+
+With additional filtering:
+
+<img src="https://raw.githubusercontent.com/kkroening/ffmpeg-python/master/examples/graphs/glob-filter.png" alt="glob-filter" width="50%" />
+
+```python
+(
+    ffmpeg
+    .input('/path/to/jpegs/*.jpg', pattern_type='glob', framerate=25)
+    .filter_('deflicker', mode='pm', size=10)
+    .filter_('scale', size='hd1080', force_original_aspect_ratio='increase')
+    .output('movie.mp4', crf=20, preset='slower', movflags='faststart', pix_fmt='yuv420p')
+    .view(filename='filter_graph')
+    .run()
+)
+```
+
 ## Audio/video pipeline
 
 <img src="https://raw.githubusercontent.com/kkroening/ffmpeg-python/master/examples/graphs/av-pipeline.png" alt="av-pipeline graph" width="80%" />
@@ -93,3 +122,4 @@ out.run()
 ## [Jupyter Stream Editor](https://github.com/kkroening/ffmpeg-python/blob/master/examples/ffmpeg-numpy.ipynb)
 
 <img src="https://raw.githubusercontent.com/kkroening/ffmpeg-python/master/doc/jupyter-demo.gif" alt="jupyter demo" width="75%" />
+
