@@ -4,27 +4,18 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>ffmpeg-python: Python bindings for FFmpeg &#8212; ffmpeg-python  documentation</title>
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -129,10 +120,10 @@ output video.</li>
 in the ffmpeg-utils manual. If the special value invert is used, the box edge color is the same as the
 video with inverted luma.</li>
 <li><strong>thickness</strong> – The expression which sets the thickness of the box edge. Default value is 3.</li>
-<li><strong>w</strong> – Alias for <code class="docutils literal"><span class="pre">width</span></code>.</li>
-<li><strong>h</strong> – Alias for <code class="docutils literal"><span class="pre">height</span></code>.</li>
-<li><strong>c</strong> – Alias for <code class="docutils literal"><span class="pre">color</span></code>.</li>
-<li><strong>t</strong> – Alias for <code class="docutils literal"><span class="pre">thickness</span></code>.</li>
+<li><strong>w</strong> – Alias for <code class="docutils literal notranslate"><span class="pre">width</span></code>.</li>
+<li><strong>h</strong> – Alias for <code class="docutils literal notranslate"><span class="pre">height</span></code>.</li>
+<li><strong>c</strong> – Alias for <code class="docutils literal notranslate"><span class="pre">color</span></code>.</li>
+<li><strong>t</strong> – Alias for <code class="docutils literal notranslate"><span class="pre">thickness</span></code>.</li>
 </ul>
 </td>
 </tr>
@@ -145,9 +136,9 @@ video with inverted luma.</li>
 <dt id="ffmpeg.drawtext">
 <code class="descclassname">ffmpeg.</code><code class="descname">drawtext</code><span class="sig-paren">(</span><em>stream</em>, <em>text=None</em>, <em>x=0</em>, <em>y=0</em>, <em>escape_text=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.drawtext" title="Permalink to this definition">¶</a></dt>
 <dd><p>Draw a text string or text from a specified file on top of a video, using the libfreetype library.</p>
-<p>To enable compilation of this filter, you need to configure FFmpeg with <code class="docutils literal"><span class="pre">--enable-libfreetype</span></code>. To enable default
-font fallback and the font option you need to configure FFmpeg with <code class="docutils literal"><span class="pre">--enable-libfontconfig</span></code>. To enable the
-text_shaping option, you need to configure FFmpeg with <code class="docutils literal"><span class="pre">--enable-libfribidi</span></code>.</p>
+<p>To enable compilation of this filter, you need to configure FFmpeg with <code class="docutils literal notranslate"><span class="pre">--enable-libfreetype</span></code>. To enable default
+font fallback and the font option you need to configure FFmpeg with <code class="docutils literal notranslate"><span class="pre">--enable-libfontconfig</span></code>. To enable the
+text_shaping option, you need to configure FFmpeg with <code class="docutils literal notranslate"><span class="pre">--enable-libfribidi</span></code>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -187,21 +178,21 @@ supported).</li>
 <li><strong>ft_load_flags</strong> – <p>The flags to be used for loading the fonts. The flags map the corresponding flags supported by
 libfreetype, and are a combination of the following values:</p>
 <ul>
-<li><code class="docutils literal"><span class="pre">default</span></code></li>
-<li><code class="docutils literal"><span class="pre">no_scale</span></code></li>
-<li><code class="docutils literal"><span class="pre">no_hinting</span></code></li>
-<li><code class="docutils literal"><span class="pre">render</span></code></li>
-<li><code class="docutils literal"><span class="pre">no_bitmap</span></code></li>
-<li><code class="docutils literal"><span class="pre">vertical_layout</span></code></li>
-<li><code class="docutils literal"><span class="pre">force_autohint</span></code></li>
-<li><code class="docutils literal"><span class="pre">crop_bitmap</span></code></li>
-<li><code class="docutils literal"><span class="pre">pedantic</span></code></li>
-<li><code class="docutils literal"><span class="pre">ignore_global_advance_width</span></code></li>
-<li><code class="docutils literal"><span class="pre">no_recurse</span></code></li>
-<li><code class="docutils literal"><span class="pre">ignore_transform</span></code></li>
-<li><code class="docutils literal"><span class="pre">monochrome</span></code></li>
-<li><code class="docutils literal"><span class="pre">linear_design</span></code></li>
-<li><code class="docutils literal"><span class="pre">no_autohint</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">default</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">no_scale</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">no_hinting</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">render</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">no_bitmap</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">vertical_layout</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">force_autohint</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">crop_bitmap</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">pedantic</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">ignore_global_advance_width</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">no_recurse</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">ignore_transform</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">monochrome</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">linear_design</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">no_autohint</span></code></li>
 </ul>
 <p>Default value is “default”.  For more information consult the documentation for the FT_LOAD_* libfreetype
 flags.</p>
@@ -217,8 +208,8 @@ positive or negative values. The default value is “0”.</li>
 <li><strong>timecode</strong> – Set the initial timecode representation in “hh:mm:ss[:;.]ff” format. It can be used with or without
 text parameter. timecode_rate option must be specified.</li>
 <li><strong>rate</strong> – Set the timecode frame rate (timecode only).</li>
-<li><strong>timecode_rate</strong> – Alias for <code class="docutils literal"><span class="pre">rate</span></code>.</li>
-<li><strong>r</strong> – Alias for <code class="docutils literal"><span class="pre">rate</span></code>.</li>
+<li><strong>timecode_rate</strong> – Alias for <code class="docutils literal notranslate"><span class="pre">rate</span></code>.</li>
+<li><strong>r</strong> – Alias for <code class="docutils literal notranslate"><span class="pre">rate</span></code>.</li>
 <li><strong>tc24hmax</strong> – If set to 1, the output of the timecode option will wrap around at 24 hours. Default is 0 (disabled).</li>
 <li><strong>text</strong> – The text string to be drawn. The text must be a sequence of UTF-8 encoded characters. This parameter is
 mandatory if no file is specified with the parameter textfile.</li>
@@ -242,27 +233,27 @@ and functions.</li>
 <dd><dl class="first docutils">
 <dt>The parameters for x and y are expressions containing the following constants and functions:</dt>
 <dd><ul class="first last simple">
-<li>dar: input display aspect ratio, it is the same as <code class="docutils literal"><span class="pre">(w</span> <span class="pre">/</span> <span class="pre">h)</span> <span class="pre">*</span> <span class="pre">sar</span></code></li>
+<li>dar: input display aspect ratio, it is the same as <code class="docutils literal notranslate"><span class="pre">(w</span> <span class="pre">/</span> <span class="pre">h)</span> <span class="pre">*</span> <span class="pre">sar</span></code></li>
 <li>hsub: horizontal chroma subsample values. For example for the pixel format “yuv422p” hsub is 2 and vsub
 is 1.</li>
 <li>vsub: vertical chroma subsample values. For example for the pixel format “yuv422p” hsub is 2 and vsub
 is 1.</li>
 <li>line_h: the height of each text line</li>
-<li>lh: Alias for <code class="docutils literal"><span class="pre">line_h</span></code>.</li>
+<li>lh: Alias for <code class="docutils literal notranslate"><span class="pre">line_h</span></code>.</li>
 <li>main_h: the input height</li>
-<li>h: Alias for <code class="docutils literal"><span class="pre">main_h</span></code>.</li>
-<li>H: Alias for <code class="docutils literal"><span class="pre">main_h</span></code>.</li>
+<li>h: Alias for <code class="docutils literal notranslate"><span class="pre">main_h</span></code>.</li>
+<li>H: Alias for <code class="docutils literal notranslate"><span class="pre">main_h</span></code>.</li>
 <li>main_w: the input width</li>
-<li>w: Alias for <code class="docutils literal"><span class="pre">main_w</span></code>.</li>
-<li>W: Alias for <code class="docutils literal"><span class="pre">main_w</span></code>.</li>
+<li>w: Alias for <code class="docutils literal notranslate"><span class="pre">main_w</span></code>.</li>
+<li>W: Alias for <code class="docutils literal notranslate"><span class="pre">main_w</span></code>.</li>
 <li>ascent: the maximum distance from the baseline to the highest/upper grid coordinate used to place a glyph
 outline point, for all the rendered glyphs. It is a positive value, due to the grid’s orientation with the Y
 axis upwards.</li>
-<li>max_glyph_a: Alias for <code class="docutils literal"><span class="pre">ascent</span></code>.</li>
+<li>max_glyph_a: Alias for <code class="docutils literal notranslate"><span class="pre">ascent</span></code>.</li>
 <li>descent: the maximum distance from the baseline to the lowest grid coordinate used to place a glyph outline
 point, for all the rendered glyphs. This is a negative value, due to the grid’s orientation, with the Y axis
 upwards.</li>
-<li>max_glyph_d: Alias for <code class="docutils literal"><span class="pre">descent</span></code>.</li>
+<li>max_glyph_d: Alias for <code class="docutils literal notranslate"><span class="pre">descent</span></code>.</li>
 <li>max_glyph_h: maximum glyph height, that is the maximum height for all the glyphs contained in the rendered
 text, it is equivalent to ascent - descent.</li>
 <li>max_glyph_w: maximum glyph width, that is the maximum width for all the glyphs contained in the rendered
@@ -272,16 +263,16 @@ text.</li>
 <li>sar: The input sample aspect ratio.</li>
 <li>t: timestamp expressed in seconds, NAN if the input timestamp is unknown</li>
 <li>text_h: the height of the rendered text</li>
-<li>th: Alias for <code class="docutils literal"><span class="pre">text_h</span></code>.</li>
+<li>th: Alias for <code class="docutils literal notranslate"><span class="pre">text_h</span></code>.</li>
 <li>text_w: the width of the rendered text</li>
-<li>tw: Alias for <code class="docutils literal"><span class="pre">text_w</span></code>.</li>
+<li>tw: Alias for <code class="docutils literal notranslate"><span class="pre">text_w</span></code>.</li>
 <li>x: the x offset coordinates where the text is drawn.</li>
 <li>y: the y offset coordinates where the text is drawn.</li>
 </ul>
 </dd>
 </dl>
 <p class="last">These parameters allow the x and y expressions to refer each other, so you can for example specify
-<code class="docutils literal"><span class="pre">y=x/dar</span></code>.</p>
+<code class="docutils literal notranslate"><span class="pre">y=x/dar</span></code>.</p>
 </dd>
 </dl>
 <p>Official documentation: <a class="reference external" href="https://ffmpeg.org/ffmpeg-filters.html#drawtext">drawtext</a></p>
@@ -291,8 +282,8 @@ text.</li>
 <dt id="ffmpeg.filter_">
 <code class="descclassname">ffmpeg.</code><code class="descname">filter_</code><span class="sig-paren">(</span><em>stream_spec</em>, <em>filter_name</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.filter_" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply custom filter.</p>
-<p><code class="docutils literal"><span class="pre">filter_</span></code> is normally used by higher-level filter functions such as <code class="docutils literal"><span class="pre">hflip</span></code>, but if a filter implementation
-is missing from <code class="docutils literal"><span class="pre">fmpeg-python</span></code>, you can call <code class="docutils literal"><span class="pre">filter_</span></code> directly to have <code class="docutils literal"><span class="pre">fmpeg-python</span></code> pass the filter name
+<p><code class="docutils literal notranslate"><span class="pre">filter_</span></code> is normally used by higher-level filter functions such as <code class="docutils literal notranslate"><span class="pre">hflip</span></code>, but if a filter implementation
+is missing from <code class="docutils literal notranslate"><span class="pre">fmpeg-python</span></code>, you can call <code class="docutils literal notranslate"><span class="pre">filter_</span></code> directly to have <code class="docutils literal notranslate"><span class="pre">fmpeg-python</span></code> pass the filter name
 and arguments to ffmpeg verbatim.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -308,19 +299,19 @@ and arguments to ffmpeg verbatim.</p>
 </tr>
 </tbody>
 </table>
-<p>The function name is suffixed with <code class="docutils literal"><span class="pre">_</span></code> in order avoid confusion with the standard python <code class="docutils literal"><span class="pre">filter</span></code> function.</p>
+<p>The function name is suffixed with <code class="docutils literal notranslate"><span class="pre">_</span></code> in order avoid confusion with the standard python <code class="docutils literal notranslate"><span class="pre">filter</span></code> function.</p>
 <p class="rubric">Example</p>
-<p><code class="docutils literal"><span class="pre">ffmpeg.input('in.mp4').filter_('hflip').output('out.mp4').run()</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">ffmpeg.input('in.mp4').filter_('hflip').output('out.mp4').run()</span></code></p>
 </dd></dl>
 
 <dl class="function">
 <dt id="ffmpeg.filter_multi_output">
 <code class="descclassname">ffmpeg.</code><code class="descname">filter_multi_output</code><span class="sig-paren">(</span><em>stream_spec</em>, <em>filter_name</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.filter_multi_output" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply custom filter with one or more outputs.</p>
-<p>This is the same as <code class="docutils literal"><span class="pre">filter_</span></code> except that the filter can produce more than one output.</p>
-<p>To reference an output stream, use either the <code class="docutils literal"><span class="pre">.stream</span></code> operator or bracket shorthand:</p>
+<p>This is the same as <code class="docutils literal notranslate"><span class="pre">filter_</span></code> except that the filter can produce more than one output.</p>
+<p>To reference an output stream, use either the <code class="docutils literal notranslate"><span class="pre">.stream</span></code> operator or bracket shorthand:</p>
 <p class="rubric">Example</p>
-<p><code class="docutils literal"><span class="pre">`</span>
+<p><code class="docutils literal notranslate"><span class="pre">`</span>
 <span class="pre">split</span> <span class="pre">=</span> <span class="pre">ffmpeg.input('in.mp4').filter_multi_output('split')</span>
 <span class="pre">split0</span> <span class="pre">=</span> <span class="pre">split.stream(0)</span>
 <span class="pre">split1</span> <span class="pre">=</span> <span class="pre">split[1]</span>
@@ -358,7 +349,7 @@ and arguments to ffmpeg verbatim.</p>
 
 <dl class="function">
 <dt id="ffmpeg.overlay">
-<code class="descclassname">ffmpeg.</code><code class="descname">overlay</code><span class="sig-paren">(</span><em>main_parent_node</em>, <em>overlay_parent_node</em>, <em>eof_action=u'repeat'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.overlay" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">ffmpeg.</code><code class="descname">overlay</code><span class="sig-paren">(</span><em>main_parent_node</em>, <em>overlay_parent_node</em>, <em>eof_action='repeat'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.overlay" title="Permalink to this definition">¶</a></dt>
 <dd><p>Overlay one video on top of another.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -374,34 +365,34 @@ within the output visible area).</li>
 <li><strong>eof_action</strong> – <p>The action to take when EOF is encountered on the secondary input; it accepts one of the following
 values:</p>
 <ul>
-<li><code class="docutils literal"><span class="pre">repeat</span></code>: Repeat the last frame (the default).</li>
-<li><code class="docutils literal"><span class="pre">endall</span></code>: End both streams.</li>
-<li><code class="docutils literal"><span class="pre">pass</span></code>: Pass the main input through.</li>
+<li><code class="docutils literal notranslate"><span class="pre">repeat</span></code>: Repeat the last frame (the default).</li>
+<li><code class="docutils literal notranslate"><span class="pre">endall</span></code>: End both streams.</li>
+<li><code class="docutils literal notranslate"><span class="pre">pass</span></code>: Pass the main input through.</li>
 </ul>
 </li>
 <li><strong>eval</strong> – <p>Set when the expressions for x, and y are evaluated.
 It accepts the following values:</p>
 <ul>
 <li><dl class="first docutils">
-<dt><code class="docutils literal"><span class="pre">init</span></code>: only evaluate expressions once during the filter initialization or when a command is</dt>
+<dt><code class="docutils literal notranslate"><span class="pre">init</span></code>: only evaluate expressions once during the filter initialization or when a command is</dt>
 <dd>processed</dd>
 </dl>
 </li>
-<li><code class="docutils literal"><span class="pre">frame</span></code>: evaluate expressions for each incoming frame</li>
+<li><code class="docutils literal notranslate"><span class="pre">frame</span></code>: evaluate expressions for each incoming frame</li>
 </ul>
-<p>Default value is <code class="docutils literal"><span class="pre">frame</span></code>.</p>
+<p>Default value is <code class="docutils literal notranslate"><span class="pre">frame</span></code>.</p>
 </li>
 <li><strong>shortest</strong> – If set to 1, force the output to terminate when the shortest input terminates. Default value is 0.</li>
 <li><strong>format</strong> – <p>Set the format for the output video.
 It accepts the following values:</p>
 <ul>
-<li><code class="docutils literal"><span class="pre">yuv420</span></code>: force YUV420 output</li>
-<li><code class="docutils literal"><span class="pre">yuv422</span></code>: force YUV422 output</li>
-<li><code class="docutils literal"><span class="pre">yuv444</span></code>: force YUV444 output</li>
-<li><code class="docutils literal"><span class="pre">rgb</span></code>: force packed RGB output</li>
-<li><code class="docutils literal"><span class="pre">gbrp</span></code>: force planar RGB output</li>
+<li><code class="docutils literal notranslate"><span class="pre">yuv420</span></code>: force YUV420 output</li>
+<li><code class="docutils literal notranslate"><span class="pre">yuv422</span></code>: force YUV422 output</li>
+<li><code class="docutils literal notranslate"><span class="pre">yuv444</span></code>: force YUV444 output</li>
+<li><code class="docutils literal notranslate"><span class="pre">rgb</span></code>: force packed RGB output</li>
+<li><code class="docutils literal notranslate"><span class="pre">gbrp</span></code>: force planar RGB output</li>
 </ul>
-<p>Default value is <code class="docutils literal"><span class="pre">yuv420</span></code>.</p>
+<p>Default value is <code class="docutils literal notranslate"><span class="pre">yuv420</span></code>.</p>
 </li>
 <li><strong>rgb</strong> (<em>deprecated</em>) – If set to 1, force the filter to accept inputs in the RGB color space. Default value is 0.
 This option is deprecated, use format instead.</li>
@@ -479,9 +470,9 @@ seconds.</li>
 <li><strong>y</strong> – Set the y expression. Default is 0.</li>
 <li><strong>d</strong> – Set the duration expression in number of frames. This sets for how many number of frames effect will last
 for single input image.</li>
-<li><strong>s</strong> – Set the output image size, default is <code class="docutils literal"><span class="pre">hd720</span></code>.</li>
+<li><strong>s</strong> – Set the output image size, default is <code class="docutils literal notranslate"><span class="pre">hd720</span></code>.</li>
 <li><strong>fps</strong> – Set the output frame rate, default is 25.</li>
-<li><strong>z</strong> – Alias for <code class="docutils literal"><span class="pre">zoom</span></code>.</li>
+<li><strong>z</strong> – Alias for <code class="docutils literal notranslate"><span class="pre">zoom</span></code>.</li>
 </ul>
 </td>
 </tr>
@@ -493,10 +484,10 @@ for single input image.</li>
 <dl class="function">
 <dt id="ffmpeg.input">
 <code class="descclassname">ffmpeg.</code><code class="descname">input</code><span class="sig-paren">(</span><em>filename</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.input" title="Permalink to this definition">¶</a></dt>
-<dd><p>Input file URL (ffmpeg <code class="docutils literal"><span class="pre">-i</span></code> option)</p>
-<p>Any supplied kwargs are passed to ffmpeg verbatim (e.g. <code class="docutils literal"><span class="pre">t=20</span></code>,
-<code class="docutils literal"><span class="pre">f='mp4'</span></code>, <code class="docutils literal"><span class="pre">acodec='pcm'</span></code>, etc.).</p>
-<p>To tell ffmpeg to read from stdin, use <code class="docutils literal"><span class="pre">pipe:</span></code> as the filename.</p>
+<dd><p>Input file URL (ffmpeg <code class="docutils literal notranslate"><span class="pre">-i</span></code> option)</p>
+<p>Any supplied kwargs are passed to ffmpeg verbatim (e.g. <code class="docutils literal notranslate"><span class="pre">t=20</span></code>,
+<code class="docutils literal notranslate"><span class="pre">f='mp4'</span></code>, <code class="docutils literal notranslate"><span class="pre">acodec='pcm'</span></code>, etc.).</p>
+<p>To tell ffmpeg to read from stdin, use <code class="docutils literal notranslate"><span class="pre">pipe:</span></code> as the filename.</p>
 <p>Official documentation: <a class="reference external" href="https://ffmpeg.org/ffmpeg.html#Main-options">Main options</a></p>
 </dd></dl>
 
@@ -514,37 +505,52 @@ for single input image.</li>
 <dt>Syntax:</dt>
 <dd><cite>ffmpeg.output(stream1[, stream2, stream3…], filename, **ffmpeg_args)</cite></dd>
 </dl>
+<p>Any supplied keyword arguments are passed to ffmpeg verbatim (e.g.
+<code class="docutils literal notranslate"><span class="pre">t=20</span></code>, <code class="docutils literal notranslate"><span class="pre">f='mp4'</span></code>, <code class="docutils literal notranslate"><span class="pre">acodec='pcm'</span></code>, <code class="docutils literal notranslate"><span class="pre">vcodec='rawvideo'</span></code>,
+etc.).  Some keyword-arguments are handled specially, as shown below.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>video_bitrate</strong> – parameter for <code class="docutils literal notranslate"><span class="pre">-b:v</span></code>, e.g. <code class="docutils literal notranslate"><span class="pre">video_bitrate=1000</span></code>.</li>
+<li><strong>audio_bitrate</strong> – parameter for <code class="docutils literal notranslate"><span class="pre">-b:a</span></code>, e.g. <code class="docutils literal notranslate"><span class="pre">audio_bitrate=200</span></code>.</li>
+<li><strong>format</strong> – alias for <code class="docutils literal notranslate"><span class="pre">-f</span></code> parameter, e.g. <code class="docutils literal notranslate"><span class="pre">format='mp4'</span></code>
+(equivalent to <code class="docutils literal notranslate"><span class="pre">f='mp4'</span></code>).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 <p>If multiple streams are provided, they are mapped to the same
 output.</p>
-<p>Any supplied kwargs are passed to ffmpeg verbatim (e.g. <code class="docutils literal"><span class="pre">t=20</span></code>,
-<code class="docutils literal"><span class="pre">f='mp4'</span></code>, <code class="docutils literal"><span class="pre">acodec='pcm'</span></code>, etc.).</p>
-<p>To tell ffmpeg to write to stdout, use <code class="docutils literal"><span class="pre">pipe:</span></code> as the filename.</p>
+<p>To tell ffmpeg to write to stdout, use <code class="docutils literal notranslate"><span class="pre">pipe:</span></code> as the filename.</p>
 <p>Official documentation: <a class="reference external" href="https://ffmpeg.org/ffmpeg.html#Synopsis">Synopsis</a></p>
 </dd></dl>
 
 <dl class="function">
 <dt id="ffmpeg.overwrite_output">
 <code class="descclassname">ffmpeg.</code><code class="descname">overwrite_output</code><span class="sig-paren">(</span><em>stream</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.overwrite_output" title="Permalink to this definition">¶</a></dt>
-<dd><p>Overwrite output files without asking (ffmpeg <code class="docutils literal"><span class="pre">-y</span></code> option)</p>
+<dd><p>Overwrite output files without asking (ffmpeg <code class="docutils literal notranslate"><span class="pre">-y</span></code> option)</p>
 <p>Official documentation: <a class="reference external" href="https://ffmpeg.org/ffmpeg.html#Main-options">Main options</a></p>
 </dd></dl>
 
 <dl class="function">
 <dt id="ffmpeg.compile">
-<code class="descclassname">ffmpeg.</code><code class="descname">compile</code><span class="sig-paren">(</span><em>stream_spec</em>, <em>cmd=u'ffmpeg'</em>, <em>overwrite_output=False</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.compile" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">ffmpeg.</code><code class="descname">compile</code><span class="sig-paren">(</span><em>stream_spec</em>, <em>cmd='ffmpeg'</em>, <em>overwrite_output=False</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.compile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build command-line for invoking ffmpeg.</p>
-<p>The <a class="reference internal" href="#ffmpeg.run" title="ffmpeg.run"><code class="xref py py-meth docutils literal"><span class="pre">run()</span></code></a> function uses this to build the commnad line
+<p>The <a class="reference internal" href="#ffmpeg.run" title="ffmpeg.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a> function uses this to build the commnad line
 arguments and should work in most cases, but calling this function
 directly is useful for debugging or if you need to invoke ffmpeg
 manually for whatever reason.</p>
-<p>This is the same as calling <a class="reference internal" href="#ffmpeg.get_args" title="ffmpeg.get_args"><code class="xref py py-meth docutils literal"><span class="pre">get_args()</span></code></a> except that it also
-includes the <code class="docutils literal"><span class="pre">ffmpeg</span></code> command as the first argument.</p>
+<p>This is the same as calling <a class="reference internal" href="#ffmpeg.get_args" title="ffmpeg.get_args"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_args()</span></code></a> except that it also
+includes the <code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code> command as the first argument.</p>
 </dd></dl>
 
 <dl class="exception">
 <dt id="ffmpeg.Error">
-<em class="property">exception </em><code class="descclassname">ffmpeg.</code><code class="descname">Error</code><span class="sig-paren">(</span><em>stream_spec</em>, <em>stdout</em>, <em>stderr</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.Error" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+<em class="property">exception </em><code class="descclassname">ffmpeg.</code><code class="descname">Error</code><span class="sig-paren">(</span><em>cmd</em>, <em>stdout</em>, <em>stderr</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.Error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
 </dd></dl>
 
 <dl class="function">
@@ -555,7 +561,7 @@ includes the <code class="docutils literal"><span class="pre">ffmpeg</span></cod
 
 <dl class="function">
 <dt id="ffmpeg.run">
-<code class="descclassname">ffmpeg.</code><code class="descname">run</code><span class="sig-paren">(</span><em>stream_spec</em>, <em>cmd=u'ffmpeg'</em>, <em>capture_stdout=False</em>, <em>capture_stderr=False</em>, <em>input=None</em>, <em>quiet=False</em>, <em>overwrite_output=False</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.run" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">ffmpeg.</code><code class="descname">run</code><span class="sig-paren">(</span><em>stream_spec</em>, <em>cmd='ffmpeg'</em>, <em>capture_stdout=False</em>, <em>capture_stderr=False</em>, <em>input=None</em>, <em>quiet=False</em>, <em>overwrite_output=False</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ivoke ffmpeg for the supplied node graph.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -563,13 +569,13 @@ includes the <code class="docutils literal"><span class="pre">ffmpeg</span></cod
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>capture_stdout</strong> – if True, capture stdout (to be used with
-<code class="docutils literal"><span class="pre">pipe:</span></code> ffmpeg outputs).</li>
+<code class="docutils literal notranslate"><span class="pre">pipe:</span></code> ffmpeg outputs).</li>
 <li><strong>capture_stderr</strong> – if True, capture stderr.</li>
-<li><strong>quiet</strong> – shorthand for setting <code class="docutils literal"><span class="pre">capture_stdout</span></code> and <code class="docutils literal"><span class="pre">capture_stderr</span></code>.</li>
-<li><strong>input</strong> – text to be sent to stdin (to be used with <code class="docutils literal"><span class="pre">pipe:</span></code>
+<li><strong>quiet</strong> – shorthand for setting <code class="docutils literal notranslate"><span class="pre">capture_stdout</span></code> and <code class="docutils literal notranslate"><span class="pre">capture_stderr</span></code>.</li>
+<li><strong>input</strong> – text to be sent to stdin (to be used with <code class="docutils literal notranslate"><span class="pre">pipe:</span></code>
 ffmpeg inputs)</li>
-<li><strong>**kwargs</strong> – keyword-arguments passed to <code class="docutils literal"><span class="pre">get_args()</span></code> (e.g.
-<code class="docutils literal"><span class="pre">overwrite_output=True</span></code>).</li>
+<li><strong>**kwargs</strong> – keyword-arguments passed to <code class="docutils literal notranslate"><span class="pre">get_args()</span></code> (e.g.
+<code class="docutils literal notranslate"><span class="pre">overwrite_output=True</span></code>).</li>
 </ul>
 </td>
 </tr>
@@ -580,7 +586,7 @@ ffmpeg inputs)</li>
 
 <dl class="function">
 <dt id="ffmpeg.view">
-<code class="descclassname">ffmpeg.</code><code class="descname">view</code><span class="sig-paren">(</span><em>stream_spec</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.view" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">ffmpeg.</code><code class="descname">view</code><span class="sig-paren">(</span><em>stream_spec</em>, <em>detail=False</em>, <em>filename=None</em>, <em>pipe=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.view" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -591,10 +597,10 @@ ffmpeg inputs)</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#ffmpeg.Error" title="ffmpeg.Error"><code class="xref py py-class docutils literal"><span class="pre">ffmpeg.Error</span></code></a> – if ffprobe returns a non-zero exit code,
-an <a class="reference internal" href="#ffmpeg.Error" title="ffmpeg.Error"><code class="xref py py-class docutils literal"><span class="pre">Error</span></code></a> is returned with a generic error message.
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#ffmpeg.Error" title="ffmpeg.Error"><code class="xref py py-class docutils literal notranslate"><span class="pre">ffmpeg.Error</span></code></a> – if ffprobe returns a non-zero exit code,
+an <a class="reference internal" href="#ffmpeg.Error" title="ffmpeg.Error"><code class="xref py py-class docutils literal notranslate"><span class="pre">Error</span></code></a> is returned with a generic error message.
 The stderr output can be retrieved by accessing the
-<code class="docutils literal"><span class="pre">stderr</span></code> property of the exception.</td>
+<code class="docutils literal notranslate"><span class="pre">stderr</span></code> property of the exception.</td>
 </tr>
 </tbody>
 </table>
@@ -631,12 +637,14 @@ The stderr output can be retrieved by accessing the
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -657,7 +665,7 @@ The stderr output can be retrieved by accessing the
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Karl Kroening.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.4.
     </div>
   </body>
 </html>
