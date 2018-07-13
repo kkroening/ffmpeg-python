@@ -25,7 +25,7 @@ def filter_multi_output(stream_spec, filter_name, *args, **kwargs):
 
 
 @filter_operator()
-def filter_(stream_spec, filter_name, *args, **kwargs):
+def filter(stream_spec, filter_name, *args, **kwargs):
     """Apply custom filter.
 
     ``filter_`` is normally used by higher-level filter functions such as ``hflip``, but if a filter implementation
@@ -42,9 +42,17 @@ def filter_(stream_spec, filter_name, *args, **kwargs):
 
     Example:
 
-        ``ffmpeg.input('in.mp4').filter_('hflip').output('out.mp4').run()``
+        ``ffmpeg.input('in.mp4').filter('hflip').output('out.mp4').run()``
     """
     return filter_multi_output(stream_spec, filter_name, *args, **kwargs).stream()
+
+
+@filter_operator()
+def filter_(stream_spec, filter_name, *args, **kwargs):
+    """Alternate name for ``filter``, so as to not collide with the
+    built-in python ``filter`` operator.
+    """
+    return filter(stream_spec, filter_name, *args, **kwargs)
 
 
 @filter_operator()
@@ -343,7 +351,7 @@ def drawtext(stream, text=None, x=0, y=0, escape_text=True, **kwargs):
         kwargs['x'] = x
     if y != 0:
         kwargs['y'] = y
-    return filter_(stream, drawtext.__name__, **kwargs)
+    return filter(stream, drawtext.__name__, **kwargs)
 
 
 @filter_operator()
@@ -432,6 +440,7 @@ __all__ = [
     'crop',
     'drawbox',
     'drawtext',
+    'filter',
     'filter_',
     'filter_multi_output',
     'hflip',

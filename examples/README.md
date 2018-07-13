@@ -17,7 +17,7 @@ height = int(video_stream['height'])
 (
     ffmpeg
     .input(in_filename, ss=time)
-    .filter_('scale', width, -1)
+    .filter('scale', width, -1)
     .output(out_filename, vframes=1)
     .run()
 )
@@ -49,7 +49,7 @@ video = (
 out, _ = (
     ffmpeg
     .input(in_filename)
-    .filter_('select', 'gte(n,{})'.format(frame_num))
+    .filter('select', 'gte(n,{})'.format(frame_num))
     .output('pipe:', vframes=1, format='image2', vcodec='mjpeg')
     .run(capture_output=True)
 )
@@ -89,8 +89,8 @@ With additional filtering:
 (
     ffmpeg
     .input('/path/to/jpegs/*.jpg', pattern_type='glob', framerate=25)
-    .filter_('deflicker', mode='pm', size=10)
-    .filter_('scale', size='hd1080', force_original_aspect_ratio='increase')
+    .filter('deflicker', mode='pm', size=10)
+    .filter('scale', size='hd1080', force_original_aspect_ratio='increase')
     .output('movie.mp4', crf=20, preset='slower', movflags='faststart', pix_fmt='yuv420p')
     .view(filename='filter_graph')
     .run()
@@ -106,11 +106,11 @@ in1 = ffmpeg.input('in1.mp4')
 in2 = ffmpeg.input('in2.mp4')
 v1 = in1['v'].hflip()
 a1 = in1['a']
-v2 = in2['v'].filter_('reverse').filter_('hue', s=0)
-a2 = in2['a'].filter_('areverse').filter_('aphaser')
+v2 = in2['v'].filter('reverse').filter('hue', s=0)
+a2 = in2['a'].filter('areverse').filter('aphaser')
 joined = ffmpeg.concat(v1, a1, v2, a2, v=1, a=1).node
 v3 = joined[0]
-a3 = joined[1].filter_('volume', 0.8)
+a3 = joined[1].filter('volume', 0.8)
 out = ffmpeg.output(v3, a3, 'out.mp4')
 out.run()
 ```

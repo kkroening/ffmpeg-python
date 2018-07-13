@@ -122,7 +122,7 @@ Alternatively, standard python help is available, such as at the python REPL pro
 Don't see the filter you're looking for?  `ffmpeg-python` includes shorthand notation for some of the most commonly used filters (such as `concat`), but it's easy to use any arbitrary ffmpeg filter:
 ```python
 stream = ffmpeg.input('dummy.mp4')
-stream = ffmpeg.filter_(stream, 'fps', fps=25, round='up')
+stream = ffmpeg.filter(stream, 'fps', fps=25, round='up')
 stream = ffmpeg.output(stream, 'dummy2.mp4')
 ffmpeg.run(stream)
 ```
@@ -132,7 +132,7 @@ Or fluently:
 (
     ffmpeg
     .input('dummy.mp4')
-    .filter_('fps', fps=25, round='up')
+    .filter('fps', fps=25, round='up')
     .output('dummy2.mp4')
     .run()
 )
