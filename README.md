@@ -23,7 +23,8 @@ ffmpeg.run(stream)
 Or if you prefer a fluent interface:
 ```python
 import ffmpeg
-(ffmpeg
+(
+    ffmpeg
     .input('input.mp4')
     .hflip()
     .output('output.mp4')
@@ -54,7 +55,8 @@ import ffmpeg
 
 in_file = ffmpeg.input('input.mp4')
 overlay_file = ffmpeg.input('overlay.png')
-(ffmpeg
+(
+    ffmpeg
     .concat(
         in_file.trim(start_frame=10, end_frame=20),
         in_file.trim(start_frame=30, end_frame=40),
@@ -117,7 +119,7 @@ Alternatively, standard python help is available, such as at the python REPL pro
 
 ## Custom Filters
 
-Don't see the filter you're looking for?  `ffmpeg-python` includes , but it's easy to use any arbitrary ffmpeg filter:
+Don't see the filter you're looking for?  `ffmpeg-python` includes shorthand notation for some of the most commonly used filters (such as `concat`), but it's easy to use any arbitrary ffmpeg filter:
 ```python
 stream = ffmpeg.input('dummy.mp4')
 stream = ffmpeg.filter_(stream, 'fps', fps=25, round='up')
@@ -127,7 +129,8 @@ ffmpeg.run(stream)
 
 Or fluently:
 ```python
-(ffmpeg
+(
+    ffmpeg
     .input('dummy.mp4')
     .filter_('fps', fps=25, round='up')
     .output('dummy2.mp4')
@@ -137,7 +140,8 @@ Or fluently:
 
 Arguments with special names such as `-qscale:v` can be specified as a keyword-args dictionary as follows:
 ```python
-(ffmpeg
+(
+    ffmpeg
     .input('dummy.mp4')
     .output('dummy2.mp4', **{'qscale:v': 3})
     .run()
