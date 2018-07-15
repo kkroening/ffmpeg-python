@@ -53,7 +53,7 @@ class Stream(object):
             Process the audio and video portions of a stream independently::
 
                 input = ffmpeg.input('in.mp4')
-                audio = input[:'a'].filter_("aecho", 0.8, 0.9, 1000, 0.3)
+                audio = input[:'a'].filter("aecho", 0.8, 0.9, 1000, 0.3)
                 video = input[:'v'].hflip()
                 out = ffmpeg.output(audio, video, 'out.mp4')
         """
@@ -141,7 +141,7 @@ class Node(KwargReprNode):
             Process the audio and video portions of a stream independently::
 
                 input = ffmpeg.input('in.mp4')
-                audio = input[:'a'].filter_("aecho", 0.8, 0.9, 1000, 0.3)
+                audio = input[:'a'].filter("aecho", 0.8, 0.9, 1000, 0.3)
                 video = input[:'v'].hflip()
                 out = ffmpeg.output(audio, video, 'out.mp4')
         """

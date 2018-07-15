@@ -174,7 +174,7 @@ def test_combined_output():
 def test_filter_with_selector():
     i = ffmpeg.input(TEST_INPUT_FILE1)
     v1 = i['v'].hflip()
-    a1 = i['a'].filter_('aecho', 0.8, 0.9, 1000, 0.3)
+    a1 = i['a'].filter('aecho', 0.8, 0.9, 1000, 0.3)
     out = ffmpeg.output(a1, v1, TEST_OUTPUT_FILE1)
     assert out.get_args() == [
         '-i', TEST_INPUT_FILE1,
@@ -214,8 +214,8 @@ def _get_complex_filter_asplit_example():
 
     return (ffmpeg
         .concat(
-            split0.filter_('atrim', start=10, end=20),
-            split1.filter_('atrim', start=30, end=40),
+            split0.filter('atrim', start=10, end=20),
+            split1.filter('atrim', start=30, end=40),
         )
         .output(TEST_OUTPUT_FILE1)
         .overwrite_output()
@@ -484,7 +484,7 @@ def test__run__dummy_cmd_list():
 
 def test__filter__custom():
     stream = ffmpeg.input('dummy.mp4')
-    stream = ffmpeg.filter_(stream, 'custom_filter', 'a', 'b', kwarg1='c')
+    stream = ffmpeg.filter(stream, 'custom_filter', 'a', 'b', kwarg1='c')
     stream = ffmpeg.output(stream, 'dummy2.mp4')
     assert stream.get_args() == [
         '-i', 'dummy.mp4',
@@ -497,7 +497,7 @@ def test__filter__custom():
 def test__filter__custom_fluent():
     stream = (ffmpeg
         .input('dummy.mp4')
-        .filter_('custom_filter', 'a', 'b', kwarg1='c')
+        .filter('custom_filter', 'a', 'b', kwarg1='c')
         .output('dummy2.mp4')
     )
     assert stream.get_args() == [

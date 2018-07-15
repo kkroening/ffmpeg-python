@@ -50,7 +50,7 @@ def get_chunk_times(in_filename, silence_threshold, silence_duration, start_time
     p = _logged_popen(
         (ffmpeg
             .input(in_filename, **input_kwargs)
-            .filter_('silencedetect', n='{}dB'.format(silence_threshold), d=silence_duration)
+            .filter('silencedetect', n='{}dB'.format(silence_threshold), d=silence_duration)
             .output('-', format='null')
             .compile()
         ) + ['-nostats'],  # FIXME: use .nostats() once it's implemented in ffmpeg-python.
