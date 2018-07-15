@@ -279,8 +279,8 @@ text.</li>
 </dd></dl>
 
 <dl class="function">
-<dt id="ffmpeg.filter_">
-<code class="descclassname">ffmpeg.</code><code class="descname">filter_</code><span class="sig-paren">(</span><em>stream_spec</em>, <em>filter_name</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.filter_" title="Permalink to this definition">¶</a></dt>
+<dt id="ffmpeg.filter">
+<code class="descclassname">ffmpeg.</code><code class="descname">filter</code><span class="sig-paren">(</span><em>stream_spec</em>, <em>filter_name</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.filter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply custom filter.</p>
 <p><code class="docutils literal notranslate"><span class="pre">filter_</span></code> is normally used by higher-level filter functions such as <code class="docutils literal notranslate"><span class="pre">hflip</span></code>, but if a filter implementation
 is missing from <code class="docutils literal notranslate"><span class="pre">fmpeg-python</span></code>, you can call <code class="docutils literal notranslate"><span class="pre">filter_</span></code> directly to have <code class="docutils literal notranslate"><span class="pre">fmpeg-python</span></code> pass the filter name
@@ -301,7 +301,14 @@ and arguments to ffmpeg verbatim.</p>
 </table>
 <p>The function name is suffixed with <code class="docutils literal notranslate"><span class="pre">_</span></code> in order avoid confusion with the standard python <code class="docutils literal notranslate"><span class="pre">filter</span></code> function.</p>
 <p class="rubric">Example</p>
-<p><code class="docutils literal notranslate"><span class="pre">ffmpeg.input('in.mp4').filter_('hflip').output('out.mp4').run()</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">ffmpeg.input('in.mp4').filter('hflip').output('out.mp4').run()</span></code></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ffmpeg.filter_">
+<code class="descclassname">ffmpeg.</code><code class="descname">filter_</code><span class="sig-paren">(</span><em>stream_spec</em>, <em>filter_name</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.filter_" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alternate name for <code class="docutils literal notranslate"><span class="pre">filter</span></code>, so as to not collide with the
+built-in python <code class="docutils literal notranslate"><span class="pre">filter</span></code> operator.</p>
 </dd></dl>
 
 <dl class="function">
