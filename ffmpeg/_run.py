@@ -186,7 +186,7 @@ def compile(stream_spec, cmd='ffmpeg', overwrite_output=False):
 @output_operator()
 def run(
         stream_spec, cmd='ffmpeg', capture_stdout=False, capture_stderr=False, input=None,
-        quiet=False, overwrite_output=False):
+        quiet=False, overwrite_output=False, wait=True):
     """Ivoke ffmpeg for the supplied node graph.
 
     Args:
@@ -196,21 +196,29 @@ def run(
         quiet: shorthand for setting ``capture_stdout`` and ``capture_stderr``.
         input: text to be sent to stdin (to be used with ``pipe:``
             ffmpeg inputs)
+        wait: wait until the ffmpeg process is done before returning. If you're using pipes, you might
+            want this False
         **kwargs: keyword-arguments passed to ``get_args()`` (e.g.
             ``overwrite_output=True``).
 
-    Returns: (out, err) tuple containing captured stdout and stderr data.
+    Returns: If wait is True (default), this function returns (out, err) tuple containing captured stdout and stderr data.
+        If wait is False, this function returns (out, err, popen) tuple containing the subprocess handle as well
     """
     args = compile(stream_spec, cmd, overwrite_output=overwrite_output)
     stdin_stream = subprocess.PIPE if input else None
     stdout_stream = subprocess.PIPE if capture_stdout or quiet else None
     stderr_stream = subprocess.PIPE if capture_stderr or quiet else None
     p = subprocess.Popen(args, stdin=stdin_stream, stdout=stdout_stream, stderr=stderr_stream)
-    out, err = p.communicate(input)
-    retcode = p.poll()
-    if retcode:
-        raise Error('ffmpeg', out, err)
-    return out, err
+    if wait:
+        out, err = p.communicate(input)
+        retcode = p.poll()
+        if retcode:
+            raise Error('ffmpeg', out, err)
+        return out, err
+    else:
+        out = p.stdout
+        err = p.stderr
+        return out, err, p
 
 
 __all__ = [

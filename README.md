@@ -32,6 +32,27 @@ import ffmpeg
 )
 ```
 
+You could also use pipes to direct the output of ffmpeg to a socket, a file or for processing in python
+```python
+import ffmpeg
+out, err, subproc = (
+	ffmpeg
+	.input('rtsp://%s:8554/default')
+	.output('-', format='h264')
+	# wait=False means run() returns immediately and does not wait for ffmpeg process to end
+	.run(capture_stdout=True, wait=False)
+)
+
+packet_size = 4096
+while subproc.poll() is None:
+	out_packet = out.read(packet_size)
+	try:
+		tcp_socket.send(out_packet)
+	except socket.error as e:
+		return
+```
+
+
 ## Complex filter graphs
 FFmpeg is extremely powerful, but its command-line interface gets really complicated really quickly - especially when working with signal graphs and doing anything more than trivial.
 
