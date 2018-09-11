@@ -3,7 +3,7 @@ import subprocess
 from ._run import Error
 
 
-def probe(filename):
+def probe(filename, cmd='ffprobe'):
     """Run ffprobe on the specified file and return a JSON representation of the output.
 
     Raises:
@@ -12,7 +12,7 @@ def probe(filename):
             The stderr output can be retrieved by accessing the
             ``stderr`` property of the exception.
     """
-    args = ['ffprobe', '-show_format', '-show_streams', '-of', 'json', filename]
+    args = [cmd, '-show_format', '-show_streams', '-of', 'json', filename]
     p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = p.communicate()
     if p.returncode != 0:
