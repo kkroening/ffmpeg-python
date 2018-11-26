@@ -3,12 +3,16 @@ from builtins import bytes
 from builtins import range
 from builtins import str
 import ffmpeg
-import mock
 import os
 import pytest
 import random
 import re
 import subprocess
+
+try:
+    import mock  # python 2
+except ImportError:
+    from unittest import mock  # python 3
 
 
 TEST_DIR = os.path.dirname(__file__)
