@@ -100,13 +100,14 @@ Here are a few:
 - [Convert video to numpy array](https://github.com/kkroening/ffmpeg-python/blob/master/examples/README.md#convert-video-to-numpy-array)
 - [Generate thumbnail for video](https://github.com/kkroening/ffmpeg-python/blob/master/examples/README.md#generate-thumbnail-for-video)
 - [Read raw PCM audio via pipe](https://github.com/kkroening/ffmpeg-python/blob/master/examples/README.md#convert-sound-to-raw-pcm-audio)
-- [Tensorflow/DeepDream streaming](https://github.com/kkroening/ffmpeg-python/blob/master/examples/README.md#tensorflow-streaming)
-
-<img src="https://raw.githubusercontent.com/kkroening/ffmpeg-python/master/examples/graphs/dream.png" alt="deep dream streaming" width="40%" />
 
 - [JupyterLab/Notebook stream editor](https://github.com/kkroening/ffmpeg-python/blob/master/examples/README.md#jupyter-stream-editor)
 
 <img src="https://raw.githubusercontent.com/kkroening/ffmpeg-python/master/doc/jupyter-demo.gif" alt="jupyter demo" width="75%" />
+
+- [Tensorflow/DeepDream streaming](https://github.com/kkroening/ffmpeg-python/blob/master/examples/README.md#tensorflow-streaming)
+
+<img src="https://raw.githubusercontent.com/kkroening/ffmpeg-python/master/examples/graphs/dream.png" alt="deep dream streaming" width="40%" />
 
 See the [Examples README](https://github.com/kkroening/ffmpeg-python/tree/master/examples) for additional examples.
 
