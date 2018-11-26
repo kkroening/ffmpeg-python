@@ -144,7 +144,7 @@ process2 = (
     .input('pipe:', format='rawvideo', pix_fmt='rgb24', s='{}x{}'.format(width, height))
     .output(out_filename, pix_fmt='yuv420p')
     .overwrite_output()
-    .run_async(pipe_stdin=True()
+    .run_async(pipe_stdin=True)
 )
 
 while True:
