@@ -190,17 +190,17 @@ process2.wait()
 packet_size = 4096
 
 process = (
-	ffmpeg
-	.input('rtsp://%s:8554/default')
-	.output('-', format='h264')
-	.run_async(pipe_stdout=True)
+    ffmpeg
+    .input('rtsp://%s:8554/default')
+    .output('-', format='h264')
+    .run_async(pipe_stdout=True)
 )
 
 while process.poll() is None:
-	packet = process.stdout.read(packet_size)
-	try:
-		tcp_socket.send(packet)
-	except socket.error:
+    packet = process.stdout.read(packet_size)
+    try:
+        tcp_socket.send(packet)
+    except socket.error:
         process.stdout.close()
         process.wait()
         break
