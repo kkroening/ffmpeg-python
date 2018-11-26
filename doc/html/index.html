@@ -569,7 +569,7 @@ includes the <code class="docutils literal notranslate"><span class="pre">ffmpeg
 <dl class="function">
 <dt id="ffmpeg.run">
 <code class="descclassname">ffmpeg.</code><code class="descname">run</code><span class="sig-paren">(</span><em>stream_spec</em>, <em>cmd='ffmpeg'</em>, <em>capture_stdout=False</em>, <em>capture_stderr=False</em>, <em>input=None</em>, <em>quiet=False</em>, <em>overwrite_output=False</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.run" title="Permalink to this definition">¶</a></dt>
-<dd><p>Ivoke ffmpeg for the supplied node graph.</p>
+<dd><p>Invoke ffmpeg for the supplied node graph.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -592,13 +592,100 @@ ffmpeg inputs)</li>
 </dd></dl>
 
 <dl class="function">
+<dt id="ffmpeg.run_async">
+<code class="descclassname">ffmpeg.</code><code class="descname">run_async</code><span class="sig-paren">(</span><em>stream_spec</em>, <em>cmd='ffmpeg'</em>, <em>pipe_stdin=False</em>, <em>pipe_stdout=False</em>, <em>pipe_stderr=False</em>, <em>quiet=False</em>, <em>overwrite_output=False</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.run_async" title="Permalink to this definition">¶</a></dt>
+<dd><p>Asynchronously invoke ffmpeg for the supplied node graph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pipe_stdin</strong> – if True, connect pipe to subprocess stdin (to be
+used with <code class="docutils literal notranslate"><span class="pre">pipe:</span></code> ffmpeg inputs).</li>
+<li><strong>pipe_stdout</strong> – if True, connect pipe to subprocess stdout (to be
+used with <code class="docutils literal notranslate"><span class="pre">pipe:</span></code> ffmpeg outputs).</li>
+<li><strong>pipe_stderr</strong> – if True, connect pipe to subprocess stderr.</li>
+<li><strong>quiet</strong> – shorthand for setting <code class="docutils literal notranslate"><span class="pre">capture_stdout</span></code> and
+<code class="docutils literal notranslate"><span class="pre">capture_stderr</span></code>.</li>
+<li><strong>**kwargs</strong> – keyword-arguments passed to <code class="docutils literal notranslate"><span class="pre">get_args()</span></code> (e.g.
+<code class="docutils literal notranslate"><span class="pre">overwrite_output=True</span></code>).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A <a class="reference external" href="https://docs.python.org/3/library/subprocess.html#popen-objects">subprocess Popen</a> object representing the child process.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>Run and stream input:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">process</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">ffmpeg</span>
+    <span class="o">.</span><span class="n">input</span><span class="p">(</span><span class="s1">&#39;pipe:&#39;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;rawvideo&#39;</span><span class="p">,</span> <span class="n">pix_fmt</span><span class="o">=</span><span class="s1">&#39;rgb24&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">x</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">))</span>
+    <span class="o">.</span><span class="n">output</span><span class="p">(</span><span class="n">out_filename</span><span class="p">,</span> <span class="n">pix_fmt</span><span class="o">=</span><span class="s1">&#39;yuv420p&#39;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">overwrite_output</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">run_async</span><span class="p">(</span><span class="n">pipe_stdin</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="n">input_data</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Run and capture output:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">process</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">ffmpeg</span>
+    <span class="o">.</span><span class="n">input</span><span class="p">(</span><span class="n">in_filename</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">output</span><span class="p">(</span><span class="s1">&#39;pipe&#39;</span><span class="p">:,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;rawvideo&#39;</span><span class="p">,</span> <span class="n">pix_fmt</span><span class="o">=</span><span class="s1">&#39;rgb24&#39;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">run_async</span><span class="p">(</span><span class="n">pipe_stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">pipe_stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">out</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Process video frame-by-frame using numpy:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">process1</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">ffmpeg</span>
+    <span class="o">.</span><span class="n">input</span><span class="p">(</span><span class="n">in_filename</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">output</span><span class="p">(</span><span class="s1">&#39;pipe:&#39;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;rawvideo&#39;</span><span class="p">,</span> <span class="n">pix_fmt</span><span class="o">=</span><span class="s1">&#39;rgb24&#39;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">run_async</span><span class="p">(</span><span class="n">pipe_stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">process2</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">ffmpeg</span>
+    <span class="o">.</span><span class="n">input</span><span class="p">(</span><span class="s1">&#39;pipe:&#39;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;rawvideo&#39;</span><span class="p">,</span> <span class="n">pix_fmt</span><span class="o">=</span><span class="s1">&#39;rgb24&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">x</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">))</span>
+    <span class="o">.</span><span class="n">output</span><span class="p">(</span><span class="n">out_filename</span><span class="p">,</span> <span class="n">pix_fmt</span><span class="o">=</span><span class="s1">&#39;yuv420p&#39;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">overwrite_output</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">run_async</span><span class="p">(</span><span class="n">pipe_stdin</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="n">in_bytes</span> <span class="o">=</span> <span class="n">process1</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">width</span> <span class="o">*</span> <span class="n">height</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">in_bytes</span><span class="p">:</span>
+        <span class="k">break</span>
+    <span class="n">in_frame</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">np</span>
+        <span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">in_bytes</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+    <span class="p">)</span>
+    <span class="n">out_frame</span> <span class="o">=</span> <span class="n">in_frame</span> <span class="o">*</span> <span class="mf">0.3</span>
+    <span class="n">process2</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+        <span class="n">frame</span>
+        <span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
+    <span class="p">)</span>
+
+<span class="n">process2</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="n">process1</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+<span class="n">process2</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
 <dt id="ffmpeg.view">
 <code class="descclassname">ffmpeg.</code><code class="descname">view</code><span class="sig-paren">(</span><em>stream_spec</em>, <em>detail=False</em>, <em>filename=None</em>, <em>pipe=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.view" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="ffmpeg.probe">
-<code class="descclassname">ffmpeg.</code><code class="descname">probe</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.probe" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">ffmpeg.</code><code class="descname">probe</code><span class="sig-paren">(</span><em>filename</em>, <em>cmd='ffprobe'</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.probe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run ffprobe on the specified file and return a JSON representation of the output.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
