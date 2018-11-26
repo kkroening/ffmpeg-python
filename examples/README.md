@@ -132,44 +132,48 @@ out.run()
 - Encode output video with ffmpeg
 
 ```python
-args1 = (
+process1 = (
     ffmpeg
     .input(in_filename)
     .output('pipe:', format='rawvideo', pix_fmt='rgb24', vframes=8)
-    .compile()
+    .run_async(pipe_stdout=True)
 )
-process1 = subprocess.Popen(args1, stdout=subprocess.PIPE)
 
-args2 = (
+process2 = (
     ffmpeg
     .input('pipe:', format='rawvideo', pix_fmt='rgb24', s='{}x{}'.format(width, height))
     .output(out_filename, pix_fmt='yuv420p')
     .overwrite_output()
-    .compile()
+    .run_async(pipe_stdin=True()
 )
-process2 = subprocess.Popen(args2, stdin=subprocess.PIPE)
 
 while True:
     in_bytes = process1.stdout.read(width * height * 3)
-    in_frame (
+    if not in_bytes:
+        break
+    in_frame = (
         np
         .frombuffer(in_bytes, np.uint8)
         .reshape([height, width, 3])
     )
 
     # See examples/tensorflow_stream.py:
-    frame = deep_dream.process_frame(frame)
+    out_frame = deep_dream.process_frame(in_frame)
 
     process2.stdin.write(
-        frame
+        in_frame
         .astype(np.uint8)
         .tobytes()
     )
+
+process2.stdin.close()
+process1.wait()
+process2.wait()
 ```
 
 <img src="https://raw.githubusercontent.com/kkroening/ffmpeg-python/master/examples/graphs/dream.png" alt="deep dream streaming" width="40%" />
 
-## [FaceTime webcam input](https://github.com/kkroening/ffmpeg-python/blob/master/examples/facetime.py)
+## [FaceTime webcam input (OS X)](https://github.com/kkroening/ffmpeg-python/blob/master/examples/facetime.py)
 
 ```python
 (
@@ -178,4 +182,26 @@ while True:
     .output('out.mp4', pix_fmt='yuv420p', vframes=100)
     .run()
 )
+```
+
+## Stream from RTSP server to TCP socket
+
+```python
+packet_size = 4096
+
+process = (
+	ffmpeg
+	.input('rtsp://%s:8554/default')
+	.output('-', format='h264')
+	.run_async(pipe_stdout=True)
+)
+
+while process.poll() is None:
+	packet = process.stdout.read(packet_size)
+	try:
+		tcp_socket.send(packet)
+	except socket.error:
+        process.stdout.close()
+        process.wait()
+        break
 ```
