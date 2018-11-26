@@ -58,7 +58,7 @@ def start_ffmpeg_process1(in_filename):
     args = (
         ffmpeg
         .input(in_filename)
-        .output('pipe:', format='rawvideo', pix_fmt='rgb24', vframes=8)
+        .output('pipe:', format='rawvideo', pix_fmt='rgb24')
         .compile()
     )
     return subprocess.Popen(args, stdout=subprocess.PIPE)
@@ -113,14 +113,14 @@ def run(in_filename, out_filename, process_frame):
     process1 = start_ffmpeg_process1(in_filename)
     process2 = start_ffmpeg_process2(out_filename, width, height)
     while True:
-        frame = read_frame(process1, width, height)
-        if frame is None:
+        in_frame = read_frame(process1, width, height)
+        if in_frame is None:
             logger.info('End of input stream')
             break
 
         logger.debug('Processing frame')
-        frame = process_frame(frame)
-        write_frame(process2, frame)
+        out_frame = process_frame(in_frame)
+        write_frame(process2, out_frame)
 
     logger.info('Waiting for ffmpeg process1')
     process1.wait()

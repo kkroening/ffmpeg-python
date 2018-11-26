@@ -1,14 +1,18 @@
 from __future__ import unicode_literals
-
-from builtins import str
 from builtins import bytes
 from builtins import range
+from builtins import str
 import ffmpeg
 import os
 import pytest
 import random
 import re
 import subprocess
+
+try:
+    import mock  # python 2
+except ImportError:
+    from unittest import mock  # python 3
 
 
 TEST_DIR = os.path.dirname(__file__)
@@ -412,6 +416,25 @@ def test__compile():
     out_file = ffmpeg.input('dummy.mp4').output('dummy2.mp4')
     assert out_file.compile() == ['ffmpeg', '-i', 'dummy.mp4', 'dummy2.mp4']
     assert out_file.compile(cmd='ffmpeg.old') == ['ffmpeg.old', '-i', 'dummy.mp4', 'dummy2.mp4']
+
+
+@pytest.mark.parametrize('pipe_stdin', [True, False])
+@pytest.mark.parametrize('pipe_stdout', [True, False])
+@pytest.mark.parametrize('pipe_stderr', [True, False])
+def test__run_async(mocker, pipe_stdin, pipe_stdout, pipe_stderr):
+    process__mock = mock.Mock()
+    popen__mock = mocker.patch.object(subprocess, 'Popen', return_value=process__mock)
+    stream = _get_simple_example()
+    process = ffmpeg.run_async(
+        stream, pipe_stdin=pipe_stdin, pipe_stdout=pipe_stdout, pipe_stderr=pipe_stderr)
+    assert process is process__mock
+
+    expected_stdin = subprocess.PIPE if pipe_stdin else None
+    expected_stdout = subprocess.PIPE if pipe_stdout else None
+    expected_stderr = subprocess.PIPE if pipe_stderr else None
+    (args,), kwargs = popen__mock.call_args 
+    assert args == ffmpeg.compile(stream)
+    assert kwargs == dict(stdin=expected_stdin, stdout=expected_stdout, stderr=expected_stderr)
 
 
 def test__run():
