@@ -78,3 +78,14 @@ def escape_chars(text, chars):
     for ch in chars:
         text = text.replace(ch, '\\' + ch)
     return text
+
+
+def convert_kwargs_to_cmd_line_args(kwargs):
+    """Helper function to build command line arguments out of dict."""
+    args = []
+    for k in sorted(kwargs.keys()):
+        v = kwargs[k]
+        args.append('-{}'.format(k))
+        if v is not None:
+            args.append('{}'.format(v))
+    return args

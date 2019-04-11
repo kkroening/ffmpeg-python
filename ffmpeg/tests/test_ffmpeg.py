@@ -650,3 +650,8 @@ def test__probe__exception():
         ffmpeg.probe(BOGUS_INPUT_FILE)
     assert str(excinfo.value) == 'ffprobe error (see stderr output for detail)'
     assert 'No such file or directory'.encode() in excinfo.value.stderr
+
+
+def test__probe__extra_args():
+    data = ffmpeg.probe(TEST_INPUT_FILE1, show_frames=None)
+    assert set(data.keys()) == {'format', 'streams', 'frames'}
