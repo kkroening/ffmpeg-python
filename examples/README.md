@@ -51,7 +51,7 @@ out, _ = (
     .input(in_filename)
     .filter('select', 'gte(n,{})'.format(frame_num))
     .output('pipe:', vframes=1, format='image2', vcodec='mjpeg')
-    .run(capture_output=True)
+    .run(capture_stdout=True)
 )
 ```
 
