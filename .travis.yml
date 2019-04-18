@@ -2,9 +2,9 @@ language: python
 before_install:
   - >
     [ -f ffmpeg-release/ffmpeg ] || (
-        curl -O https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-64bit-static.tar.xz &&
+        curl -O https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz &&
         mkdir -p ffmpeg-release &&
-        tar Jxf ffmpeg-release-64bit-static.tar.xz --strip-components=1 -C ffmpeg-release
+        tar Jxf ffmpeg-release-amd64-static.tar.xz --strip-components=1 -C ffmpeg-release
     )
 matrix:
   include:
