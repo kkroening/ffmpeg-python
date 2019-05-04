@@ -1,4 +1,7 @@
 from __future__ import unicode_literals
+
+import asyncio
+
 from builtins import bytes
 from builtins import range
 from builtins import str
@@ -655,3 +658,31 @@ def test__probe__exception():
 def test__probe__extra_args():
     data = ffmpeg.probe(TEST_INPUT_FILE1, show_frames=None)
     assert set(data.keys()) == {'format', 'streams', 'frames'}
+
+
+def test_run_asyncio():
+    async def test_async():
+        process = await (
+            ffmpeg
+             .input(TEST_INPUT_FILE1)
+             .output('pipe:', format='rawvideo', pix_fmt='rgb24')['v']
+             .run_asyncio(pipe_stdout=True, quiet=False)
+        )
+
+        video_frame_size = 320 * 240 * 3  # Note: RGB24 == 3 bytes per pixel. 320x240 - video size
+
+        total_bytes = 0
+
+        while True:
+            frame_bytes = await process.stdout.read(video_frame_size)
+            if len(frame_bytes) == 0:
+                break
+            else:
+                total_bytes += len(frame_bytes)
+
+        await process.wait()
+
+        assert total_bytes == 48153600, 'Incorrect size of the output frames'
+
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(test_async())
