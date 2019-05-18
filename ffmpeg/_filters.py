@@ -29,7 +29,7 @@ def filter(stream_spec, filter_name, *args, **kwargs):
     """Apply custom filter.
 
     ``filter_`` is normally used by higher-level filter functions such as ``hflip``, but if a filter implementation
-    is missing from ``fmpeg-python``, you can call ``filter_`` directly to have ``fmpeg-python`` pass the filter name
+    is missing from ``ffmpeg-python``, you can call ``filter_`` directly to have ``ffmpeg-python`` pass the filter name
     and arguments to ffmpeg verbatim.
 
     Args:
