@@ -8,7 +8,7 @@ from ._utils import escape_chars
 def filter_multi_output(stream_spec, filter_name, *args, **kwargs):
     """Apply custom filter with one or more outputs.
 
-    This is the same as ``filter_`` except that the filter can produce more than one output.
+    This is the same as ``filter`` except that the filter can produce more than one output.
 
     To reference an output stream, use either the ``.stream`` operator or bracket shorthand:
 

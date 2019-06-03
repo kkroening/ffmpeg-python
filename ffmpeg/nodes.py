@@ -53,8 +53,8 @@ class Stream(object):
             Process the audio and video portions of a stream independently::
 
                 input = ffmpeg.input('in.mp4')
-                audio = input[:'a'].filter("aecho", 0.8, 0.9, 1000, 0.3)
-                video = input[:'v'].hflip()
+                audio = input['a'].filter("aecho", 0.8, 0.9, 1000, 0.3)
+                video = input['v'].hflip()
                 out = ffmpeg.output(audio, video, 'out.mp4')
         """
         if self.selector is not None:
@@ -62,6 +62,56 @@ class Stream(object):
         elif not isinstance(index, basestring):
             raise TypeError("Expected string index (e.g. 'a'); got {!r}".format(index))
         return self.node.stream(label=self.label, selector=index)
+
+    @property
+    def audio(self):
+        """Select the audio-portion of a stream.
+
+        Some ffmpeg filters drop audio streams, and care must be taken
+        to preserve the audio in the final output.  The ``.audio`` and
+        ``.video`` operators can be used to reference the audio/video
+        portions of a stream so that they can be processed separately
+        and then re-combined later in the pipeline.  This dilemma is
+        intrinsic to ffmpeg, and ffmpeg-python tries to stay out of the
+        way while users may refer to the official ffmpeg documentation
+        as to why certain filters drop audio.
+
+        ``stream.audio`` is a shorthand for ``stream['a']``.
+
+        Example:
+            Process the audio and video portions of a stream independently::
+
+                input = ffmpeg.input('in.mp4')
+                audio = input.audio.filter("aecho", 0.8, 0.9, 1000, 0.3)
+                video = input.video.hflip()
+                out = ffmpeg.output(audio, video, 'out.mp4')
+        """
+        return self['a']
+
+    @property
+    def video(self):
+        """Select the video-portion of a stream.
+
+        Some ffmpeg filters drop audio streams, and care must be taken
+        to preserve the audio in the final output.  The ``.audio`` and
+        ``.video`` operators can be used to reference the audio/video
+        portions of a stream so that they can be processed separately
+        and then re-combined later in the pipeline.  This dilemma is
+        intrinsic to ffmpeg, and ffmpeg-python tries to stay out of the
+        way while users may refer to the official ffmpeg documentation
+        as to why certain filters drop audio.
+
+        ``stream.video`` is a shorthand for ``stream['v']``.
+
+        Example:
+            Process the audio and video portions of a stream independently::
+
+                input = ffmpeg.input('in.mp4')
+                audio = input.audio.filter("aecho", 0.8, 0.9, 1000, 0.3)
+                video = input.video.hflip()
+                out = ffmpeg.output(audio, video, 'out.mp4')
+        """
+        return self['v']
 
 
 def get_stream_map(stream_spec):
@@ -286,3 +336,8 @@ def filter_operator(name=None):
 
 def output_operator(name=None):
     return stream_operator(stream_classes={OutputStream}, name=name)
+
+
+__all__ = [
+    'Stream',
+]

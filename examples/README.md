@@ -104,10 +104,10 @@ With additional filtering:
 ```python
 in1 = ffmpeg.input('in1.mp4')
 in2 = ffmpeg.input('in2.mp4')
-v1 = in1['v'].hflip()
-a1 = in1['a']
-v2 = in2['v'].filter('reverse').filter('hue', s=0)
-a2 = in2['a'].filter('areverse').filter('aphaser')
+v1 = in1.video.hflip()
+a1 = in1.audio
+v2 = in2.video.filter('reverse').filter('hue', s=0)
+a2 = in2.audio.filter('areverse').filter('aphaser')
 joined = ffmpeg.concat(v1, a1, v2, a2, v=1, a=1).node
 v3 = joined[0]
 a3 = joined[1].filter('volume', 0.8)

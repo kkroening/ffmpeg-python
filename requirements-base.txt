@@ -1,6 +1,0 @@
-future
-pytest
-pytest-mock
-pytest-runner
-sphinx
-tox
