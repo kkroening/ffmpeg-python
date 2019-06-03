@@ -67,6 +67,13 @@ setup(
     keywords=keywords,
     long_description=long_description,
     install_requires=['future'],
+    extras_require={
+        'dev': [
+            'future',
+            'pytest',
+            'pytest-mock',
+        ],
+    },
     classifiers=[
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',

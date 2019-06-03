@@ -175,10 +175,15 @@ def test_combined_output():
     ]
 
 
-def test_filter_with_selector():
+@pytest.mark.parametrize('use_shorthand', [True, False])
+def test_filter_with_selector(use_shorthand):
     i = ffmpeg.input(TEST_INPUT_FILE1)
-    v1 = i['v'].hflip()
-    a1 = i['a'].filter('aecho', 0.8, 0.9, 1000, 0.3)
+    if use_shorthand:
+        v1 = i.video.hflip()
+        a1 = i.audio.filter('aecho', 0.8, 0.9, 1000, 0.3)
+    else:
+        v1 = i['v'].hflip()
+        a1 = i['a'].filter('aecho', 0.8, 0.9, 1000, 0.3)
     out = ffmpeg.output(a1, v1, TEST_OUTPUT_FILE1)
     assert out.get_args() == [
         '-i', TEST_INPUT_FILE1,
@@ -273,7 +278,7 @@ def test_filter_concat__audio_only():
 def test_filter_concat__audio_video():
     in1 = ffmpeg.input('in1.mp4')
     in2 = ffmpeg.input('in2.mp4')
-    joined = ffmpeg.concat(in1['v'], in1['a'], in2.hflip(), in2['a'], v=1, a=1).node
+    joined = ffmpeg.concat(in1.video, in1.audio, in2.hflip(), in2['a'], v=1, a=1).node
     args = (
         ffmpeg
         .output(joined[0], joined[1], 'out.mp4')
@@ -298,7 +303,7 @@ def test_filter_concat__wrong_stream_count():
     in1 = ffmpeg.input('in1.mp4')
     in2 = ffmpeg.input('in2.mp4')
     with pytest.raises(ValueError) as excinfo:
-        ffmpeg.concat(in1['v'], in1['a'], in2.hflip(), v=1, a=1).node
+        ffmpeg.concat(in1.video, in1.audio, in2.hflip(), v=1, a=1).node
     assert str(excinfo.value) == \
         'Expected concat input streams to have length multiple of 2 (v=1, a=1); got 3'
 
