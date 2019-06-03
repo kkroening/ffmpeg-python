@@ -84,7 +84,7 @@ The latest version of `ffmpeg-python` can be acquired via a typical pip install:
 pip install ffmpeg-python
 ```
 
-Or clone the source and install locally:
+Or the source can be cloned and installed from locally:
 ```bash
 git clone git@github.com:kkroening/ffmpeg-python.git
 pip install -e ./ffmpeg-python
@@ -111,7 +111,7 @@ See the [Examples README](https://github.com/kkroening/ffmpeg-python/tree/master
 
 ## Custom Filters
 
-Don't see the filter you're looking for?  `ffmpeg-python` includes shorthand notation for some of the most commonly used filters (such as `concat`), but it's easy to use any arbitrary ffmpeg filter:
+Don't see the filter you're looking for?  While `ffmpeg-python` includes shorthand notation for some of the most commonly used filters (such as `concat`), all filters can be referenced via the `.filter` operator:
 ```python
 stream = ffmpeg.input('dummy.mp4')
 stream = ffmpeg.filter(stream, 'fps', fps=25, round='up')
@@ -140,11 +140,23 @@ Arguments with special names such as `-qscale:v` can be specified as a keyword-a
 )
 ```
 
+Filters that take multiple input streams can be specified by passing the input streams as an array to `ffmpeg.filter`:
+```python
+main = ffmpeg.input('main.mp4')
+logo = ffmpeg.input('logo.png')
+stream = (
+    ffmpeg
+    .filter([main, logo], 'overlay', 10, 10)
+    .output('out.mp4')
+    .run()
+)
+```
+
 When in doubt, refer to the [existing filters](https://github.com/kkroening/ffmpeg-python/blob/master/ffmpeg/_filters.py), [examples](https://github.com/kkroening/ffmpeg-python/tree/master/examples), and/or the [official ffmpeg documentation](https://ffmpeg.org/ffmpeg-filters.html).
 
 ## Frequently asked questions
 
-**Why do I get an import/attribute/etc error from `import ffmpeg`?**
+**Why do I get an import/attribute/etc. error from `import ffmpeg`?**
 
 Make sure you ran `pip install ffmpeg-python` and not `pip install ffmpeg` or `pip install python-ffmpeg`.
 
@@ -168,7 +180,7 @@ As usual, take a look at the [examples](https://github.com/kkroening/ffmpeg-pyth
 
 <img align="right" src="https://raw.githubusercontent.com/kkroening/ffmpeg-python/master/doc/logo.png" alt="ffmpeg-python logo" width="20%" />
 
-One of the best things you can do to help make `ffmpeg-python` better is to answer [open questions](https://github.com/kkroening/ffmpeg-python/labels/question) in the issue tracker.  The questions that are answered will be tagged and eventually incorporated into the documentation, examples, and other learning resources.
+One of the best things you can do to help make `ffmpeg-python` better is to answer [open questions](https://github.com/kkroening/ffmpeg-python/labels/question) in the issue tracker.  The questions that are answered will be tagged and incorporated into the documentation, examples, and other learning resources.
 
 If you notice things that could be better in the documentation or overall development experience, please say so in the [issue tracker](https://github.com/kkroening/ffmpeg-python/issues).  And of course, feel free to report any bugs or submit feature requests.
 
