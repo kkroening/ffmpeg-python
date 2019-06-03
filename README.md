@@ -32,7 +32,7 @@ import ffmpeg
 )
 ```
 
-## [[API reference]](https://kkroening.github.io/ffmpeg-python/)
+## [API reference](https://kkroening.github.io/ffmpeg-python/)
 
 ## Complex filter graphs
 FFmpeg is extremely powerful, but its command-line interface gets really complicated rather quickly - especially when working with signal graphs and doing anything more than trivial.
@@ -51,7 +51,7 @@ ffmpeg -i input.mp4 -i overlay.png -filter_complex "[0]trim=start_frame=10:end_f
 
 Maybe this looks great to you, but if you're not an FFmpeg command-line expert, it probably looks alien.
 
-If you're like me and find Python to be powerful and readable, it's easy with `ffmpeg-python`:
+If you're like me and find Python to be powerful and readable, it's easier with `ffmpeg-python`:
 ```python
 import ffmpeg
 
@@ -70,28 +70,24 @@ overlay_file = ffmpeg.input('overlay.png')
 )
 ```
 
-`ffmpeg-python` takes care of running `ffmpeg` with the command-line arguments that correspond to the above filter diagram, and it's easy to see what's going on and make changes as needed.
+`ffmpeg-python` takes care of running `ffmpeg` with the command-line arguments that correspond to the above filter diagram, in familiar Python terms.
 
 <img src="https://raw.githubusercontent.com/kkroening/ffmpeg-python/master/doc/screenshot.png" alt="Screenshot" align="middle" width="60%" />
 
-Real-world signal graphs can get a heck of a lot more complex, but `ffmpeg-python` handles them with ease.
-
+Real-world signal graphs can get a heck of a lot more complex, but `ffmpeg-python` handles arbitrarily large (directed-acyclic) signal graphs.
 
 ## Installation
 
-The latest version of `ffmpeg-python` can be acquired via pip:
+The latest version of `ffmpeg-python` can be acquired via a typical pip install:
 
 ```
 pip install ffmpeg-python
 ```
 
-It's also possible to clone the source and put it on your python path (`$PYTHONPATH`, `sys.path`, etc.):
-
+Or clone the source and install locally:
 ```bash
-$ git clone git@github.com:kkroening/ffmpeg-python.git
-$ export PYTHONPATH=${PYTHONPATH}:ffmpeg-python
-$ python
->>> import ffmpeg
+git clone git@github.com:kkroening/ffmpeg-python.git
+pip install -e ./ffmpeg-python
 ```
 
 ## [Examples](https://github.com/kkroening/ffmpeg-python/tree/master/examples)
@@ -166,7 +162,7 @@ Some ffmpeg filters drop audio streams, and care must be taken to preserve the a
 
 This dilemma is intrinsic to ffmpeg, and ffmpeg-python tries to stay out of the way while users may refer to the official ffmpeg documentation as to why certain filters drop audio.
 
-As usual, take a look at the [Examples](https://github.com/kkroening/ffmpeg-python/tree/master/examples#audiovideo-pipeline) (the "Audio/video pipeline" example in particular).
+As usual, take a look at the [examples](https://github.com/kkroening/ffmpeg-python/tree/master/examples#audiovideo-pipeline) (*Audio/video pipeline* in particular).
 
 ## Contributing
 
@@ -179,6 +175,18 @@ If you notice things that could be better in the documentation or overall develo
 Pull requests are welcome as well, but it wouldn't hurt to touch base in the issue tracker or hop on the [Matrix chat channel](https://riot.im/app/#/room/#ffmpeg-python:matrix.org) first.
 
 Anyone who fixes any of the [open bugs](https://github.com/kkroening/ffmpeg-python/labels/bug) or implements [requested enhancements](https://github.com/kkroening/ffmpeg-python/labels/enhancement) is a hero, but changes should include passing tests.
+
+### Running tests
+
+```bash
+git clone git@github.com:kkroening/ffmpeg-python.git
+cd ffmpeg-python
+virtualenv venv
+. venv/bin/activate  # (OS X / Linux)
+venv\bin\activate    # (Windows)
+pip install -e .[dev]
+pytest
+```
 
 <br />
 
