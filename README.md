@@ -130,27 +130,63 @@ Or fluently:
 )
 ```
 
-Arguments with special names such as `-qscale:v` can be specified as a keyword-args dictionary as follows:
+**Special option names:**
+
+Arguments with special names such as `-qscale:v` (variable bitrate), `-b:v` (constant bitrate), etc. can be specified as a keyword-args dictionary as follows:
 ```python
 (
     ffmpeg
-    .input('dummy.mp4')
-    .output('dummy2.mp4', **{'qscale:v': 3})
+    .input('in.mp4')
+    .output('out.mp4', **{'qscale:v': 3})
     .run()
 )
 ```
 
-Filters that take multiple input streams can be specified by passing the input streams as an array to `ffmpeg.filter`:
+**Multiple inputs:**
+
+Filters that take multiple input streams can be used by passing the input streams as an array to `ffmpeg.filter`:
 ```python
 main = ffmpeg.input('main.mp4')
 logo = ffmpeg.input('logo.png')
-stream = (
+(
     ffmpeg
     .filter([main, logo], 'overlay', 10, 10)
     .output('out.mp4')
     .run()
 )
 ```
+
+**Multiple outputs:**
+
+Filters that produce multiple outputs can be used with `.filter_multi_output`:
+```python
+split = (
+    ffmpeg
+    .input('in.mp4')
+    .filter_multi_output('split')  # or `.split()`
+)
+(
+    ffmpeg
+    .concat(split[0], split[1].reverse())
+    .output('out.mp4')
+    .run()
+)
+```
+(In this particular case, `.split()` is the equivalent shorthand, but the general approach works for other multi-output filters)
+
+**String expressions:**
+
+Expressions to be interpreted by ffmpeg can be included as string parameters and reference any special ffmpeg variable names:
+```python
+(
+    ffmpeg
+    .input('in.mp4')
+    .filter('crop', 'in_w-2*10', 'in_h-2*20')
+    .input('out.mp4')
+)
+```
+
+<br />
 
 When in doubt, refer to the [existing filters](https://github.com/kkroening/ffmpeg-python/blob/master/ffmpeg/_filters.py), [examples](https://github.com/kkroening/ffmpeg-python/tree/master/examples), and/or the [official ffmpeg documentation](https://ffmpeg.org/ffmpeg-filters.html).
 
@@ -160,14 +196,6 @@ When in doubt, refer to the [existing filters](https://github.com/kkroening/ffmp
 
 Make sure you ran `pip install ffmpeg-python` and not `pip install ffmpeg` or `pip install python-ffmpeg`.
 
-**How do I do XYZ?**
-
-Take a look at each of the links in the [Additional Resources](https://kkroening.github.io/ffmpeg-python/) section at the end of this README.  If you look everywhere and can't find what you're looking for and have a question that may be relevant to other users, you may open an issue asking how to do it, while providing a thorough explanation of what you're trying to do and what you've tried so far.
-
-Issues not directly related to `ffmpeg-python` or issues asking others to write your code for you or how to do the work of solving a complex signal processing problem for you that's not relevant to other users will be closed.
-
-That said, we hope to continue improving our documentation and provide a community of support for people using `ffmpeg-python` to do cool and exciting things.
-
 **Why did my audio stream get dropped?**
 
 Some ffmpeg filters drop audio streams, and care must be taken to preserve the audio in the final output.  The ``.audio`` and ``.video`` operators can be used to reference the audio/video portions of a stream so that they can be processed separately and then re-combined later in the pipeline.
@@ -175,6 +203,14 @@ Some ffmpeg filters drop audio streams, and care must be taken to preserve the a
 This dilemma is intrinsic to ffmpeg, and ffmpeg-python tries to stay out of the way while users may refer to the official ffmpeg documentation as to why certain filters drop audio.
 
 As usual, take a look at the [examples](https://github.com/kkroening/ffmpeg-python/tree/master/examples#audiovideo-pipeline) (*Audio/video pipeline* in particular).
+
+**How do I do XYZ?**
+
+Take a look at each of the links in the [Additional Resources](https://kkroening.github.io/ffmpeg-python/) section at the end of this README.  If you look everywhere and can't find what you're looking for and have a question that may be relevant to other users, you may open an issue asking how to do it, while providing a thorough explanation of what you're trying to do and what you've tried so far.
+
+Issues not directly related to `ffmpeg-python` or issues asking others to write your code for you or how to do the work of solving a complex signal processing problem for you that's not relevant to other users will be closed.
+
+That said, we hope to continue improving our documentation and provide a community of support for people using `ffmpeg-python` to do cool and exciting things.
 
 ## Contributing
 
