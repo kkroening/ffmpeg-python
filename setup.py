@@ -69,9 +69,11 @@ setup(
     install_requires=['future'],
     extras_require={
         'dev': [
-            'future',
-            'pytest',
-            'pytest-mock',
+            'future==0.17.1',
+            'pytest-mock==1.10.4',
+            'pytest==4.6.1',
+            'Sphinx==2.1.0',
+            'tox==3.12.1',
         ],
     },
     classifiers=[

@@ -336,3 +336,8 @@ def filter_operator(name=None):
 
 def output_operator(name=None):
     return stream_operator(stream_classes={OutputStream}, name=name)
+
+
+__all__ = [
+    'Stream',
+]
