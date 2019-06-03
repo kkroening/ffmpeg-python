@@ -70,14 +70,31 @@ class DagNode(object):
         raise NotImplementedError()
 
 
-DagEdge = namedtuple('DagEdge', ['downstream_node', 'downstream_label', 'upstream_node', 'upstream_label', 'upstream_selector'])
+DagEdge = namedtuple(
+    "DagEdge",
+    [
+        "downstream_node",
+        "downstream_label",
+        "upstream_node",
+        "upstream_label",
+        "upstream_selector",
+    ],
+)
 
 
 def get_incoming_edges(downstream_node, incoming_edge_map):
     edges = []
     for downstream_label, upstream_info in list(incoming_edge_map.items()):
         upstream_node, upstream_label, upstream_selector = upstream_info
-        edges += [DagEdge(downstream_node, downstream_label, upstream_node, upstream_label, upstream_selector)]
+        edges += [
+            DagEdge(
+                downstream_node,
+                downstream_label,
+                upstream_node,
+                upstream_label,
+                upstream_selector,
+            )
+        ]
     return edges
 
 
@@ -86,7 +103,15 @@ def get_outgoing_edges(upstream_node, outgoing_edge_map):
     for upstream_label, downstream_infos in list(outgoing_edge_map.items()):
         for downstream_info in downstream_infos:
             downstream_node, downstream_label, downstream_selector = downstream_info
-            edges += [DagEdge(downstream_node, downstream_label, upstream_node, upstream_label, downstream_selector)]
+            edges += [
+                DagEdge(
+                    downstream_node,
+                    downstream_label,
+                    upstream_node,
+                    upstream_label,
+                    downstream_selector,
+                )
+            ]
     return edges
 
 
@@ -99,12 +124,20 @@ class KwargReprNode(DagNode):
         hashes = []
         for downstream_label, upstream_info in list(self.incoming_edge_map.items()):
             upstream_node, upstream_label, upstream_selector = upstream_info
-            hashes += [hash(x) for x in [downstream_label, upstream_node, upstream_label, upstream_selector]]
+            hashes += [
+                hash(x)
+                for x in [
+                    downstream_label,
+                    upstream_node,
+                    upstream_label,
+                    upstream_selector,
+                ]
+            ]
         return hashes
 
     @property
     def __inner_hash(self):
-        props = {'args': self.args, 'kwargs': self.kwargs}
+        props = {"args": self.args, "kwargs": self.kwargs}
         return get_hash(props)
 
     def __get_hash(self):
@@ -126,14 +159,16 @@ class KwargReprNode(DagNode):
 
     @property
     def short_hash(self):
-        return '{:x}'.format(abs(hash(self)))[:12]
+        return "{:x}".format(abs(hash(self)))[:12]
 
     def long_repr(self, include_hash=True):
-        formatted_props = ['{!r}'.format(arg) for arg in self.args]
-        formatted_props += ['{}={!r}'.format(key, self.kwargs[key]) for key in sorted(self.kwargs)]
-        out = '{}({})'.format(self.name, ', '.join(formatted_props))
+        formatted_props = ["{!r}".format(arg) for arg in self.args]
+        formatted_props += [
+            "{}={!r}".format(key, self.kwargs[key]) for key in sorted(self.kwargs)
+        ]
+        out = "{}({})".format(self.name, ", ".join(formatted_props))
         if include_hash:
-            out += ' <{}>'.format(self.short_hash)
+            out += " <{}>".format(self.short_hash)
         return out
 
     def __repr__(self):
@@ -157,21 +192,35 @@ def topo_sort(downstream_nodes):
     sorted_nodes = []
     outgoing_edge_maps = {}
 
-    def visit(upstream_node, upstream_label, downstream_node, downstream_label, downstream_selector=None):
+    def visit(
+        upstream_node,
+        upstream_label,
+        downstream_node,
+        downstream_label,
+        downstream_selector=None,
+    ):
         if upstream_node in marked_nodes:
-            raise RuntimeError('Graph is not a DAG')
+            raise RuntimeError("Graph is not a DAG")
 
         if downstream_node is not None:
             outgoing_edge_map = outgoing_edge_maps.get(upstream_node, {})
             outgoing_edge_infos = outgoing_edge_map.get(upstream_label, [])
-            outgoing_edge_infos += [(downstream_node, downstream_label, downstream_selector)]
+            outgoing_edge_infos += [
+                (downstream_node, downstream_label, downstream_selector)
+            ]
             outgoing_edge_map[upstream_label] = outgoing_edge_infos
             outgoing_edge_maps[upstream_node] = outgoing_edge_map
 
         if upstream_node not in sorted_nodes:
             marked_nodes.append(upstream_node)
             for edge in upstream_node.incoming_edges:
-                visit(edge.upstream_node, edge.upstream_label, edge.downstream_node, edge.downstream_label, edge.upstream_selector)
+                visit(
+                    edge.upstream_node,
+                    edge.upstream_label,
+                    edge.downstream_node,
+                    edge.downstream_label,
+                    edge.upstream_selector,
+                )
             marked_nodes.remove(upstream_node)
             sorted_nodes.append(upstream_node)
 

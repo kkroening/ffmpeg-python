@@ -8,10 +8,7 @@ import copy
 import operator
 import subprocess
 
-from ._ffmpeg import (
-    input,
-    output,
-)
+from ._ffmpeg import input, output
 from .nodes import (
     get_stream_spec_nodes,
     FilterNode,
@@ -24,7 +21,9 @@ from .nodes import (
 
 class Error(Exception):
     def __init__(self, cmd, stdout, stderr):
-        super(Error, self).__init__('{} error (see stderr output for detail)'.format(cmd))
+        super(Error, self).__init__(
+            '{} error (see stderr output for detail)'.format(cmd)
+        )
         self.stdout = stdout
         self.stderr = stderr
 
@@ -69,9 +68,15 @@ def _format_output_stream_name(stream_name_map, edge):
 def _get_filter_spec(node, outgoing_edge_map, stream_name_map):
     incoming_edges = node.incoming_edges
     outgoing_edges = get_outgoing_edges(node, outgoing_edge_map)
-    inputs = [_format_input_stream_name(stream_name_map, edge) for edge in incoming_edges]
-    outputs = [_format_output_stream_name(stream_name_map, edge) for edge in outgoing_edges]
-    filter_spec = '{}{}{}'.format(''.join(inputs), node._get_filter(outgoing_edges), ''.join(outputs))
+    inputs = [
+        _format_input_stream_name(stream_name_map, edge) for edge in incoming_edges
+    ]
+    outputs = [
+        _format_output_stream_name(stream_name_map, edge) for edge in outgoing_edges
+    ]
+    filter_spec = '{}{}{}'.format(
+        ''.join(inputs), node._get_filter(outgoing_edges), ''.join(outputs)
+    )
     return filter_spec
 
 
@@ -84,14 +89,20 @@ def _allocate_filter_stream_names(filter_nodes, outgoing_edge_maps, stream_name_
                 # TODO: automatically insert `splits` ahead of time via graph transformation.
                 raise ValueError(
                     'Encountered {} with multiple outgoing edges with same upstream label {!r}; a '
-                    '`split` filter is probably required'.format(upstream_node, upstream_label))
+                    '`split` filter is probably required'.format(
+                        upstream_node, upstream_label
+                    )
+                )
             stream_name_map[upstream_node, upstream_label] = 's{}'.format(stream_count)
             stream_count += 1
 
 
 def _get_filter_arg(filter_nodes, outgoing_edge_maps, stream_name_map):
     _allocate_filter_stream_names(filter_nodes, outgoing_edge_maps, stream_name_map)
-    filter_specs = [_get_filter_spec(node, outgoing_edge_maps[node], stream_name_map) for node in filter_nodes]
+    filter_specs = [
+        _get_filter_spec(node, outgoing_edge_maps[node], stream_name_map)
+        for node in filter_nodes
+    ]
     return ';'.join(filter_specs)
 
 
@@ -109,7 +120,9 @@ def _get_output_args(node, stream_name_map):
 
     for edge in node.incoming_edges:
         # edge = node.incoming_edges[0]
-        stream_name = _format_input_stream_name(stream_name_map, edge, is_final_arg=True)
+        stream_name = _format_input_stream_name(
+            stream_name_map, edge, is_final_arg=True
+        )
         if stream_name != '0' or len(node.incoming_edges) > 1:
             args += ['-map', stream_name]
 
@@ -123,7 +136,9 @@ def _get_output_args(node, stream_name_map):
         args += ['-b:a', str(kwargs.pop('audio_bitrate'))]
     if 'video_size' in kwargs:
         video_size = kwargs.pop('video_size')
-        if not isinstance(video_size, basestring) and isinstance(video_size, collections.Iterable):
+        if not isinstance(video_size, basestring) and isinstance(
+            video_size, collections.Iterable
+        ):
             video_size = '{}x{}'.format(video_size[0], video_size[1])
         args += ['-video_size', video_size]
     args += convert_kwargs_to_cmd_line_args(kwargs)
@@ -147,7 +162,9 @@ def get_args(stream_spec, overwrite_output=False):
     args += reduce(operator.add, [_get_input_args(node) for node in input_nodes])
     if filter_arg:
         args += ['-filter_complex', filter_arg]
-    args += reduce(operator.add, [_get_output_args(node, stream_name_map) for node in output_nodes])
+    args += reduce(
+        operator.add, [_get_output_args(node, stream_name_map) for node in output_nodes]
+    )
     args += reduce(operator.add, [_get_global_args(node) for node in global_nodes], [])
     if overwrite_output:
         args += ['-y']
@@ -175,8 +192,14 @@ def compile(stream_spec, cmd='ffmpeg', overwrite_output=False):
 
 @output_operator()
 def run_async(
-        stream_spec, cmd='ffmpeg', pipe_stdin=False, pipe_stdout=False, pipe_stderr=False,
-        quiet=False, overwrite_output=False):
+    stream_spec,
+    cmd='ffmpeg',
+    pipe_stdin=False,
+    pipe_stdout=False,
+    pipe_stderr=False,
+    quiet=False,
+    overwrite_output=False,
+):
     """Asynchronously invoke ffmpeg for the supplied node graph.
 
     Args:
@@ -259,13 +282,20 @@ def run_async(
     stdout_stream = subprocess.PIPE if pipe_stdout or quiet else None
     stderr_stream = subprocess.PIPE if pipe_stderr or quiet else None
     return subprocess.Popen(
-        args, stdin=stdin_stream, stdout=stdout_stream, stderr=stderr_stream)
+        args, stdin=stdin_stream, stdout=stdout_stream, stderr=stderr_stream
+    )
 
 
 @output_operator()
 def run(
-        stream_spec, cmd='ffmpeg', capture_stdout=False, capture_stderr=False, input=None,
-        quiet=False, overwrite_output=False):
+    stream_spec,
+    cmd='ffmpeg',
+    capture_stdout=False,
+    capture_stderr=False,
+    input=None,
+    quiet=False,
+    overwrite_output=False,
+):
     """Invoke ffmpeg for the supplied node graph.
 
     Args:
@@ -296,10 +326,4 @@ def run(
     return out, err
 
 
-__all__ = [
-    'compile',
-    'Error',
-    'get_args',
-    'run',
-    'run_async',
-]
+__all__ = ['compile', 'Error', 'get_args', 'run', 'run_async']

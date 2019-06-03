@@ -34,8 +34,11 @@ def with_metaclass(meta, *bases):
 
 
 if sys.version_info.major >= 3:
+
     class basestring(with_metaclass(BaseBaseString)):
         pass
+
+
 else:
     # noinspection PyUnresolvedReferences,PyCompatibility
     from builtins import basestring
@@ -52,7 +55,10 @@ def _recursive_repr(item):
     elif isinstance(item, list):
         result = '[{}]'.format(', '.join([_recursive_repr(x) for x in item]))
     elif isinstance(item, dict):
-        kv_pairs = ['{}: {}'.format(_recursive_repr(k), _recursive_repr(item[k])) for k in sorted(item)]
+        kv_pairs = [
+            '{}: {}'.format(_recursive_repr(k), _recursive_repr(item[k]))
+            for k in sorted(item)
+        ]
         result = '{' + ', '.join(kv_pairs) + '}'
     else:
         result = repr(item)

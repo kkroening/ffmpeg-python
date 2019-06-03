@@ -23,10 +23,15 @@ def _get_types_str(types):
 class Stream(object):
     """Represents the outgoing edge of an upstream node; may be used to create more downstream nodes."""
 
-    def __init__(self, upstream_node, upstream_label, node_types, upstream_selector=None):
+    def __init__(
+        self, upstream_node, upstream_label, node_types, upstream_selector=None
+    ):
         if not _is_of_types(upstream_node, node_types):
-            raise TypeError('Expected upstream node to be of one of the following type(s): {}; got {}'.format(
-                _get_types_str(node_types), type(upstream_node)))
+            raise TypeError(
+                'Expected upstream node to be of one of the following type(s): {}; got {}'.format(
+                    _get_types_str(node_types), type(upstream_node)
+                )
+            )
         self.node = upstream_node
         self.label = upstream_label
         self.selector = upstream_selector
@@ -42,7 +47,9 @@ class Stream(object):
         selector = ''
         if self.selector:
             selector = ':{}'.format(self.selector)
-        out = '{}[{!r}{}] <{}>'.format(node_repr, self.label, selector, self.node.short_hash)
+        out = '{}[{!r}{}] <{}>'.format(
+            node_repr, self.label, selector, self.node.short_hash
+        )
         return out
 
     def __getitem__(self, index):
@@ -146,26 +153,50 @@ class Node(KwargReprNode):
     @classmethod
     def __check_input_len(cls, stream_map, min_inputs, max_inputs):
         if min_inputs is not None and len(stream_map) < min_inputs:
-            raise ValueError('Expected at least {} input stream(s); got {}'.format(min_inputs, len(stream_map)))
+            raise ValueError(
+                'Expected at least {} input stream(s); got {}'.format(
+                    min_inputs, len(stream_map)
+                )
+            )
         elif max_inputs is not None and len(stream_map) > max_inputs:
-            raise ValueError('Expected at most {} input stream(s); got {}'.format(max_inputs, len(stream_map)))
+            raise ValueError(
+                'Expected at most {} input stream(s); got {}'.format(
+                    max_inputs, len(stream_map)
+                )
+            )
 
     @classmethod
     def __check_input_types(cls, stream_map, incoming_stream_types):
         for stream in list(stream_map.values()):
             if not _is_of_types(stream, incoming_stream_types):
-                raise TypeError('Expected incoming stream(s) to be of one of the following types: {}; got {}'
-                                .format(_get_types_str(incoming_stream_types), type(stream)))
+                raise TypeError(
+                    'Expected incoming stream(s) to be of one of the following types: {}; got {}'.format(
+                        _get_types_str(incoming_stream_types), type(stream)
+                    )
+                )
 
     @classmethod
     def __get_incoming_edge_map(cls, stream_map):
         incoming_edge_map = {}
         for downstream_label, upstream in list(stream_map.items()):
-            incoming_edge_map[downstream_label] = (upstream.node, upstream.label, upstream.selector)
+            incoming_edge_map[downstream_label] = (
+                upstream.node,
+                upstream.label,
+                upstream.selector,
+            )
         return incoming_edge_map
 
-    def __init__(self, stream_spec, name, incoming_stream_types, outgoing_stream_type, min_inputs,
-                 max_inputs, args=[], kwargs={}):
+    def __init__(
+        self,
+        stream_spec,
+        name,
+        incoming_stream_types,
+        outgoing_stream_type,
+        min_inputs,
+        max_inputs,
+        args=[],
+        kwargs={},
+    ):
         stream_map = get_stream_map(stream_spec)
         self.__check_input_len(stream_map, min_inputs, max_inputs)
         self.__check_input_types(stream_map, incoming_stream_types)
@@ -203,8 +234,9 @@ class Node(KwargReprNode):
 
 class FilterableStream(Stream):
     def __init__(self, upstream_node, upstream_label, upstream_selector=None):
-        super(FilterableStream, self).__init__(upstream_node, upstream_label, {InputNode, FilterNode},
-                                               upstream_selector)
+        super(FilterableStream, self).__init__(
+            upstream_node, upstream_label, {InputNode, FilterNode}, upstream_selector
+        )
 
 
 # noinspection PyMethodOverriding
@@ -220,7 +252,7 @@ class InputNode(Node):
             min_inputs=0,
             max_inputs=0,
             args=args,
-            kwargs=kwargs
+            kwargs=kwargs,
         )
 
     @property
@@ -239,7 +271,7 @@ class FilterNode(Node):
             min_inputs=1,
             max_inputs=max_inputs,
             args=args,
-            kwargs=kwargs
+            kwargs=kwargs,
         )
 
     """FilterNode"""
@@ -279,7 +311,7 @@ class OutputNode(Node):
             min_inputs=1,
             max_inputs=None,
             args=args,
-            kwargs=kwargs
+            kwargs=kwargs,
         )
 
     @property
@@ -289,8 +321,12 @@ class OutputNode(Node):
 
 class OutputStream(Stream):
     def __init__(self, upstream_node, upstream_label, upstream_selector=None):
-        super(OutputStream, self).__init__(upstream_node, upstream_label, {OutputNode, GlobalNode, MergeOutputsNode},
-                                           upstream_selector=upstream_selector)
+        super(OutputStream, self).__init__(
+            upstream_node,
+            upstream_label,
+            {OutputNode, GlobalNode, MergeOutputsNode},
+            upstream_selector=upstream_selector,
+        )
 
 
 # noinspection PyMethodOverriding
@@ -302,7 +338,7 @@ class MergeOutputsNode(Node):
             incoming_stream_types={OutputStream},
             outgoing_stream_type=OutputStream,
             min_inputs=1,
-            max_inputs=None
+            max_inputs=None,
         )
 
 
@@ -317,7 +353,7 @@ class GlobalNode(Node):
             min_inputs=1,
             max_inputs=1,
             args=args,
-            kwargs=kwargs
+            kwargs=kwargs,
         )
 
 
@@ -338,6 +374,4 @@ def output_operator(name=None):
     return stream_operator(stream_classes={OutputStream}, name=name)
 
 
-__all__ = [
-    'Stream',
-]
+__all__ = ['Stream']

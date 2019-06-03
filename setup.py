@@ -2,22 +2,26 @@ from setuptools import setup
 from textwrap import dedent
 
 version = '0.1.17'
-download_url = 'https://github.com/kkroening/ffmpeg-python/archive/v{}.zip'.format(version)
+download_url = 'https://github.com/kkroening/ffmpeg-python/archive/v{}.zip'.format(
+    version
+)
 
-long_description = dedent("""\
+long_description = dedent(
+    '''\
     ffmpeg-python: Python bindings for FFmpeg
     =========================================
 
     :Github: https://github.com/kkroening/ffmpeg-python
     :API Reference: https://kkroening.github.io/ffmpeg-python/
-""")
+'''
+)
 
 
 file_formats = [
     'aac',
     'ac3',
     'avi',
-    'bmp'
+    'bmp',
     'flac',
     'gif',
     'mov',
@@ -70,11 +74,12 @@ setup(
     extras_require={
         'dev': [
             'future==0.17.1',
+            'numpy==1.16.4',
             'pytest-mock==1.10.4',
             'pytest==4.6.1',
             'Sphinx==2.1.0',
             'tox==3.12.1',
-        ],
+        ]
     },
     classifiers=[
         'Intended Audience :: Developers',
