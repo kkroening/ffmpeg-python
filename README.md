@@ -148,7 +148,7 @@ When in doubt, refer to the [existing filters](https://github.com/kkroening/ffmp
 
 ## Frequently asked questions
 
-**Why do I get an import/attribute/etc error from `import ffmpeg`?*
+**Why do I get an import/attribute/etc error from `import ffmpeg`?**
 
 Make sure you ran `pip install ffmpeg-python` and not `pip install ffmpeg` or `pip install python-ffmpeg`.
 
