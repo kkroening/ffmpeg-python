@@ -71,13 +71,13 @@ class DagNode(object):
 
 
 DagEdge = namedtuple(
-    "DagEdge",
+    'DagEdge',
     [
-        "downstream_node",
-        "downstream_label",
-        "upstream_node",
-        "upstream_label",
-        "upstream_selector",
+        'downstream_node',
+        'downstream_label',
+        'upstream_node',
+        'upstream_label',
+        'upstream_selector',
     ],
 )
 
@@ -137,7 +137,7 @@ class KwargReprNode(DagNode):
 
     @property
     def __inner_hash(self):
-        props = {"args": self.args, "kwargs": self.kwargs}
+        props = {'args': self.args, 'kwargs': self.kwargs}
         return get_hash(props)
 
     def __get_hash(self):
@@ -159,16 +159,16 @@ class KwargReprNode(DagNode):
 
     @property
     def short_hash(self):
-        return "{:x}".format(abs(hash(self)))[:12]
+        return '{:x}'.format(abs(hash(self)))[:12]
 
     def long_repr(self, include_hash=True):
-        formatted_props = ["{!r}".format(arg) for arg in self.args]
+        formatted_props = ['{!r}'.format(arg) for arg in self.args]
         formatted_props += [
-            "{}={!r}".format(key, self.kwargs[key]) for key in sorted(self.kwargs)
+            '{}={!r}'.format(key, self.kwargs[key]) for key in sorted(self.kwargs)
         ]
-        out = "{}({})".format(self.name, ", ".join(formatted_props))
+        out = '{}({})'.format(self.name, ', '.join(formatted_props))
         if include_hash:
-            out += " <{}>".format(self.short_hash)
+            out += ' <{}>'.format(self.short_hash)
         return out
 
     def __repr__(self):
@@ -200,7 +200,7 @@ def topo_sort(downstream_nodes):
         downstream_selector=None,
     ):
         if upstream_node in marked_nodes:
-            raise RuntimeError("Graph is not a DAG")
+            raise RuntimeError('Graph is not a DAG')
 
         if downstream_node is not None:
             outgoing_edge_map = outgoing_edge_maps.get(upstream_node, {})
