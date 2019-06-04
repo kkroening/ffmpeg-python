@@ -176,7 +176,7 @@ def compile(stream_spec, cmd='ffmpeg', overwrite_output=False):
 @output_operator()
 def run_async(
         stream_spec, cmd='ffmpeg', pipe_stdin=False, pipe_stdout=False, pipe_stderr=False,
-        quiet=False, overwrite_output=False):
+        quiet=False, overwrite_output=False, popen_textmode=None):
     """Asynchronously invoke ffmpeg for the supplied node graph.
 
     Args:
@@ -259,13 +259,13 @@ def run_async(
     stdout_stream = subprocess.PIPE if pipe_stdout or quiet else None
     stderr_stream = subprocess.PIPE if pipe_stderr or quiet else None
     return subprocess.Popen(
-        args, stdin=stdin_stream, stdout=stdout_stream, stderr=stderr_stream)
+        args, stdin=stdin_stream, stdout=stdout_stream, stderr=stderr_stream, text=popen_textmode)
 
 
 @output_operator()
 def run(
         stream_spec, cmd='ffmpeg', capture_stdout=False, capture_stderr=False, input=None,
-        quiet=False, overwrite_output=False):
+        quiet=False, overwrite_output=False, popen_textmode=None):
     """Invoke ffmpeg for the supplied node graph.
 
     Args:
@@ -288,6 +288,7 @@ def run(
         pipe_stderr=capture_stderr,
         quiet=quiet,
         overwrite_output=overwrite_output,
+		popen_textmode=popen_textmode,
     )
     out, err = process.communicate(input)
     retcode = process.poll()
