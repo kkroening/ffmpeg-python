@@ -32,8 +32,10 @@ import ffmpeg
 )
 ```
 
+## [API reference](https://kkroening.github.io/ffmpeg-python/)
+
 ## Complex filter graphs
-FFmpeg is extremely powerful, but its command-line interface gets really complicated really quickly - especially when working with signal graphs and doing anything more than trivial.
+FFmpeg is extremely powerful, but its command-line interface gets really complicated rather quickly - especially when working with signal graphs and doing anything more than trivial.
 
 Take for example a signal graph that looks like this:
 
@@ -49,7 +51,7 @@ ffmpeg -i input.mp4 -i overlay.png -filter_complex "[0]trim=start_frame=10:end_f
 
 Maybe this looks great to you, but if you're not an FFmpeg command-line expert, it probably looks alien.
 
-If you're like me and find Python to be powerful and readable, it's easy with `ffmpeg-python`:
+If you're like me and find Python to be powerful and readable, it's easier with `ffmpeg-python`:
 ```python
 import ffmpeg
 
@@ -68,28 +70,24 @@ overlay_file = ffmpeg.input('overlay.png')
 )
 ```
 
-`ffmpeg-python` takes care of running `ffmpeg` with the command-line arguments that correspond to the above filter diagram, and it's easy to see what's going on and make changes as needed.
+`ffmpeg-python` takes care of running `ffmpeg` with the command-line arguments that correspond to the above filter diagram, in familiar Python terms.
 
 <img src="https://raw.githubusercontent.com/kkroening/ffmpeg-python/master/doc/screenshot.png" alt="Screenshot" align="middle" width="60%" />
 
-Real-world signal graphs can get a heck of a lot more complex, but `ffmpeg-python` handles them with ease.
-
+Real-world signal graphs can get a heck of a lot more complex, but `ffmpeg-python` handles arbitrarily large (directed-acyclic) signal graphs.
 
 ## Installation
 
-The latest version of `ffmpeg-python` can be acquired via pip:
+The latest version of `ffmpeg-python` can be acquired via a typical pip install:
 
 ```
 pip install ffmpeg-python
 ```
 
-It's also possible to clone the source and put it on your python path (`$PYTHONPATH`, `sys.path`, etc.):
-
+Or the source can be cloned and installed from locally:
 ```bash
-$ git clone git@github.com:kkroening/ffmpeg-python.git
-$ export PYTHONPATH=${PYTHONPATH}:ffmpeg-python
-$ python
->>> import ffmpeg
+git clone git@github.com:kkroening/ffmpeg-python.git
+pip install -e ./ffmpeg-python
 ```
 
 ## [Examples](https://github.com/kkroening/ffmpeg-python/tree/master/examples)
@@ -111,20 +109,9 @@ Here are a few:
 
 See the [Examples README](https://github.com/kkroening/ffmpeg-python/tree/master/examples) for additional examples.
 
-## [API Reference](https://kkroening.github.io/ffmpeg-python/)
-
-API documentation is automatically generated from python docstrings and hosted on github pages: https://kkroening.github.io/ffmpeg-python/
-
-Alternatively, standard python help is available, such as at the python REPL prompt as follows:
-
-```python
->>> import ffmpeg
->>> help(ffmpeg)
-```
-
 ## Custom Filters
 
-Don't see the filter you're looking for?  `ffmpeg-python` includes shorthand notation for some of the most commonly used filters (such as `concat`), but it's easy to use any arbitrary ffmpeg filter:
+Don't see the filter you're looking for?  While `ffmpeg-python` includes shorthand notation for some of the most commonly used filters (such as `concat`), all filters can be referenced via the `.filter` operator:
 ```python
 stream = ffmpeg.input('dummy.mp4')
 stream = ffmpeg.filter(stream, 'fps', fps=25, round='up')
@@ -143,27 +130,111 @@ Or fluently:
 )
 ```
 
-Arguments with special names such as `-qscale:v` can be specified as a keyword-args dictionary as follows:
+**Special option names:**
+
+Arguments with special names such as `-qscale:v` (variable bitrate), `-b:v` (constant bitrate), etc. can be specified as a keyword-args dictionary as follows:
 ```python
 (
     ffmpeg
-    .input('dummy.mp4')
-    .output('dummy2.mp4', **{'qscale:v': 3})
+    .input('in.mp4')
+    .output('out.mp4', **{'qscale:v': 3})
     .run()
 )
 ```
 
+**Multiple inputs:**
+
+Filters that take multiple input streams can be used by passing the input streams as an array to `ffmpeg.filter`:
+```python
+main = ffmpeg.input('main.mp4')
+logo = ffmpeg.input('logo.png')
+(
+    ffmpeg
+    .filter([main, logo], 'overlay', 10, 10)
+    .output('out.mp4')
+    .run()
+)
+```
+
+**Multiple outputs:**
+
+Filters that produce multiple outputs can be used with `.filter_multi_output`:
+```python
+split = (
+    ffmpeg
+    .input('in.mp4')
+    .filter_multi_output('split')  # or `.split()`
+)
+(
+    ffmpeg
+    .concat(split[0], split[1].reverse())
+    .output('out.mp4')
+    .run()
+)
+```
+(In this particular case, `.split()` is the equivalent shorthand, but the general approach works for other multi-output filters)
+
+**String expressions:**
+
+Expressions to be interpreted by ffmpeg can be included as string parameters and reference any special ffmpeg variable names:
+```python
+(
+    ffmpeg
+    .input('in.mp4')
+    .filter('crop', 'in_w-2*10', 'in_h-2*20')
+    .input('out.mp4')
+)
+```
+
+<br />
+
 When in doubt, refer to the [existing filters](https://github.com/kkroening/ffmpeg-python/blob/master/ffmpeg/_filters.py), [examples](https://github.com/kkroening/ffmpeg-python/tree/master/examples), and/or the [official ffmpeg documentation](https://ffmpeg.org/ffmpeg-filters.html).
+
+## Frequently asked questions
+
+**Why do I get an import/attribute/etc. error from `import ffmpeg`?**
+
+Make sure you ran `pip install ffmpeg-python` and not `pip install ffmpeg` or `pip install python-ffmpeg`.
+
+**Why did my audio stream get dropped?**
+
+Some ffmpeg filters drop audio streams, and care must be taken to preserve the audio in the final output.  The ``.audio`` and ``.video`` operators can be used to reference the audio/video portions of a stream so that they can be processed separately and then re-combined later in the pipeline.
+
+This dilemma is intrinsic to ffmpeg, and ffmpeg-python tries to stay out of the way while users may refer to the official ffmpeg documentation as to why certain filters drop audio.
+
+As usual, take a look at the [examples](https://github.com/kkroening/ffmpeg-python/tree/master/examples#audiovideo-pipeline) (*Audio/video pipeline* in particular).
+
+**How do I do XYZ?**
+
+Take a look at each of the links in the [Additional Resources](https://kkroening.github.io/ffmpeg-python/) section at the end of this README.  If you look everywhere and can't find what you're looking for and have a question that may be relevant to other users, you may open an issue asking how to do it, while providing a thorough explanation of what you're trying to do and what you've tried so far.
+
+Issues not directly related to `ffmpeg-python` or issues asking others to write your code for you or how to do the work of solving a complex signal processing problem for you that's not relevant to other users will be closed.
+
+That said, we hope to continue improving our documentation and provide a community of support for people using `ffmpeg-python` to do cool and exciting things.
 
 ## Contributing
 
 <img align="right" src="https://raw.githubusercontent.com/kkroening/ffmpeg-python/master/doc/logo.png" alt="ffmpeg-python logo" width="20%" />
 
-Feel free to report any bugs or submit feature requests.
+One of the best things you can do to help make `ffmpeg-python` better is to answer [open questions](https://github.com/kkroening/ffmpeg-python/labels/question) in the issue tracker.  The questions that are answered will be tagged and incorporated into the documentation, examples, and other learning resources.
 
-It's generally straightforward to use filters that aren't explicitly built into `ffmpeg-python` but if there's a feature you'd like to see included in the library, head over to the [issue tracker](https://github.com/kkroening/ffmpeg-python/issues).
+If you notice things that could be better in the documentation or overall development experience, please say so in the [issue tracker](https://github.com/kkroening/ffmpeg-python/issues).  And of course, feel free to report any bugs or submit feature requests.
 
-Pull requests are welcome as well.
+Pull requests are welcome as well, but it wouldn't hurt to touch base in the issue tracker or hop on the [Matrix chat channel](https://riot.im/app/#/room/#ffmpeg-python:matrix.org) first.
+
+Anyone who fixes any of the [open bugs](https://github.com/kkroening/ffmpeg-python/labels/bug) or implements [requested enhancements](https://github.com/kkroening/ffmpeg-python/labels/enhancement) is a hero, but changes should include passing tests.
+
+### Running tests
+
+```bash
+git clone git@github.com:kkroening/ffmpeg-python.git
+cd ffmpeg-python
+virtualenv venv
+. venv/bin/activate  # (OS X / Linux)
+venv\bin\activate    # (Windows)
+pip install -e .[dev]
+pytest
+```
 
 <br />
 
@@ -177,9 +248,11 @@ Pull requests are welcome as well.
 ## Additional Resources
 
 - [API Reference](https://kkroening.github.io/ffmpeg-python/)
+- [Examples](https://github.com/kkroening/ffmpeg-python/tree/master/examples)
 - [Filters](https://github.com/kkroening/ffmpeg-python/blob/master/ffmpeg/_filters.py)
-- [Tests](https://github.com/kkroening/ffmpeg-python/blob/master/ffmpeg/tests/test_ffmpeg.py)
 - [FFmpeg Homepage](https://ffmpeg.org/)
 - [FFmpeg Documentation](https://ffmpeg.org/ffmpeg.html)
 - [FFmpeg Filters Documentation](https://ffmpeg.org/ffmpeg-filters.html)
+- [Test cases](https://github.com/kkroening/ffmpeg-python/blob/master/ffmpeg/tests/test_ffmpeg.py)
+- [Issue tracker](https://github.com/kkroening/ffmpeg-python/issues)
 - Matrix Chat: [#ffmpeg-python:matrix.org](https://riot.im/app/#/room/#ffmpeg-python:matrix.org)
