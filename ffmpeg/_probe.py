@@ -24,6 +24,4 @@ def probe(filename, cmd='ffprobe', **kwargs):
     return json.loads(out.decode('utf-8'))
 
 
-__all__ = [
-    'probe',
-]
+__all__ = ['probe']

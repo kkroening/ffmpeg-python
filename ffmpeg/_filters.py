@@ -21,7 +21,9 @@ def filter_multi_output(stream_spec, filter_name, *args, **kwargs):
         ffmpeg.concat(split0, split1).output('out.mp4').run()
         ```
     """
-    return FilterNode(stream_spec, filter_name, args=args, kwargs=kwargs, max_inputs=None)
+    return FilterNode(
+        stream_spec, filter_name, args=args, kwargs=kwargs, max_inputs=None
+    )
 
 
 @filter_operator()
@@ -144,7 +146,12 @@ def overlay(main_parent_node, overlay_parent_node, eof_action='repeat', **kwargs
     Official documentation: `overlay <https://ffmpeg.org/ffmpeg-filters.html#overlay-1>`__
     """
     kwargs['eof_action'] = eof_action
-    return FilterNode([main_parent_node, overlay_parent_node], overlay.__name__, kwargs=kwargs, max_inputs=2).stream()
+    return FilterNode(
+        [main_parent_node, overlay_parent_node],
+        overlay.__name__,
+        kwargs=kwargs,
+        max_inputs=2,
+    ).stream()
 
 
 @filter_operator()
@@ -180,10 +187,7 @@ def crop(stream, x, y, width, height, **kwargs):
     Official documentation: `crop <https://ffmpeg.org/ffmpeg-filters.html#crop>`__
     """
     return FilterNode(
-        stream,
-        crop.__name__,
-        args=[width, height, x, y],
-        kwargs=kwargs
+        stream, crop.__name__, args=[width, height, x, y], kwargs=kwargs
     ).stream()
 
 
@@ -209,7 +213,9 @@ def drawbox(stream, x, y, width, height, color, thickness=None, **kwargs):
     """
     if thickness:
         kwargs['t'] = thickness
-    return FilterNode(stream, drawbox.__name__, args=[x, y, width, height, color], kwargs=kwargs).stream()
+    return FilterNode(
+        stream, drawbox.__name__, args=[x, y, width, height, color], kwargs=kwargs
+    ).stream()
 
 
 @filter_operator()
@@ -385,8 +391,10 @@ def concat(*streams, **kwargs):
     stream_count = video_stream_count + audio_stream_count
     if len(streams) % stream_count != 0:
         raise ValueError(
-            'Expected concat input streams to have length multiple of {} (v={}, a={}); got {}'
-                .format(stream_count, video_stream_count, audio_stream_count, len(streams)))
+            'Expected concat input streams to have length multiple of {} (v={}, a={}); got {}'.format(
+                stream_count, video_stream_count, audio_stream_count, len(streams)
+            )
+        )
     kwargs['n'] = int(len(streams) / stream_count)
     return FilterNode(streams, concat.__name__, kwargs=kwargs, max_inputs=None).stream()
 

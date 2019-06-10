@@ -94,9 +94,4 @@ def output(*streams_and_filename, **kwargs):
     return OutputNode(streams, output.__name__, kwargs=kwargs).stream()
 
 
-__all__ = [
-    'input',
-    'merge_outputs',
-    'output',
-    'overwrite_output',
-]
+__all__ = ['input', 'merge_outputs', 'output', 'overwrite_output']
