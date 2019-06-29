@@ -240,6 +240,8 @@ pytest
 
 ### Special thanks
 
+- [Fabrice Bellard](https://bellard.org/)
+- [The FFmpeg team](https://ffmpeg.org/donations.html)
 - [Arne de Laat](https://github.com/153957)
 - [Davide Depau](https://github.com/depau)
 - [Dim](https://github.com/lloti)
