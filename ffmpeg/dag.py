@@ -100,7 +100,7 @@ def get_incoming_edges(downstream_node, incoming_edge_map):
 
 def get_outgoing_edges(upstream_node, outgoing_edge_map):
     edges = []
-    for upstream_label, downstream_infos in list(outgoing_edge_map.items()):
+    for upstream_label, downstream_infos in sorted(outgoing_edge_map.items()):
         for downstream_info in downstream_infos:
             downstream_node, downstream_label, downstream_selector = downstream_info
             edges += [

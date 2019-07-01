@@ -84,7 +84,7 @@ def _allocate_filter_stream_names(filter_nodes, outgoing_edge_maps, stream_name_
     stream_count = 0
     for upstream_node in filter_nodes:
         outgoing_edge_map = outgoing_edge_maps[upstream_node]
-        for upstream_label, downstreams in list(outgoing_edge_map.items()):
+        for upstream_label, downstreams in sorted(outgoing_edge_map.items()):
             if len(downstreams) > 1:
                 # TODO: automatically insert `splits` ahead of time via graph transformation.
                 raise ValueError(
