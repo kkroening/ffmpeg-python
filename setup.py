@@ -1,7 +1,7 @@
 from setuptools import setup
 from textwrap import dedent
 
-version = '0.1.18'
+version = '0.2.0'
 download_url = 'https://github.com/kkroening/ffmpeg-python/archive/v{}.zip'.format(
     version
 )
