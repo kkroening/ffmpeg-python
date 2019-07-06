@@ -32,8 +32,11 @@ def with_metaclass(meta, *bases):
 
 
 if sys.version_info.major >= 3:
+
     class basestring(with_metaclass(BaseBaseString)):
         pass
+
+
 else:
     basestring = basestring
 
