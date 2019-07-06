@@ -1,5 +1,7 @@
 from setuptools import setup
 from textwrap import dedent
+import sys
+
 
 version = '0.2.0'
 download_url = 'https://github.com/kkroening/ffmpeg-python/archive/v{}.zip'.format(
@@ -57,6 +59,19 @@ misc_keywords = [
 
 keywords = misc_keywords + file_formats
 
+
+dev_requires = [
+    'future>=0.17.1',
+    'numpy>=1.16.4',
+    'pytest-mock>=1.10.4',
+    'pytest>=4.6.1',
+    'tox>=3.12.1',
+]
+
+if sys.version_info[0] >= 3:
+    dev_requires += ['Sphinx>=2.1.0']
+
+
 setup(
     name='ffmpeg-python',
     packages=['ffmpeg'],
@@ -70,17 +85,8 @@ setup(
     download_url=download_url,
     keywords=keywords,
     long_description=long_description,
-    install_requires=['future'],
-    extras_require={
-        'dev': [
-            'future==0.17.1',
-            'numpy==1.16.4',
-            'pytest-mock==1.10.4',
-            'pytest==4.6.1',
-            'Sphinx==2.1.0',
-            'tox==3.12.1',
-        ]
-    },
+    install_requires=[],
+    extras_require={'dev': dev_requires},
     classifiers=[
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
