@@ -1,7 +1,4 @@
 from __future__ import unicode_literals
-from builtins import bytes
-from builtins import range
-from builtins import str
 import ffmpeg
 import os
 import pytest
@@ -689,9 +686,7 @@ def test_pipe():
         cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE
     )
 
-    in_data = bytes(
-        bytearray([random.randint(0, 255) for _ in range(frame_size * frame_count)])
-    )
+    in_data = bytearray([random.randint(0, 255) for _ in range(frame_size * frame_count)])
     p.stdin.write(in_data)  # note: this could block, in which case need to use threads
     p.stdin.close()
 
