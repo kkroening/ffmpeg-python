@@ -716,3 +716,51 @@ def test__probe__exception():
 def test__probe__extra_args():
     data = ffmpeg.probe(TEST_INPUT_FILE1, show_frames=None)
     assert set(data.keys()) == {'format', 'streams', 'frames'}
+
+def get_filter_complex_input(flt, name):
+    m = re.search(r'\[([^]]+)\]{}(?=[[;]|$)'.format(name), flt)
+    if m:
+        return m.group(1)
+    else:
+        return None
+
+def get_filter_complex_outputs(flt, name):
+    m = re.search(r'(^|[];]){}((\[[^]]+\])+)(?=;|$)'.format(name), flt)
+    if m:
+        return m.group(2)[1:-1].split('][')
+    else:
+        return None
+
+def test__get_filter_complex_input():
+    assert get_filter_complex_input("", "scale") is None
+    assert get_filter_complex_input("scale", "scale") is None
+    assert get_filter_complex_input("scale[s3][s4];etc", "scale") is None
+    assert get_filter_complex_input("[s2]scale", "scale") == "s2"
+    assert get_filter_complex_input("[s2]scale;etc", "scale") == "s2"
+    assert get_filter_complex_input("[s2]scale[s3][s4];etc", "scale") == "s2"
+
+def test__get_filter_complex_outputs():
+    assert get_filter_complex_outputs("", "scale") is None
+    assert get_filter_complex_outputs("scale", "scale") is None
+    assert get_filter_complex_outputs("scalex[s0][s1]", "scale") is None
+    assert get_filter_complex_outputs("scale[s0][s1]", "scale") == ['s0', 's1']
+    assert get_filter_complex_outputs("[s5]scale[s0][s1]", "scale") == ['s0', 's1']
+    assert get_filter_complex_outputs("[s5]scale[s1][s0]", "scale") == ['s1', 's0']
+    assert get_filter_complex_outputs("[s5]scale[s1]", "scale") == ['s1']
+    assert get_filter_complex_outputs("[s5]scale[s1];x", "scale") == ['s1']
+    assert get_filter_complex_outputs("y;[s5]scale[s1];x", "scale") == ['s1']
+
+def test__multi_output_edge_label_order():
+    scale2ref = ffmpeg.filter_multi_output([ffmpeg.input('x'), ffmpeg.input('y')], 'scale2ref')
+    out = (
+        ffmpeg.merge_outputs(
+            scale2ref[1].filter('scale').output('a'),
+            scale2ref[10000].filter('hflip').output('b')
+        )
+    )
+
+    args = out.get_args()
+    flt_cmpl = args[args.index('-filter_complex')+1]
+    out1, out2 = get_filter_complex_outputs(flt_cmpl, 'scale2ref')
+    assert out1 == get_filter_complex_input(flt_cmpl, 'scale')
+    assert out2 == get_filter_complex_input(flt_cmpl, 'hflip')
