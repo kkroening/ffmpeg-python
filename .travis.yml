@@ -1,4 +1,5 @@
 language: python
+dist: xenial
 before_install:
   - >
     [ -f ffmpeg-release/ffmpeg ] || (
