@@ -235,7 +235,7 @@ class Node(KwargReprNode):
 class FilterableStream(Stream):
     def __init__(self, upstream_node, upstream_label, upstream_selector=None):
         super(FilterableStream, self).__init__(
-            upstream_node, upstream_label, {InputNode, FilterNode}, upstream_selector
+            upstream_node, upstream_label, {HeaderNode, InputNode, FilterNode}, upstream_selector
         )
 
 
@@ -243,11 +243,11 @@ class FilterableStream(Stream):
 class InputNode(Node):
     """InputNode type"""
 
-    def __init__(self, name, args=[], kwargs={}):
+    def __init__(self, name, stream: Stream = None, args=[], kwargs={}):
         super(InputNode, self).__init__(
-            stream_spec=None,
+            stream_spec=stream,
             name=name,
-            incoming_stream_types={},
+            incoming_stream_types={FilterableStream},
             outgoing_stream_type=FilterableStream,
             min_inputs=0,
             max_inputs=0,
@@ -343,6 +343,23 @@ class MergeOutputsNode(Node):
 
 
 # noinspection PyMethodOverriding
+class HeaderNode (Node):
+
+    def __init__(self, name: str = None, args=[], kwargs={}):
+        super(HeaderNode, self).__init__(
+            stream_spec=None,
+            name=name,
+            incoming_stream_types={},
+            outgoing_stream_type=FilterableStream,
+            min_inputs=0,
+            max_inputs=0,
+            args=args,
+            kwargs=kwargs,
+        )
+
+# noinspection PyMethodOverriding
+
+
 class GlobalNode(Node):
     def __init__(self, stream, name, args=[], kwargs={}):
         super(GlobalNode, self).__init__(

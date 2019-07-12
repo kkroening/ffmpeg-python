@@ -6,6 +6,7 @@ from ._utils import basestring
 from .nodes import (
     filter_operator,
     GlobalNode,
+    HeaderNode,
     InputNode,
     MergeOutputsNode,
     OutputNode,
@@ -13,7 +14,7 @@ from .nodes import (
 )
 
 
-def input(filename, **kwargs):
+def input(filename, *stream, **kwargs):
     """Input file URL (ffmpeg ``-i`` option)
 
     Any supplied kwargs are passed to ffmpeg verbatim (e.g. ``t=20``,
@@ -29,7 +30,13 @@ def input(filename, **kwargs):
         if 'format' in kwargs:
             raise ValueError("Can't specify both `format` and `f` kwargs")
         kwargs['format'] = fmt
-    return InputNode(input.__name__, kwargs=kwargs).stream()
+    return InputNode(input.__name__, stream=stream, kwargs=kwargs).stream()
+
+
+def header(**kwargs):
+    """Add extra header command-line argument(s), e.g. ``-re``.
+    """
+    return HeaderNode(header.__name__, kwargs=kwargs).stream()
 
 
 @output_operator()
@@ -94,4 +101,4 @@ def output(*streams_and_filename, **kwargs):
     return OutputNode(streams, output.__name__, kwargs=kwargs).stream()
 
 
-__all__ = ['input', 'merge_outputs', 'output', 'overwrite_output']
+__all__ = ['header', 'input', 'merge_outputs', 'output', 'overwrite_output']

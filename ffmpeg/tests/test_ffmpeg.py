@@ -135,6 +135,20 @@ def test_global_args():
     ]
 
 
+def test_header_args():
+    out_file = (
+        ffmpeg.header(thread_queue_size='512')
+        .input("input.mp4")
+        .output("output.mp4")
+    )
+    assert out_file.get_args() == [
+        '-thread_queue_size=512',
+        '-i',
+        'input.mp4',
+        'output.mp4',
+    ]
+
+
 def _get_simple_example():
     return ffmpeg.input(TEST_INPUT_FILE1).output(TEST_OUTPUT_FILE1)
 
@@ -697,7 +711,7 @@ def test_pipe():
 
     out_data = p.stdout.read()
     assert len(out_data) == frame_size * (frame_count - start_frame)
-    assert out_data == in_data[start_frame * frame_size :]
+    assert out_data == in_data[start_frame * frame_size:]
 
 
 def test__probe():
