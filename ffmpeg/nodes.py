@@ -198,6 +198,7 @@ class Node(KwargReprNode):
         kwargs={},
     ):
         stream_map = get_stream_map(stream_spec)
+        print('{}'.format(stream_map))
         self.__check_input_len(stream_map, min_inputs, max_inputs)
         self.__check_input_types(stream_map, incoming_stream_types)
         incoming_edge_map = self.__get_incoming_edge_map(stream_map)
@@ -250,7 +251,7 @@ class InputNode(Node):
             incoming_stream_types={FilterableStream},
             outgoing_stream_type=FilterableStream,
             min_inputs=0,
-            max_inputs=0,
+            max_inputs=None,
             args=args,
             kwargs=kwargs,
         )
@@ -342,7 +343,6 @@ class MergeOutputsNode(Node):
         )
 
 
-# noinspection PyMethodOverriding
 class HeaderNode (Node):
 
     def __init__(self, name: str = None, args=[], kwargs={}):

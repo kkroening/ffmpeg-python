@@ -107,6 +107,17 @@ def _get_filter_arg(filter_nodes, outgoing_edge_maps, stream_name_map):
     return ';'.join(filter_specs)
 
 
+def _get_header_args(node):
+    kwargs = copy.copy(node.kwargs)
+    args = []
+    print(node.args)
+    print(node.kwargs)
+    for arg in node.args:
+        args += arg
+    args += convert_kwargs_to_cmd_line_args(kwargs)
+    return args
+
+
 def _get_global_args(node):
     return list(node.args)
 
@@ -155,13 +166,15 @@ def get_args(stream_spec, overwrite_output=False):
     # TODO: group nodes together, e.g. `-i somefile -r somerate`.
     sorted_nodes, outgoing_edge_maps = topo_sort(nodes)
     header_nodes = [node for node in sorted_nodes if isinstance(node, HeaderNode)]
+
+    print('{}'.format(repr(header_nodes)))
     input_nodes = [node for node in sorted_nodes if isinstance(node, InputNode)]
     output_nodes = [node for node in sorted_nodes if isinstance(node, OutputNode)]
     global_nodes = [node for node in sorted_nodes if isinstance(node, GlobalNode)]
     filter_nodes = [node for node in sorted_nodes if isinstance(node, FilterNode)]
     stream_name_map = {(node, None): str(i) for i, node in enumerate(input_nodes)}
     filter_arg = _get_filter_arg(filter_nodes, outgoing_edge_maps, stream_name_map)
-    args += reduce(operator.add, [_get_global_args(node) for node in header_nodes], [])
+    args += reduce(operator.add, [_get_header_args(node) for node in header_nodes], [])
     args += reduce(operator.add, [_get_input_args(node) for node in input_nodes])
     if filter_arg:
         args += ['-filter_complex', filter_arg]

@@ -14,7 +14,8 @@ from .nodes import (
 )
 
 
-def input(filename, *stream, **kwargs):
+@filter_operator()
+def input(*streams_and_filename, **kwargs):
     """Input file URL (ffmpeg ``-i`` option)
 
     Any supplied kwargs are passed to ffmpeg verbatim (e.g. ``t=20``,
@@ -24,19 +25,27 @@ def input(filename, *stream, **kwargs):
 
     Official documentation: `Main options <https://ffmpeg.org/ffmpeg.html#Main-options>`__
     """
-    kwargs['filename'] = filename
+    streams_and_filename = list(streams_and_filename)
+    if 'filename' not in kwargs:
+        if not isinstance(streams_and_filename[-1], basestring):
+            raise ValueError('A filename must be provided')
+        kwargs['filename'] = streams_and_filename.pop(-1)
+    streams = streams_and_filename
+
     fmt = kwargs.pop('f', None)
     if fmt:
         if 'format' in kwargs:
             raise ValueError("Can't specify both `format` and `f` kwargs")
         kwargs['format'] = fmt
-    return InputNode(input.__name__, stream=stream, kwargs=kwargs).stream()
+    return InputNode(name=input.__name__, stream=streams, kwargs=kwargs).stream()
 
 
-def header(**kwargs):
+def header(*args, **kwargs):
     """Add extra header command-line argument(s), e.g. ``-re``.
     """
-    return HeaderNode(header.__name__, kwargs=kwargs).stream()
+    stream = None
+    print("in header: {}, {}, {}".format(repr(stream), args, kwargs))
+    return HeaderNode(name=header.__name__, args=args, kwargs=kwargs).stream()
 
 
 @output_operator()
