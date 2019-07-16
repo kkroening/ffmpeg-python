@@ -44,7 +44,6 @@ def header(*args, **kwargs):
     """Add extra header command-line argument(s), e.g. ``-re``.
     """
     stream = None
-    print("in header: {}, {}, {}".format(repr(stream), args, kwargs))
     return HeaderNode(name=header.__name__, args=args, kwargs=kwargs).stream()
 
 

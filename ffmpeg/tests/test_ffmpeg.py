@@ -137,10 +137,6 @@ def test_global_args():
 
 def test_header_args():
 
-    # header = ffmpeg.header('-re', '-s', thread_queue_size=512)
-
-    # print('in test: {}'.format(repr(header)))
-
     out_file = (
         ffmpeg.header(thread_queue_size='512')
         .input("input.mp4")
