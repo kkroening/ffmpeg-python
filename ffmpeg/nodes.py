@@ -344,7 +344,7 @@ class MergeOutputsNode(Node):
 
 class HeaderNode (Node):
 
-    def __init__(self, name: str = None, args=[], kwargs={}):
+    def __init__(self, name, args=[], kwargs={}):
         super(HeaderNode, self).__init__(
             stream_spec=None,
             name=name,

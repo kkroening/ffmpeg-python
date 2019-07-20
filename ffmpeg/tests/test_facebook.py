@@ -16,7 +16,7 @@ except ImportError:
     from unittest import mock  # python 3
 
 
-def pip_to_rtmp(url: str):
+def pip_to_rtmp(url):
     """ Capture Facetime camera and screen in macOS and stream it to facebook
     """
     facetime_camera_input = (
