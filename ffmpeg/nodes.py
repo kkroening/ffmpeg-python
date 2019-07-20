@@ -243,7 +243,7 @@ class FilterableStream(Stream):
 class InputNode(Node):
     """InputNode type"""
 
-    def __init__(self, name, stream: Stream = None, args=[], kwargs={}):
+    def __init__(self, name, Stream=None, args=[], kwargs={}):
         super(InputNode, self).__init__(
             stream_spec=stream,
             name=name,
