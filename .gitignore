@@ -1,6 +1,7 @@
 .cache
 .eggs
 .tox/
+.vscode/
 dist/
 ffmpeg/tests/sample_data/out*.mp4
 ffmpeg_python.egg-info/
