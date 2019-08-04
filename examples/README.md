@@ -161,7 +161,7 @@ while True:
     out_frame = deep_dream.process_frame(in_frame)
 
     process2.stdin.write(
-        in_frame
+        out_frame
         .astype(np.uint8)
         .tobytes()
     )
