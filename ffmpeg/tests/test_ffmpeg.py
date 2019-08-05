@@ -718,6 +718,28 @@ def test__probe__extra_args():
     assert set(data.keys()) == {'format', 'streams', 'frames'}
 
 
+def test__build_data():
+    data = ffmpeg.get_build_data()
+    assert set(data.keys()) == {
+        'version', 'formats', 'demuxers', 'muxers', 'codecs', 'bsfs',
+        'protocols', 'filters', 'pix_fmts', 'sample_fmts', 'layouts',
+        'colors', 'devices', 'hw_devices', 'hwaccels'}
+
+    assert isinstance(data['version'], str)
+
+    for fields_key in {'formats', 'demuxers', 'muxers', 'codecs', 'filters'}:
+        assert isinstance(data[fields_key], dict)
+
+    list_keys = {'bsfs'}
+    for list_key in list_keys:
+        assert isinstance(data[list_key], list)
+
+    assert isinstance(data['protocols'], dict)
+    for protocol_key in {'input', 'output'}:
+        assert protocol_key in data['protocols']
+        assert isinstance(data['protocols'][protocol_key], list)
+
+
 def get_filter_complex_input(flt, name):
     m = re.search(r'\[([^]]+)\]{}(?=[[;]|$)'.format(name), flt)
     if m:
