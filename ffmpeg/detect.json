@@ -1,0 +1,71 @@
+{
+  "hwaccels": {
+    "api_avail": {
+      "Linux": {
+        "AMD": [
+          "opencl",
+          "omx",
+          "vaapi",
+          "vdpau"
+        ],
+        "NVIDIA": [
+          "cuvid",
+          "opencl",
+          "vaapi",
+          "vdpau"
+        ],
+        "Intel": [
+          "libmfx",
+          "opencl",
+          "vaapi"
+        ]
+      },
+      "Darwin": {
+        "iOS": [
+          "videotoolbox"
+        ],
+        "macOS": [
+          "opencl",
+          "videotoolbox"
+        ]
+      },
+      "Android": {
+        "NaN": [
+          "mediacodec",
+          "opencl",
+          "omx",
+          "v4l2m2m"
+        ]
+      },
+      "Other": {
+        "Raspberry Pi": [
+          "mmal",
+          "omx"
+        ]
+      },
+      "Windows": {
+        "AMD": [
+          "amf",
+          "d3d11va",
+          "dxva2",
+          "mediafoundation",
+          "opencl"
+        ],
+        "NVIDIA": [
+          "cuvid",
+          "d3d11va",
+          "dxva2",
+          "mediafoundation",
+          "opencl"
+        ],
+        "Intel": [
+          "d3d11va",
+          "dxva2",
+          "libmfx",
+          "mediafoundation",
+          "opencl"
+        ]
+      }
+    }
+  }
+}
