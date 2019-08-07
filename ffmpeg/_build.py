@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument(
-    '--ffmpeg', type=argparse.FileType('r'),
+    '--ffmpeg', default='ffmpeg',
     help='The path to the ffmpeg execuatble')
 
 
@@ -68,6 +68,7 @@ def _run(args):
         raise subprocess.CalledProcessError(
             process.returncode, process.args, output=stdout, stderr=stderr)
     return stdout.decode()
+
 
 def _get_line_fields(
         stdout, header_lines, line_re, flags={}, int_fields=set()):
@@ -256,21 +257,21 @@ def get_build_data(cmd='ffmpeg'):
     Extract details about the ffmpeg build.
     """
     return dict(
-        version=get_version(cmd='ffmpeg'),
-        formats=get_formats(cmd='ffmpeg'),
-        demuxers=get_demuxers(cmd='ffmpeg'),
-        muxers=get_muxers(cmd='ffmpeg'),
-        codecs=get_codecs(cmd='ffmpeg'),
-        bsfs=get_bsfs(cmd='ffmpeg'),
-        protocols=get_protocols(cmd='ffmpeg'),
-        filters=get_filters(cmd='ffmpeg'),
-        pix_fmts=get_pix_fmts(cmd='ffmpeg'),
-        sample_fmts=get_sample_fmts(cmd='ffmpeg'),
-        layouts=get_layouts(cmd='ffmpeg'),
-        colors=get_colors(cmd='ffmpeg'),
-        devices=get_devices(cmd='ffmpeg'),
-        hw_devices=get_hw_devices(cmd='ffmpeg'),
-        hwaccels=get_hwaccels(cmd='ffmpeg'))
+        version=get_version(cmd=cmd),
+        formats=get_formats(cmd=cmd),
+        demuxers=get_demuxers(cmd=cmd),
+        muxers=get_muxers(cmd=cmd),
+        codecs=get_codecs(cmd=cmd),
+        bsfs=get_bsfs(cmd=cmd),
+        protocols=get_protocols(cmd=cmd),
+        filters=get_filters(cmd=cmd),
+        pix_fmts=get_pix_fmts(cmd=cmd),
+        sample_fmts=get_sample_fmts(cmd=cmd),
+        layouts=get_layouts(cmd=cmd),
+        colors=get_colors(cmd=cmd),
+        devices=get_devices(cmd=cmd),
+        hw_devices=get_hw_devices(cmd=cmd),
+        hwaccels=get_hwaccels(cmd=cmd))
 
 __all__ = [
     'get_build_data',
