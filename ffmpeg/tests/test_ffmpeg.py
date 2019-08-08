@@ -740,6 +740,13 @@ def test__build_data():
         assert isinstance(data['protocols'][protocol_key], list)
 
 
+def test__detect():
+    for hwaccels in [
+            ffmpeg.detect_hwaccels(),
+            ffmpeg.detect_hwaccels(['foohwaccel'])]:
+        assert isinstance(hwaccels, list)
+
+
 def get_filter_complex_input(flt, name):
     m = re.search(r'\[([^]]+)\]{}(?=[[;]|$)'.format(name), flt)
     if m:
