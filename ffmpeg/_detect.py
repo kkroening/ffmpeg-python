@@ -43,6 +43,10 @@ HWACCELS_BY_PERFORMANCE = [
     'qsv', 'd3d11va', 'dxva2', 'vaapi', 'drm']
 # Loaded from JSON
 DATA = None
+# Some accelerated codecs use a different prefix than the base codec
+CODEC_SYNONYMS = {
+    'mpeg1video': 'mpeg1',
+    'mpeg2video': 'mpeg2'}
 
 
 def detect_gpu():
@@ -88,9 +92,65 @@ def detect_hwaccels(hwaccels=None, cmd='ffmpeg'):
     return hwaccels
 
 
+def detect_coder(
+        codec, coder, hwaccels=None, avail_codecs=None, cmd='ffmpeg'):
+    """
+    Determine the optimal decoder/encoder given the hwaccels.
+    """
+    if hwaccels is None:
+        hwaccels = detect_hwaccels(cmd=cmd)
+    if avail_codecs is None:
+        avail_codecs = ffmpeg.get_codecs(cmd=cmd)[codec][coder]
+
+    # Some accelerated codecs use a different prefix than the base codec
+    base_codec = CODEC_SYNONYMS.get(codec, codec)
+
+    # Gather all available accelerated coders for this codec
+    codecs = []
+    for hwaccel in hwaccels:
+        hwaccel_codec = '{0}_{1}'.format(base_codec, hwaccel)
+        if hwaccel_codec in avail_codecs:
+            codecs.append(hwaccel_codec)
+
+    codecs.append(codec)
+    return codecs
+
+
+def detect_codecs(
+        decoder, encoder, hwaccels=None, avail_codecs=None, cmd='ffmpeg'):
+    """
+    Detect the optimal de/encoder for the codec based on the optimal hwaccel.
+    """
+    hwaccels = detect_hwaccels(hwaccels, cmd=cmd)
+
+    build_codecs = ffmpeg.get_codecs(cmd=cmd)
+    build_decoders = build_codecs[decoder]['decoders']
+    build_encoders = build_codecs[encoder]['encoders']
+    if avail_codecs is None:
+        # Consider all the available hwaccels
+        avail_codecs = dict(decoders=build_decoders, encoders=build_encoders)
+    else:
+        # Support passing in restricted sets of decoders and encoders
+        avail_codecs['decoders'] = [
+            codec for codec in avail_codecs['decoders']
+            if codec in build_decoders]
+        avail_codecs['encoders'] = [
+            codec for codec in avail_codecs['encoders']
+            if codec in build_encoders]
+
+    return dict(
+        hwaccels=hwaccels,
+        decoders=detect_coder(
+            decoder, 'decoders', hwaccels, avail_codecs['decoders']),
+        encoders=detect_coder(
+            encoder, 'encoders', hwaccels, avail_codecs['encoders']))
+
+
 __all__ = [
     'detect_gpu',
     'detect_hwaccels',
+    'detect_coder',
+    'detect_codecs',
 ]
 
 
@@ -113,7 +173,8 @@ def main(args=None):
     args = parser.parse_args(args)
     data = dict(
         gpu=detect_gpu(),
-        hwaccels=detect_hwaccels(args.ffmpeg))
+        hwaccels=detect_hwaccels(cmd=args.ffmpeg),
+        codecs=detect_codecs(cmd=args.ffmpeg))
     json.dump(data, sys.stdout, indent=2)
 
 

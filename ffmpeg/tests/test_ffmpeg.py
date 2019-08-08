@@ -746,6 +746,18 @@ def test__detect():
             ffmpeg.detect_hwaccels(['foohwaccel'])]:
         assert isinstance(hwaccels, list)
 
+    for codecs in [
+            ffmpeg.detect_codecs('h264', 'h264'),
+            ffmpeg.detect_codecs(
+                'h264', 'h264', ['foohwaccel'], dict(
+                    decoders=['bardecoder'], encoders=['quxencoder']))]:
+        assert 'hwaccels' in codecs
+        assert isinstance(codecs['hwaccels'], list)
+        assert 'decoders' in codecs
+        assert isinstance(codecs['decoders'], list)
+        assert 'encoders' in codecs
+        assert isinstance(codecs['encoders'], list)
+
 
 def get_filter_complex_input(flt, name):
     m = re.search(r'\[([^]]+)\]{}(?=[[;]|$)'.format(name), flt)
