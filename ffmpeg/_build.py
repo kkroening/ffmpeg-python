@@ -40,6 +40,8 @@ CODEC_DESCRIPTION_RE = re.compile(
 CODEC_CODERS_RE = re.compile(
     r' \((?P<type>(de|en)coders): (?P<coders>[^)]+) \)')
 
+HWACCEL_SYNONYMS = dict(cuvid=['nvenc', 'nvdec', 'cuda'])
+
 FILTER_RE = re.compile(
     r'^ (?P<timeline>[T.])(?P<slice>[S.])(?P<command>[C.]) '
     r'(?P<name>[^ ]+) +(?P<io>[^ ]+) +(?P<description>.+)$',
@@ -248,22 +250,53 @@ def get_hw_devices(cmd='ffmpeg'):
 
 def get_hwaccels(cmd='ffmpeg'):
     """
-    Extract the hwaccels of the ffmpeg build.
+    Extract the hwaccels of the ffmpeg build, including specific codecs.
+
+    Return all the hardware acceleration APIs supported by this build
+    including all the codecs that are specific to the API.
     """
+    data = dict(codecs=get_codecs(cmd=cmd), hwaccels=[])
+
     stdout = _run([cmd, '-hwaccels'])
-    return stdout.split('\n')[1:-2]
+    hwaccel_names = stdout.split('\n')[1:-2]
+
+    for hwaccel_name in hwaccel_names:
+        hwaccel = dict(name=hwaccel_name)
+        data['hwaccels'].append(hwaccel)
+        hwaccel['codecs'] = hwaccel_codecs = {}
+        for codec_name, codec in data['codecs'].items():
+            hwaccel_codec = {}
+            for coders_key in ('decoders', 'encoders'):
+                matching_coders = []
+                for coder in codec.get(coders_key, []):
+                    for synonym in (
+                            [hwaccel_name] +
+                            HWACCEL_SYNONYMS.get(hwaccel_name, [])):
+                        if (
+                                coder == synonym or
+                                '_' + synonym in coder or
+                                synonym + '_' in coder):
+                            matching_coders.append(coder)
+                            break
+                if matching_coders:
+                    hwaccel_codec[coders_key] = matching_coders
+            if hwaccel_codec:
+                hwaccel_codecs[codec_name] = hwaccel_codec
+
+    return data
 
 
 def get_build_data(cmd='ffmpeg'):
     """
     Extract details about the ffmpeg build.
     """
+    hwaccels_data = get_hwaccels(cmd=cmd)
     return dict(
         version=get_version(cmd=cmd),
         formats=get_formats(cmd=cmd),
         demuxers=get_demuxers(cmd=cmd),
         muxers=get_muxers(cmd=cmd),
-        codecs=get_codecs(cmd=cmd),
+        codecs=hwaccels_data['codecs'],
         bsfs=get_bsfs(cmd=cmd),
         protocols=get_protocols(cmd=cmd),
         filters=get_filters(cmd=cmd),
@@ -273,7 +306,7 @@ def get_build_data(cmd='ffmpeg'):
         colors=get_colors(cmd=cmd),
         devices=get_devices(cmd=cmd),
         hw_devices=get_hw_devices(cmd=cmd),
-        hwaccels=get_hwaccels(cmd=cmd))
+        hwaccels=hwaccels_data['hwaccels'])
 
 __all__ = [
     'get_build_data',

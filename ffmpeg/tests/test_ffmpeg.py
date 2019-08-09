@@ -727,7 +727,16 @@ def test__build_data():
 
     assert isinstance(data['version'], str)
 
-    for fields_key in {'formats', 'demuxers', 'muxers', 'codecs', 'filters'}:
+    assert isinstance(data['codecs'], dict)
+    for codec, coders in data['codecs'].items():
+        assert isinstance(codec, str)
+        assert isinstance(coders, dict)
+    assert isinstance(data['hwaccels'], list)
+    for hwaccel in data['hwaccels']:
+        assert isinstance(hwaccel, dict)
+        assert 'name' in hwaccel
+
+    for fields_key in {'formats', 'demuxers', 'muxers', 'filters'}:
         assert isinstance(data[fields_key], dict)
 
     list_keys = {'bsfs'}
@@ -741,10 +750,13 @@ def test__build_data():
 
 
 def test__detect():
-    for hwaccels in [
+    for hwaccels_data in [
             ffmpeg.detect_hwaccels(),
             ffmpeg.detect_hwaccels(['foohwaccel'])]:
-        assert isinstance(hwaccels, list)
+        assert isinstance(hwaccels_data['hwaccels'], list)
+        for hwaccel in hwaccels_data['hwaccels']:
+            assert isinstance(hwaccel, dict)
+            assert 'name' in hwaccel
 
     for codecs in [
             ffmpeg.detect_codecs('h264', 'h264'),

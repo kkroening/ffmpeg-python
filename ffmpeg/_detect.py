@@ -43,10 +43,6 @@ HWACCELS_BY_PERFORMANCE = [
     'qsv', 'd3d11va', 'dxva2', 'vaapi', 'drm']
 # Loaded from JSON
 DATA = None
-# Some accelerated codecs use a different prefix than the base codec
-CODEC_SYNONYMS = {
-    'mpeg1video': 'mpeg1',
-    'mpeg2video': 'mpeg2'}
 
 
 def detect_gpu():
@@ -67,14 +63,15 @@ def detect_hwaccels(hwaccels=None, cmd='ffmpeg'):
     Extract details about the ffmpeg build.
     """
     # Filter against what's available in the ffmpeg build
-    build_hwaccels = ffmpeg.get_hwaccels(cmd=cmd)
+    hwaccels_data = ffmpeg.get_hwaccels(cmd=cmd)
     if hwaccels is None:
         # Consider all the available hwaccels
-        hwaccels = build_hwaccels
+        hwaccels = hwaccels_data['hwaccels']
     else:
         # Support passing in a restricted set of hwaccels
         hwaccels = [
-            hwaccel for hwaccel in hwaccels if hwaccel in build_hwaccels]
+            hwaccel for hwaccel in hwaccels_data['hwaccels']
+            if hwaccel['name'] in hwaccels]
 
     # Filter against which APIs are available on this OS+GPU
     data = _get_data()
@@ -82,16 +79,18 @@ def detect_hwaccels(hwaccels=None, cmd='ffmpeg'):
     gpu = detect_gpu()
     api_avail = data['hwaccels']['api_avail'][plat_sys][
         gpu['vendor'].replace(' Corporation', '')]
-    hwaccels = [hwaccel for hwaccel in hwaccels if hwaccel in api_avail]
+    hwaccels = [
+        hwaccel for hwaccel in hwaccels if hwaccel['name'] in api_avail]
 
     hwaccels.sort(key=lambda hwaccel: (
         # Sort unranked hwaccels last, but in the order given by ffmpeg
-        hwaccel not in HWACCELS_BY_PERFORMANCE,
+        hwaccel['name'] in HWACCELS_BY_PERFORMANCE and 1 or 0,
         (
             # Sort ranked hwaccels per the constant
-            hwaccel in HWACCELS_BY_PERFORMANCE and
-            HWACCELS_BY_PERFORMANCE.index(hwaccel))))
-    return hwaccels
+            hwaccel['name'] in HWACCELS_BY_PERFORMANCE and
+            HWACCELS_BY_PERFORMANCE.index(hwaccel['name']))))
+    hwaccels_data['hwaccels'] = hwaccels
+    return hwaccels_data
 
 
 def detect_coder(
