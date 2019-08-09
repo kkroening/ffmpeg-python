@@ -140,7 +140,9 @@ def get_codecs(cmd='ffmpeg'):
     codecs = _get_line_fields(stdout, 10, CODEC_RE, CODEC_FLAGS)
     for codec in codecs.values():
         for coders_match in CODEC_CODERS_RE.finditer(codec['description']):
-            codec[coders_match.group(1)] = coders_match.group(3).split()
+            coders = coders_match.group(3).split()
+            if coders:
+                codec[coders_match.group(1)] = coders
         description_match = CODEC_DESCRIPTION_RE.search(codec['description'])
         if description_match is not None:
             codec['description'] = description_match.group('description')
