@@ -55,9 +55,11 @@ def detect_gpu():
     """
     plat_sys = platform.system()
     if plat_sys == 'Linux':
+        # TODO: Android and other Linux'es that don't have `lshw`
         display_output = subprocess.check_output(
             ['lshw', '-class', 'display', '-json'])
         return json.loads(display_output.decode().strip().strip(','))
+    # TODO Other platforms
 
 
 def detect_hwaccels(hwaccels=None, cmd='ffmpeg'):
