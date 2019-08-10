@@ -60,12 +60,22 @@ def detect_gpu():
     Detect the GPU vendor, generation and model if possible.
     """
     plat_sys = platform.system()
+    gpu = None
+
     if plat_sys == 'Linux':
         # TODO: Android and other Linux'es that don't have `lshw`
         display_output = subprocess.check_output(
             ['lshw', '-class', 'display', '-json'])
-        return json.loads(display_output.decode().strip().strip(','))
-    # TODO Other platforms
+        display_data = json.loads(display_output.decode().strip().strip(','))
+        gpu = dict(
+            vendor=display_data['vendor'].replace(' Corporation', ''))
+
+    else:
+        # TODO Other platforms
+        raise NotImplementedError(
+            'GPU detection for {0!r} not supported yet'.format(plat_sys))
+
+    return gpu
 
 
 def detect_hwaccels(hwaccels=None, cmd='ffmpeg'):
@@ -87,8 +97,7 @@ def detect_hwaccels(hwaccels=None, cmd='ffmpeg'):
     data = _get_data()
     plat_sys = platform.system()
     gpu = detect_gpu()
-    api_avail = data['hwaccels']['api_avail'][plat_sys][
-        gpu['vendor'].replace(' Corporation', '')]
+    api_avail = data['hwaccels']['api_avail'][plat_sys][gpu['vendor']]
     hwaccels = [
         hwaccel for hwaccel in hwaccels if hwaccel['name'] in api_avail]
 
