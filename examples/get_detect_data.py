@@ -31,10 +31,11 @@ PLATFORM_TO_PY = {
 }
 
 
-def main():
-    data = {}
 
-    data['hwaccels'] = hwaccels = {}
+def get_hwaccel_data():
+    """
+    Download the ffmpeg hwaccel API support matrix to detection data.
+    """
     response = requests.get(HWACCELINTRO_URL)
     api_avail_table, impl_table = pandas.read_html(response.content)
 
@@ -42,6 +43,7 @@ def main():
     platform_cols = api_avail_table.loc[0][1:]
     api_rows = api_avail_table[0][2:]
 
+    hwaccels = {}
     hwaccels['api_avail'] = platforms = {}
     for gpu_vendor_idx, gpu_vendor in enumerate(gpu_vendor_cols):
         platform = platform_cols[gpu_vendor_idx + 1]
@@ -52,6 +54,14 @@ def main():
             if api_avail_table[gpu_vendor_idx + 1][api_idx + 2] != 'N':
                 avail_hwaccels.append(API_TO_HWACCEL[api])
 
+    return hwaccels
+
+
+def main():
+    """
+    Download ffmpeg detection data.
+    """
+    data = dict(hwaccels=get_hwaccel_data())
     json.dump(data, sys.stdout, indent=2)
 
 
