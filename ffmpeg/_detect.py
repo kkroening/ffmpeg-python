@@ -54,6 +54,8 @@ HWACCEL_OUTPUT_FORMATS = {
     'vaapi': 'vaapi'}
 
 GPU_PRODUCT_RE = re.compile(r'(?P<chip>[^[]+)(\[(?P<board>[^]]+)\]|)')
+GPU_WMI_PROPERTIES = dict(
+    vendor='AdapterCompatibility', board='VideoProcessor')
 
 # Loaded from JSON
 DATA = None
@@ -85,6 +87,17 @@ def detect_gpus():
                 gpu.update(**product_match.groupdict())
                 if not gpu['board']:
                     gpu['board'] = gpu.pop('chip')
+
+    elif plat_sys == 'Windows':
+        import wmi
+        for controller in wmi.WMI().Win32_VideoController():
+            gpu = {}
+            for key, wmi_prop in GPU_WMI_PROPERTIES.items():
+                value = controller.wmi_property(wmi_prop).value
+                if value:
+                    gpu[key] = value
+            if gpu:
+                gpus.append(gpu)
 
     else:
         # TODO Other platforms

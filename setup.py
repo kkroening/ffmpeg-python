@@ -72,6 +72,9 @@ setup(
     long_description=long_description,
     install_requires=['future'],
     extras_require={
+        'detect': [
+            "pywin32; sys_platform == 'Windows'",
+            "wmi; sys_platform == 'Windows'"],
         'dev': [
             'future==0.17.1',
             'numpy==1.16.4',
