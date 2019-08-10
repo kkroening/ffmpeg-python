@@ -60,7 +60,7 @@ def detect_gpu():
 
 def detect_hwaccels(hwaccels=None, cmd='ffmpeg'):
     """
-    Extract details about the ffmpeg build.
+    Order the available hardware accelerations by performance.
     """
     # Filter against what's available in the ffmpeg build
     hwaccels_data = ffmpeg.get_hwaccels(cmd=cmd)
@@ -96,7 +96,7 @@ def detect_hwaccels(hwaccels=None, cmd='ffmpeg'):
 def detect_coder(
         codec, coder, hwaccels=None, avail_codecs=None, cmd='ffmpeg'):
     """
-    Determine the optimal decoder/encoder given the hwaccels.
+    Detect the optimal decoders and encoders on the optimal hwaccel.
     """
     if hwaccels is None:
         hwaccels = detect_hwaccels(cmd=cmd)
