@@ -24,6 +24,7 @@ import sys
 import platform
 import os
 import copy
+import re
 import json
 import logging
 import argparse
@@ -51,6 +52,9 @@ HWACCELS_BY_PERFORMANCE = [
 HWACCEL_OUTPUT_FORMATS = {
     'nvdec': 'cuda',
     'vaapi': 'vaapi'}
+
+GPU_PRODUCT_RE = re.compile(r'(?P<chip>[^[]+)(\[(?P<board>[^]]+)\]|)')
+
 # Loaded from JSON
 DATA = None
 
@@ -69,6 +73,12 @@ def detect_gpu():
         display_data = json.loads(display_output.decode().strip().strip(','))
         gpu = dict(
             vendor=display_data['vendor'].replace(' Corporation', ''))
+
+        product_match = GPU_PRODUCT_RE.search(display_data['product'])
+        if product_match:
+            gpu.update(**product_match.groupdict())
+            if not gpu['board']:
+                gpu['board'] = gpu.pop('chip')
 
     else:
         # TODO Other platforms
