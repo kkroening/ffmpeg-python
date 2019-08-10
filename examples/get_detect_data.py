@@ -108,8 +108,7 @@ def get_nvidia_data():
                     model_data[key] = value == 'YES'
                 else:
                     model_data[key] = value
-            model_data['BOARD'] = model_data['BOARD'].replace(
-                '\xa0', ' ')
+            model_data['BOARD'] = model_data['BOARD'].replace('\xa0', ' ')
             # Add keys for the data for the ffmpeg codec names for fast lookup
             for codec_prefix, codec in NVIDIA_CODEC_COLUMN_PREFIXES.items():
                 for column_idx, column in enumerate(nvenc_row.keys()):
