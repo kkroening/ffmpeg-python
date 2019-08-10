@@ -40,8 +40,17 @@ parser.add_argument(
 
 # List `hwaccel` options by order of expected performance when available.
 HWACCELS_BY_PERFORMANCE = [
-    'cuvid', 'amf', 'vdpau',
-    'qsv', 'd3d11va', 'dxva2', 'vaapi', 'drm']
+    # NVidia
+    'nvdec', 'cuvid', 'cuda',
+    # AMD
+    'amf',
+    # Windows
+    'qsv', 'd3d11va', 'dxva2',
+    # Linux
+    'vaapi', 'vdpau', 'drm']
+HWACCEL_OUTPUT_FORMATS = {
+    'nvdec': 'cuda',
+    'vaapi': 'vaapi'}
 # Loaded from JSON
 DATA = None
 
@@ -126,6 +135,9 @@ def detect_codecs(decoder, encoder, hwaccels=None, cmd='ffmpeg'):
                 hwaccel_kwargs = dict(
                     input=dict(hwaccel=hwaccel['name']),
                     output=dict(codec=hwaccel_encoder))
+                if hwaccel['name'] in HWACCEL_OUTPUT_FORMATS:
+                    hwaccel_kwargs['input']['hwaccel_output_format'] = (
+                        HWACCEL_OUTPUT_FORMATS[hwaccel['name']])
                 codecs_kwargs.append(hwaccel_kwargs)
                 for hwaccel_decoder in hwaccel['codecs'].get(
                         decoder, {}).get('decoders', []):
