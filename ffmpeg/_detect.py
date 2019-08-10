@@ -24,6 +24,7 @@ import sys
 import platform
 import os
 import copy
+import collections
 import re
 import json
 import logging
@@ -57,7 +58,7 @@ HWACCEL_OUTPUT_FORMATS = {
     'vaapi': 'vaapi'}
 
 GPU_PRODUCT_RE = re.compile(r'(?P<chip>[^[]+)(\[(?P<board>[^]]+)\]|)')
-GPU_WMI_PROPERTIES = dict(
+GPU_WMI_PROPERTIES = collections.OrderedDict(
     vendor='AdapterCompatibility', board='VideoProcessor')
 
 # Loaded from JSON
@@ -75,12 +76,14 @@ def detect_gpus():
         # TODO: Android and other Linux'es that don't have `lshw`
         display_output = subprocess.check_output(
             ['lshw', '-class', 'display', '-json'])
-        displays_data = json.loads(display_output.decode().strip().strip(','))
+        displays_data = json.loads(
+            display_output.decode().strip().strip(','),
+            object_pairs_hook=collections.OrderedDict)
         if not isinstance(displays_data, list):
             # TODO: Confirm this is how `lshw` handles multiple GPUs
             displays_data = [displays_data]
         for display_data in displays_data:
-            gpu = dict(
+            gpu = collections.OrderedDict(
                 vendor=display_data['vendor'].replace(' Corporation', ''))
             # TODO get multiple GPUs from lshw
             gpus.append(gpu)
@@ -94,7 +97,7 @@ def detect_gpus():
     elif plat_sys == 'Windows':
         import wmi
         for controller in wmi.WMI().Win32_VideoController():
-            gpu = {}
+            gpu = collections.OrderedDict()
             for key, wmi_prop in GPU_WMI_PROPERTIES.items():
                 value = controller.wmi_property(wmi_prop).value
                 if value:
@@ -179,7 +182,8 @@ def detect_codecs(decoder, encoder, hwaccels=None, cmd='ffmpeg'):
             'Could not detect a supported encoder for {0!r}'.format(encoder))
 
     codecs_kwargs = []
-    default_kwargs = dict(output=dict(codec=avail_encoders[0]))
+    default_kwargs = collections.OrderedDict(
+        output=collections.OrderedDict(codec=avail_encoders[0]))
     for hwaccel in hwaccels_data['hwaccels']:
 
         if hwaccel['codecs']:
@@ -190,9 +194,9 @@ def detect_codecs(decoder, encoder, hwaccels=None, cmd='ffmpeg'):
                 # Remove hwaccel codecs from future consideration.
                 hwaccel_encoder = hwaccel_encoder
                 avail_encoders.remove(hwaccel_encoder)
-                hwaccel_kwargs = dict(
-                    input=dict(hwaccel=hwaccel['name']),
-                    output=dict(codec=hwaccel_encoder))
+                hwaccel_kwargs = collections.OrderedDict(
+                    input=collections.OrderedDict(hwaccel=hwaccel['name']),
+                    output=collections.OrderedDict(codec=hwaccel_encoder))
                 if hwaccel['name'] in HWACCEL_OUTPUT_FORMATS:
                     hwaccel_kwargs['input']['hwaccel_output_format'] = (
                         HWACCEL_OUTPUT_FORMATS[hwaccel['name']])
@@ -210,7 +214,8 @@ def detect_codecs(decoder, encoder, hwaccels=None, cmd='ffmpeg'):
         else:
             # This hwaccel doesn't require specific coders.
             hwaccel_kwargs = copy.deepcopy(default_kwargs)
-            hwaccel_kwargs['input'] = dict(hwaccel=hwaccel['name'])
+            hwaccel_kwargs['input'] = collections.OrderedDict(
+                hwaccel=hwaccel['name'])
             codecs_kwargs.append(hwaccel_kwargs)
 
     codecs_kwargs.append(default_kwargs)
@@ -232,7 +237,8 @@ def _get_data():
     if DATA is None:
         with open(os.path.join(
                 os.path.dirname(__file__), 'detect.json')) as data_opened:
-            DATA = json.load(data_opened)
+            DATA = json.load(
+                data_opened, object_pairs_hook=collections.OrderedDict)
     return DATA
 
 
@@ -243,7 +249,7 @@ def _parse_models(
     Parse model lines, sets and ranges from a boards string.
     """
     if model_lines_data is None:
-        model_lines_data = {}
+        model_lines_data = collections.OrderedDict()
 
     boards = boards.strip().lower()
     model_line_positions = [
@@ -261,7 +267,8 @@ def _parse_models(
     if model_group:
         # First item is a model range for the previous model line
         model_line_data = model_lines_data.setdefault(
-            model_line, dict(models={}, model_ranges=[]))
+            model_line, collections.OrderedDict(
+                models=collections.OrderedDict(), model_ranges=[]))
 
         models = []
         for model_split in model_group.split('/'):
@@ -301,7 +308,7 @@ def main(args=None):
     Dump all ffmpeg build data to json.
     """
     args = parser.parse_args(args)
-    data = dict(
+    data = collections.OrderedDict(
         gpus=detect_gpus(),
         hwaccels=detect_hwaccels(cmd=args.ffmpeg),
         codecs=detect_codecs(cmd=args.ffmpeg))

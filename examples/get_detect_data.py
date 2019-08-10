@@ -4,6 +4,7 @@ Retrieve and process all the external data for hardware detection.
 """
 
 import sys
+import collections
 import math
 import json
 
@@ -51,12 +52,12 @@ def get_hwaccel_data():
     platform_cols = api_avail_table.loc[0][1:]
     api_rows = api_avail_table[0][2:]
 
-    hwaccels = {}
-    hwaccels['api_avail'] = platforms = {}
+    hwaccels = collections.OrderedDict()
+    hwaccels['api_avail'] = platforms = collections.OrderedDict()
     for gpu_vendor_idx, gpu_vendor in enumerate(gpu_vendor_cols):
         platform = platform_cols[gpu_vendor_idx + 1]
         platform = PLATFORM_TO_PY.get(platform, platform)
-        gpu_vendors = platforms.setdefault(platform, {})
+        gpu_vendors = platforms.setdefault(platform, collections.OrderedDict())
         avail_hwaccels = gpu_vendors.setdefault(gpu_vendor, [])
         for api_idx, api in enumerate(api_rows):
             if api_avail_table[gpu_vendor_idx + 1][api_idx + 2] != 'N':
@@ -74,7 +75,9 @@ def get_nvidia_data():
     (
         nvenc_recent, nvenc_consumer, nvenc_workstation, nvenc_virt,
         nvdec_recent, nvdec_consumer, nvdec_workstation, nvdec_virt) = tables
-    nvidia = dict(lines=[], model_lines={}, boards={})
+    nvidia = collections.OrderedDict(
+        lines=[], model_lines=collections.OrderedDict(),
+        boards=collections.OrderedDict())
 
     # Compile aggregate data needed to parse individual rows
     for nvenc_table in (
@@ -99,7 +102,7 @@ def get_nvidia_data():
                 continue
 
             # Assemble the data for this row to use for each model or range
-            model_data = {}
+            model_data = collections.OrderedDict()
             for key, value in nvenc_row.items():
                 if value in {'YES', 'NO'}:
                     model_data[key] = value == 'YES'
@@ -125,7 +128,7 @@ def get_nvidia_data():
     # GTX model numbers
     for model_line, model_line_suffixes in NVIDIA_LINE_SUFFIXES.items():
         models_data = nvidia['model_lines'][model_line]['models']
-        for model_num in models_data:
+        for model_num in list(models_data):
             for model_line_suffix in model_line_suffixes:
                 if model_num.startswith(model_line_suffix + ' '):
                     models_data[model_num[
@@ -152,7 +155,7 @@ def main():
     """
     Download ffmpeg detection data.
     """
-    data = dict(
+    data = collections.OrderedDict(
         hwaccels=get_hwaccel_data(),
         nvidia=get_nvidia_data(),
     )

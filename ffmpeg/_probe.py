@@ -1,3 +1,8 @@
+"""
+Run ffprobe on the file and return a JSON representation of the output.
+"""
+
+import collections
 import json
 import subprocess
 from ._run import Error
@@ -21,7 +26,8 @@ def probe(filename, cmd='ffprobe', **kwargs):
     out, err = p.communicate()
     if p.returncode != 0:
         raise Error('ffprobe', out, err)
-    return json.loads(out.decode('utf-8'))
+    return json.loads(
+        out.decode('utf-8'), object_pairs_hook=collections.OrderedDict)
 
 
 __all__ = ['probe']
