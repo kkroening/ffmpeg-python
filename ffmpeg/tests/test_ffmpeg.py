@@ -769,6 +769,28 @@ def test__detect():
             assert isinstance(codec_kwargs['output']['codec'], str)
 
 
+def test__detect_parse_models():
+    """
+    Parse model lines, sets and ranges.
+    """
+    model_lines = ffmpeg._detect._parse_models(
+        model_lines=['geforce rtx', 'geforce gtx', 'geforce gt', 'geforce'],
+        boards=(
+            'GeForce GT 630 > 640 GeForce GTX 650 / 660 '
+            'GeForce GT 740+750'),
+        model_data={})
+    assert 'geforce gt' in model_lines
+    assert 'models' in model_lines['geforce gt']
+    assert '740' in model_lines['geforce gt']['models']
+    assert '750' in model_lines['geforce gt']['models']
+    assert 'model_ranges' in model_lines['geforce gt']
+    assert '630 > 640' in model_lines['geforce gt']['model_ranges'][0]
+    assert 'geforce gtx' in model_lines
+    assert 'models' in model_lines['geforce gtx']
+    assert '650' in model_lines['geforce gtx']['models']
+    assert '660' in model_lines['geforce gtx']['models']
+
+
 def get_filter_complex_input(flt, name):
     m = re.search(r'\[([^]]+)\]{}(?=[[;]|$)'.format(name), flt)
     if m:

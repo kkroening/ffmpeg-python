@@ -39,6 +39,9 @@ parser.add_argument(
     '--ffmpeg', default='ffmpeg',
     help='The path to the ffmpeg execuatble')
 
+# Separators to divide a range of models within a line
+MODEL_RANGE_SEPARATORS = ['-', '>']
+
 # List `hwaccel` options by order of expected performance when available.
 HWACCELS_BY_PERFORMANCE = [
     # NVidia
@@ -106,6 +109,18 @@ def detect_gpus():
 
     if not gpus:
         raise ValueError('No GPUs detected')
+
+    data = _get_data()
+    for gpu in gpus:
+        vendor_data = data.get(gpu.get('vendor', '').lower())
+        if vendor_data:
+            model_lines_data = _parse_models(
+                model_lines=vendor_data['lines'],
+                boards=gpu['board'].lower(), model_data={})
+            gpu['model_line'] = list(model_lines_data.keys())[0]
+            gpu['model_num'] = list(model_lines_data[
+                gpu['model_line']]['models'].keys())[0]
+
     return gpus
 
 
@@ -219,6 +234,62 @@ def _get_data():
                 os.path.dirname(__file__), 'detect.json')) as data_opened:
             DATA = json.load(data_opened)
     return DATA
+
+
+def _parse_models(
+        model_lines, boards, model_data,
+        model_lines_data=None, model_line=None):
+    """
+    Parse model lines, sets and ranges from a boards string.
+    """
+    if model_lines_data is None:
+        model_lines_data = {}
+
+    boards = boards.strip().lower()
+    model_line_positions = [
+        (boards.index(next_model_line), idx, next_model_line)
+        for idx, next_model_line in enumerate(model_lines)
+        if next_model_line in boards]
+    if model_line_positions:
+        pos, idx, next_model_line = min(model_line_positions)
+        model_group, next_boards = boards.split(next_model_line.lower(), 1)
+    else:
+        model_group = boards
+        next_boards = ''
+
+    model_group = model_group.strip()
+    if model_group:
+        # First item is a model range for the previous model line
+        model_line_data = model_lines_data.setdefault(
+            model_line, dict(models={}, model_ranges=[]))
+
+        models = []
+        for model_split in model_group.split('/'):
+            models.extend(
+                model.strip()
+                for model in model_split.split('+'))
+
+        for model_range in models:
+            for model_range_separator in MODEL_RANGE_SEPARATORS:
+                model_range_parameters = model_range.split(
+                    model_range_separator)
+                if len(model_range_parameters) > 1:
+                    # This is a range of models
+                    model_line_data['model_ranges'].append(
+                        [model_range, model_data])
+                    models.remove(model_range)
+                    break
+            else:
+                model_line_data['models'][model_range] = model_data
+
+    next_boards = next_boards.strip()
+    if next_boards:
+        return _parse_models(
+            model_lines=model_lines, boards=next_boards,
+            model_data=model_data, model_lines_data=model_lines_data,
+            model_line=next_model_line)
+
+    return model_lines_data
 
 
 def main(args=None):
