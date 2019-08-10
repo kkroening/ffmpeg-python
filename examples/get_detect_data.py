@@ -9,6 +9,10 @@ import json
 import requests
 import pandas
 
+PLATFORM_TO_PY = {
+    'Apple': 'Darwin',
+}
+
 HWACCELINTRO_URL = 'https://trac.ffmpeg.org/wiki/HWAccelIntro'
 API_TO_HWACCEL = {
     'AMF': 'amf',
@@ -25,9 +29,6 @@ API_TO_HWACCEL = {
     'VAAPI': 'vaapi',
     'VDPAU': 'vdpau',
     'VideoToolbox': 'videotoolbox',
-}
-PLATFORM_TO_PY = {
-    'Apple': 'Darwin',
 }
 
 
