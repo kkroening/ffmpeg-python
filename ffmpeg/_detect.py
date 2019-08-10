@@ -59,33 +59,41 @@ GPU_PRODUCT_RE = re.compile(r'(?P<chip>[^[]+)(\[(?P<board>[^]]+)\]|)')
 DATA = None
 
 
-def detect_gpu():
+def detect_gpus():
     """
-    Detect the GPU vendor, generation and model if possible.
+    Detect the vendor, generation and model for each GPU if possible.
     """
     plat_sys = platform.system()
-    gpu = None
+    gpus = []
 
     if plat_sys == 'Linux':
         # TODO: Android and other Linux'es that don't have `lshw`
         display_output = subprocess.check_output(
             ['lshw', '-class', 'display', '-json'])
-        display_data = json.loads(display_output.decode().strip().strip(','))
-        gpu = dict(
-            vendor=display_data['vendor'].replace(' Corporation', ''))
+        displays_data = json.loads(display_output.decode().strip().strip(','))
+        if not isinstance(displays_data, list):
+            # TODO: Confirm this is how `lshw` handles multiple GPUs
+            displays_data = [displays_data]
+        for display_data in displays_data:
+            gpu = dict(
+                vendor=display_data['vendor'].replace(' Corporation', ''))
+            # TODO get multiple GPUs from lshw
+            gpus.append(gpu)
 
-        product_match = GPU_PRODUCT_RE.search(display_data['product'])
-        if product_match:
-            gpu.update(**product_match.groupdict())
-            if not gpu['board']:
-                gpu['board'] = gpu.pop('chip')
+            product_match = GPU_PRODUCT_RE.search(display_data['product'])
+            if product_match:
+                gpu.update(**product_match.groupdict())
+                if not gpu['board']:
+                    gpu['board'] = gpu.pop('chip')
 
     else:
         # TODO Other platforms
         raise NotImplementedError(
             'GPU detection for {0!r} not supported yet'.format(plat_sys))
 
-    return gpu
+    if not gpus:
+        raise ValueError('No GPUs detected')
+    return gpus
 
 
 def detect_hwaccels(hwaccels=None, cmd='ffmpeg'):
@@ -106,8 +114,11 @@ def detect_hwaccels(hwaccels=None, cmd='ffmpeg'):
     # Filter against which APIs are available on this OS+GPU
     data = _get_data()
     plat_sys = platform.system()
-    gpu = detect_gpu()
-    api_avail = data['hwaccels']['api_avail'][plat_sys][gpu['vendor']]
+    gpus = detect_gpus()
+    api_avail = set()
+    for gpu in gpus:
+        api_avail.update(
+            data['hwaccels']['api_avail'][plat_sys][gpu['vendor']])
     hwaccels = [
         hwaccel for hwaccel in hwaccels if hwaccel['name'] in api_avail]
 
@@ -179,7 +190,7 @@ def detect_codecs(decoder, encoder, hwaccels=None, cmd='ffmpeg'):
 
 
 __all__ = [
-    'detect_gpu',
+    'detect_gpus',
     'detect_hwaccels',
     'detect_codecs',
 ]
@@ -203,7 +214,7 @@ def main(args=None):
     """
     args = parser.parse_args(args)
     data = dict(
-        gpu=detect_gpu(),
+        gpus=detect_gpus(),
         hwaccels=detect_hwaccels(cmd=args.ffmpeg),
         codecs=detect_codecs(cmd=args.ffmpeg))
     json.dump(data, sys.stdout, indent=2)
