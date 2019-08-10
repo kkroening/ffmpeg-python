@@ -4,10 +4,13 @@ Retrieve and process all the external data for hardware detection.
 """
 
 import sys
+import math
 import json
 
 import requests
 import pandas
+
+from ffmpeg import _detect
 
 PLATFORM_TO_PY = {
     'Apple': 'Darwin',
@@ -31,6 +34,10 @@ API_TO_HWACCEL = {
     'VideoToolbox': 'videotoolbox',
 }
 
+NVIDIA_GPU_MATRIX_URL = (
+    'https://developer.nvidia.com/video-encode-decode-gpu-support-matrix')
+NVIDIA_LINE_SUFFIXES = {'geforce': ['gtx titan', 'gtx', 'gt', 'rtx']}
+NVIDIA_CODEC_COLUMN_PREFIXES = {'h.264': 'h264', 'h.265': 'hevc'}
 
 
 def get_hwaccel_data():
@@ -58,11 +65,97 @@ def get_hwaccel_data():
     return hwaccels
 
 
+def get_nvidia_data():
+    """
+    Download the NVIDIA GPU support matrix to detection data.
+    """
+    response = requests.get(NVIDIA_GPU_MATRIX_URL)
+    tables = pandas.read_html(response.content)
+    (
+        nvenc_recent, nvenc_consumer, nvenc_workstation, nvenc_virt,
+        nvdec_recent, nvdec_consumer, nvdec_workstation, nvdec_virt) = tables
+    nvidia = dict(lines=[], model_lines={}, boards={})
+
+    # Compile aggregate data needed to parse individual rows
+    for nvenc_table in (
+            nvenc_recent, nvenc_consumer, nvenc_workstation, nvenc_virt):
+        for board in nvenc_table['BOARD']:
+            line = board.replace('\xa0', ' ').split(None, 1)[0].lower()
+            if line not in nvidia['lines']:
+                nvidia['lines'].append(line)
+    for line, line_suffixes in NVIDIA_LINE_SUFFIXES.items():
+        for line_suffix in reversed(line_suffixes):
+            nvidia['lines'].insert(0, ' '.join((line, line_suffix)))
+
+    for nvenc_table in (
+            nvenc_recent, nvenc_consumer, nvenc_workstation, nvenc_virt):
+        for nvenc_row_idx, nvenc_row in nvenc_table.iterrows():
+            nvenc_row_values = {
+                idx: cell for idx, cell in enumerate(nvenc_row[1:]) if (
+                    cell and
+                    not (isinstance(cell, float) and math.isnan(cell)))}
+            if not nvenc_row_values:
+                # Divider row
+                continue
+
+            # Assemble the data for this row to use for each model or range
+            model_data = {}
+            for key, value in nvenc_row.items():
+                if value in {'YES', 'NO'}:
+                    model_data[key] = value == 'YES'
+                else:
+                    model_data[key] = value
+            model_data['BOARD'] = model_data['BOARD'].replace(
+                '\xa0', ' ')
+            # Add keys for the data for the ffmpeg codec names for fast lookup
+            for codec_prefix, codec in NVIDIA_CODEC_COLUMN_PREFIXES.items():
+                for column_idx, column in enumerate(nvenc_row.keys()):
+                    if column.lower().startswith(codec_prefix):
+                        model_data[codec] = nvenc_row[column_idx] == 'YES'
+                        break
+            nvidia['boards'][model_data['BOARD']] = model_data
+
+            _detect._parse_models(
+                model_lines=nvidia['lines'],
+                boards=model_data['BOARD'].lower(),
+                model_data=model_data['BOARD'],
+                model_lines_data=nvidia['model_lines'])
+
+    # Clean up some annoying clashes between the titan model line and GeForce
+    # GTX model numbers
+    for model_line, model_line_suffixes in NVIDIA_LINE_SUFFIXES.items():
+        models_data = nvidia['model_lines'][model_line]['models']
+        for model_num in models_data:
+            for model_line_suffix in model_line_suffixes:
+                if model_num.startswith(model_line_suffix + ' '):
+                    models_data[model_num[
+                        len(model_line_suffix + ' '):]] = models_data.pop(
+                            model_num)
+    for titan_model_num in {'black', 'xp'}:
+        nvidia['model_lines']['geforce gtx']['models'][
+            'titan ' + titan_model_num] = nvidia['model_lines'][
+                'titan']['models'].pop(titan_model_num)
+    for titan_model_num in list(nvidia['model_lines'][
+            'geforce gtx titan']['models'].keys()):
+        nvidia['model_lines']['geforce gtx']['models'][
+            'titan ' + titan_model_num] = nvidia['model_lines'][
+                'geforce gtx titan']['models'].pop(titan_model_num)
+    nvidia['model_lines']['geforce gtx']['models']['titan'] = nvidia[
+        'model_lines']['geforce gtx']['models']['titan black']
+    del nvidia['model_lines']['geforce gtx']['models']['titan ']
+    del nvidia['model_lines']['geforce gtx titan']
+
+    return nvidia
+
+
 def main():
     """
     Download ffmpeg detection data.
     """
-    data = dict(hwaccels=get_hwaccel_data())
+    data = dict(
+        hwaccels=get_hwaccel_data(),
+        nvidia=get_nvidia_data(),
+    )
     json.dump(data, sys.stdout, indent=2)
 
 

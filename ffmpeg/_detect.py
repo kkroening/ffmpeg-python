@@ -275,9 +275,13 @@ def _parse_models(
                     model_range_separator)
                 if len(model_range_parameters) > 1:
                     # This is a range of models
-                    model_line_data['model_ranges'].append(
-                        [model_range, model_data])
-                    models.remove(model_range)
+                    if model_range in model_line_data['model_ranges']:
+                        model_line_data['model_ranges'][
+                            model_line_data['model_ranges'].index(
+                                model_range)] = model_data
+                    else:
+                        model_line_data['model_ranges'].append(
+                            [model_range, model_data])
                     break
             else:
                 model_line_data['models'][model_range] = model_data
