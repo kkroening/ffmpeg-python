@@ -23,6 +23,7 @@ made more rigorously.
 import sys
 import platform
 import os
+import copy
 import json
 import logging
 import argparse
@@ -93,64 +94,55 @@ def detect_hwaccels(hwaccels=None, cmd='ffmpeg'):
     return hwaccels_data
 
 
-def detect_coder(
-        codec, coder, hwaccels=None, avail_codecs=None, cmd='ffmpeg'):
+def detect_codecs(decoder, encoder, hwaccels=None, cmd='ffmpeg'):
     """
     Detect the optimal decoders and encoders on the optimal hwaccel.
     """
-    if hwaccels is None:
-        hwaccels = detect_hwaccels(cmd=cmd)
-    if avail_codecs is None:
-        avail_codecs = ffmpeg.get_codecs(cmd=cmd)[codec][coder]
+    hwaccels_data = detect_hwaccels(hwaccels, cmd=cmd)
 
-    # Some accelerated codecs use a different prefix than the base codec
-    base_codec = CODEC_SYNONYMS.get(codec, codec)
+    build_codecs = hwaccels_data['codecs']
+    avail_decoders = build_codecs[decoder]['decoders']
+    avail_encoders = build_codecs[encoder]['encoders']
 
-    # Gather all available accelerated coders for this codec
-    codecs = []
-    for hwaccel in hwaccels:
-        hwaccel_codec = '{0}_{1}'.format(base_codec, hwaccel)
-        if hwaccel_codec in avail_codecs:
-            codecs.append(hwaccel_codec)
+    codecs_kwargs = []
+    default_kwargs = dict(output=dict(codec=avail_encoders[0]))
+    for hwaccel in hwaccels_data['hwaccels']:
 
-    codecs.append(codec)
-    return codecs
+        if hwaccel['codecs']:
+            # This hwaccel requires specific coders.
+            for hwaccel_encoder in hwaccel['codecs'].get(
+                    encoder, {}).get('encoders', []):
+                # We have an accelerated encoder, include it.
+                # Remove hwaccel codecs from future consideration.
+                hwaccel_encoder = hwaccel_encoder
+                avail_encoders.remove(hwaccel_encoder)
+                hwaccel_kwargs = dict(
+                    input=dict(hwaccel=hwaccel['name']),
+                    output=dict(codec=hwaccel_encoder))
+                codecs_kwargs.append(hwaccel_kwargs)
+                for hwaccel_decoder in hwaccel['codecs'].get(
+                        decoder, {}).get('decoders', []):
+                    if hwaccel_decoder in avail_decoders:
+                        # We have an accelerated decoder, can make a minor but
+                        # significant difference.
+                        # Remove hwaccel codecs from future consideration.
+                        hwaccel_kwargs['input']['codec'] = hwaccel_decoder
+                        avail_decoders.remove(hwaccel_decoder)
+                # Otherwise let ffmpeg choose the decoder
 
+        else:
+            # This hwaccel doesn't require specific coders.
+            hwaccel_kwargs = copy.deepcopy(default_kwargs)
+            hwaccel_kwargs['input'] = dict(hwaccel=hwaccel['name'])
+            codecs_kwargs.append(hwaccel_kwargs)
 
-def detect_codecs(
-        decoder, encoder, hwaccels=None, avail_codecs=None, cmd='ffmpeg'):
-    """
-    Detect the optimal de/encoder for the codec based on the optimal hwaccel.
-    """
-    hwaccels = detect_hwaccels(hwaccels, cmd=cmd)
-
-    build_codecs = ffmpeg.get_codecs(cmd=cmd)
-    build_decoders = build_codecs[decoder]['decoders']
-    build_encoders = build_codecs[encoder]['encoders']
-    if avail_codecs is None:
-        # Consider all the available hwaccels
-        avail_codecs = dict(decoders=build_decoders, encoders=build_encoders)
-    else:
-        # Support passing in restricted sets of decoders and encoders
-        avail_codecs['decoders'] = [
-            codec for codec in avail_codecs['decoders']
-            if codec in build_decoders]
-        avail_codecs['encoders'] = [
-            codec for codec in avail_codecs['encoders']
-            if codec in build_encoders]
-
-    return dict(
-        hwaccels=hwaccels,
-        decoders=detect_coder(
-            decoder, 'decoders', hwaccels, avail_codecs['decoders']),
-        encoders=detect_coder(
-            encoder, 'encoders', hwaccels, avail_codecs['encoders']))
+    codecs_kwargs.append(default_kwargs)
+    return codecs_kwargs
 
 
 __all__ = [
     'detect_gpu',
     'detect_hwaccels',
-    'detect_coder',
     'detect_codecs',
 ]
 
