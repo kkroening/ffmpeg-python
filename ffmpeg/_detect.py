@@ -171,6 +171,23 @@ def detect_hwaccels(hwaccels=None, cmd='ffmpeg'):
     hwaccels = [
         hwaccel for hwaccel in hwaccels if hwaccel['name'] in api_avail]
 
+    # Filter encoders and decoders based on what's supported by the GPU
+    for gpu in gpus:
+        for coder_type in ['encoders', 'decoders']:
+            coder_data = gpu.get(coder_type)
+            if coder_data is None:
+                continue
+            for hwaccel in hwaccels:
+                for codec, coders in hwaccel.get('codecs', {}).items():
+                    coder_supported = coder_data.get(codec)
+                    if coder_supported is None or coder_supported:
+                        # This encoder/decoder is supported, no need to filter
+                        # it out
+                        continue
+
+                    # This codec isn't supported by the GPU hjardware
+                    coders.pop(coder_type, None)
+
     hwaccels.sort(key=lambda hwaccel: (
         # Sort unranked hwaccels last, but in the order given by ffmpeg
         hwaccel['name'] in HWACCELS_BY_PERFORMANCE and 1 or 0,
@@ -178,6 +195,7 @@ def detect_hwaccels(hwaccels=None, cmd='ffmpeg'):
             # Sort ranked hwaccels per the constant
             hwaccel['name'] in HWACCELS_BY_PERFORMANCE and
             HWACCELS_BY_PERFORMANCE.index(hwaccel['name']))))
+
     hwaccels_data['hwaccels'] = hwaccels
     return hwaccels_data
 
