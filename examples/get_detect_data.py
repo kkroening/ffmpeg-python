@@ -138,6 +138,10 @@ def get_nvidia_data():
                             model_data[codec] = nv_coder_row[
                                 column_idx] == 'YES'
                             break
+                    else:
+                        # Assume encoder support is not available
+                        model_data[codec] = False
+
                 coder_data['boards'][model_data['BOARD']] = model_data
 
                 _detect._parse_models(
