@@ -192,7 +192,6 @@ def detect_codecs(decoder, encoder, hwaccels=None, cmd='ffmpeg'):
                     encoder, {}).get('encoders', []):
                 # We have an accelerated encoder, include it.
                 # Remove hwaccel codecs from future consideration.
-                hwaccel_encoder = hwaccel_encoder
                 avail_encoders.remove(hwaccel_encoder)
                 hwaccel_kwargs = collections.OrderedDict(
                     input=collections.OrderedDict(hwaccel=hwaccel['name']),
