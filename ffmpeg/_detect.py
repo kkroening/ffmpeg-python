@@ -117,12 +117,30 @@ def detect_gpus():
     for gpu in gpus:
         vendor_data = data.get(gpu.get('vendor', '').lower())
         if vendor_data:
+
             model_lines_data = _parse_models(
                 model_lines=vendor_data['lines'],
                 boards=gpu['board'].lower(), model_data={})
             gpu['model_line'] = list(model_lines_data.keys())[0]
             gpu['model_num'] = list(model_lines_data[
                 gpu['model_line']]['models'].keys())[0]
+
+            for coder_type in ['encoders', 'decoders']:
+                model_line_data = vendor_data[coder_type]['model_lines'][
+                    gpu['model_line']]
+                coder_boards = model_line_data['models'].get(
+                    gpu['model_num'])
+                if coder_boards is None:
+                    for model_range, boards in model_line_data[
+                            'model_ranges']:
+                        # TODO proper model range matching
+                        if gpu['model_num'] in model_range:
+                            coder_boards = boards
+                            break
+                if coder_boards is None:
+                    continue
+                gpu[coder_type] = vendor_data[coder_type]['boards'][
+                    coder_boards]
 
     return gpus
 
