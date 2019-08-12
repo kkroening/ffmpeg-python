@@ -1,3 +1,5 @@
+*.py[co]
+
 .cache
 .eggs
 .tox/
@@ -6,3 +8,5 @@ ffmpeg/tests/sample_data/out*.mp4
 ffmpeg_python.egg-info/
 venv*
 build/
+
+*~
