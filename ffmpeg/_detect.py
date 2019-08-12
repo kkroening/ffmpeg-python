@@ -46,14 +46,18 @@ MODEL_RANGE_SEPARATORS = ['-', '>']
 HWACCEL = dict(
     # List `hwaccel` options by order of expected performance when available.
     BY_PERFORMANCE=[
-        # NVidia
-        'nvdec', 'cuvid', 'cuda',
-        # AMD
+        # NVidia cross-OS
+        'cuda', 'cuvid', 'nvdec',
+        # NVidia Linux
+        'vdpau',
+        # AMD Windows
         'amf',
-        # Windows
-        'qsv', 'd3d11va', 'dxva2',
-        # Linux
-        'vaapi', 'vdpau', 'drm'],
+        # Intel Windows
+        'qsv',
+        # Linux, not GPU specific
+        'vaapi', 'drm',
+        # Windows, not GPU specific
+        'd3d11va', 'dxva2'],
     OUTPUT_FORMATS={
         'nvdec': 'cuda',
         'vaapi': 'vaapi'})
