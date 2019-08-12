@@ -17,45 +17,51 @@ parser.add_argument(
     help='The path to the ffmpeg execuatble')
 
 
-VERSION_RE = re.compile(r' version (?P<version>[^ ]+) ')
+VERSION = dict(
+    RE=re.compile(r' version (?P<version>[^ ]+) '))
 
-MUXER_RE = re.compile(
-    r'^ (?P<demuxing>[D ])(?P<muxing>[E ]) '
-    r'(?P<name>[^ ]+) +(?P<description>.+)$',
-    re.M)
-MUXER_FLAGS = dict(demuxing='D', muxing='E')
+MUXER = dict(
+    RE=re.compile(
+        r'^ (?P<demuxing>[D ])(?P<muxing>[E ]) '
+        r'(?P<name>[^ ]+) +(?P<description>.+)$',
+        re.M),
+    FLAGS=dict(demuxing='D', muxing='E'))
 
-CODEC_RE = re.compile(
-    r'^ (?P<decoding>[D.])(?P<encoding>[E.])'
-    r'(?P<stream>[VAS.])(?P<intra_frame>[I.])'
-    r'(?P<lossy>[L.])(?P<lossless>[S.]) '
-    r'(?P<name>[^ ]+) +(?P<description>.+)$',
-    re.M)
-CODEC_FLAGS = dict(
-    decoding='D', encoding='E',
-    stream=dict(video='V', audio='A', subtitle='S'),
-    intra_frame='I', lossy='L', lossless='S')
-CODEC_DESCRIPTION_RE = re.compile(
-    r'^(?P<description>.+?) \((de|en)coders: [^)]+ \)')
-CODEC_CODERS_RE = re.compile(
-    r' \((?P<type>(de|en)coders): (?P<coders>[^)]+) \)')
+CODEC = dict(
+    RE=re.compile(
+        r'^ (?P<decoding>[D.])(?P<encoding>[E.])'
+        r'(?P<stream>[VAS.])(?P<intra_frame>[I.])'
+        r'(?P<lossy>[L.])(?P<lossless>[S.]) '
+        r'(?P<name>[^ ]+) +(?P<description>.+)$',
+        re.M),
+    FLAGS=dict(
+        decoding='D', encoding='E',
+        stream=dict(video='V', audio='A', subtitle='S'),
+        intra_frame='I', lossy='L', lossless='S'),
+    DESCRIPTION_RE=re.compile(
+        r'^(?P<description>.+?) \((de|en)coders: [^)]+ \)'),
+    CODERS_RE=re.compile(
+        r' \((?P<type>(de|en)coders): (?P<coders>[^)]+) \)'))
 
-HWACCEL_SYNONYMS = dict(cuvid=['nvenc', 'nvdec', 'cuda'])
+HWACCEL = dict(
+    SYNONYMS=dict(cuvid=['nvenc', 'nvdec', 'cuda']))
 
-FILTER_RE = re.compile(
-    r'^ (?P<timeline>[T.])(?P<slice>[S.])(?P<command>[C.]) '
-    r'(?P<name>[^ ]+) +(?P<io>[^ ]+) +(?P<description>.+)$',
-    re.M)
-FILTER_FLAGS = dict(timeline='T', slice='S', command='C')
+FILTER = dict(
+    RE=re.compile(
+        r'^ (?P<timeline>[T.])(?P<slice>[S.])(?P<command>[C.]) '
+        r'(?P<name>[^ ]+) +(?P<io>[^ ]+) +(?P<description>.+)$',
+        re.M),
+    FLAGS=dict(timeline='T', slice='S', command='C'))
 
-PIX_FMT_RE = re.compile(
-    r'^(?P<input>[I.])(?P<output>[O.])(?P<accelerated>[H.])'
-    r'(?P<palleted>[P.])(?P<bitstream>[B.]) '
-    r'(?P<name>[^ ]+) +(?P<components>[0-9]+) +(?P<bits>[0-9]+)$',
-    re.M)
-PIX_FMT_FLAGS = dict(
-    input='I', output='O', accelerated='H', palleted='P', bitstream='B')
-PIX_FMT_INT_FIELDS = {'components', 'bits'}
+PIX_FMT = dict(
+    RE=re.compile(
+        r'^(?P<input>[I.])(?P<output>[O.])(?P<accelerated>[H.])'
+        r'(?P<palleted>[P.])(?P<bitstream>[B.]) '
+        r'(?P<name>[^ ]+) +(?P<components>[0-9]+) +(?P<bits>[0-9]+)$',
+        re.M),
+    FLAGS=dict(
+        input='I', output='O', accelerated='H', palleted='P', bitstream='B'),
+    INT_FIELDS={'components', 'bits'})
 
 
 def _run(args):
@@ -107,7 +113,7 @@ def get_version(cmd='ffmpeg'):
     Extract the version of the ffmpeg build.
     """
     stdout = _run([cmd, '-version'])
-    match = VERSION_RE.search(stdout.split('\n')[0])
+    match = VERSION['RE'].search(stdout.split('\n')[0])
     return match.group('version')
 
 
@@ -116,7 +122,7 @@ def get_formats(cmd='ffmpeg'):
     Extract the formats of the ffmpeg build.
     """
     stdout = _run([cmd, '-formats'])
-    return _get_line_fields(stdout, 4, MUXER_RE, MUXER_FLAGS)
+    return _get_line_fields(stdout, 4, MUXER['RE'], MUXER['FLAGS'])
 
 
 def get_demuxers(cmd='ffmpeg'):
@@ -124,7 +130,7 @@ def get_demuxers(cmd='ffmpeg'):
     Extract the demuxers of the ffmpeg build.
     """
     stdout = _run([cmd, '-demuxers'])
-    return _get_line_fields(stdout, 4, MUXER_RE, MUXER_FLAGS)
+    return _get_line_fields(stdout, 4, MUXER['RE'], MUXER['FLAGS'])
 
 
 def get_muxers(cmd='ffmpeg'):
@@ -132,7 +138,7 @@ def get_muxers(cmd='ffmpeg'):
     Extract the muxers of the ffmpeg build.
     """
     stdout = _run([cmd, '-muxers'])
-    return _get_line_fields(stdout, 4, MUXER_RE, MUXER_FLAGS)
+    return _get_line_fields(stdout, 4, MUXER['RE'], MUXER['FLAGS'])
 
 
 def get_codecs(cmd='ffmpeg'):
@@ -140,13 +146,14 @@ def get_codecs(cmd='ffmpeg'):
     Extract the codecs of the ffmpeg build.
     """
     stdout = _run([cmd, '-codecs'])
-    codecs = _get_line_fields(stdout, 10, CODEC_RE, CODEC_FLAGS)
+    codecs = _get_line_fields(stdout, 10, CODEC['RE'], CODEC['FLAGS'])
     for codec in codecs.values():
-        for coders_match in CODEC_CODERS_RE.finditer(codec['description']):
+        for coders_match in CODEC['CODERS_RE'].finditer(codec['description']):
             coders = coders_match.group(3).split()
             if coders:
                 codec[coders_match.group(1)] = coders
-        description_match = CODEC_DESCRIPTION_RE.search(codec['description'])
+        description_match = CODEC['DESCRIPTION_RE'].search(
+            codec['description'])
         if description_match is not None:
             codec['description'] = description_match.group('description')
     return codecs
@@ -179,7 +186,7 @@ def get_filters(cmd='ffmpeg'):
     Extract the filters of the ffmpeg build.
     """
     stdout = _run([cmd, '-filters'])
-    return _get_line_fields(stdout, 8, FILTER_RE, FILTER_FLAGS)
+    return _get_line_fields(stdout, 8, FILTER['RE'], FILTER['FLAGS'])
 
 
 def get_pix_fmts(cmd='ffmpeg'):
@@ -188,7 +195,7 @@ def get_pix_fmts(cmd='ffmpeg'):
     """
     stdout = _run([cmd, '-pix_fmts'])
     return _get_line_fields(
-        stdout, 8, PIX_FMT_RE, PIX_FMT_FLAGS, PIX_FMT_INT_FIELDS)
+        stdout, 8, PIX_FMT['RE'], PIX_FMT['FLAGS'], PIX_FMT['INT_FIELDS'])
 
 
 def get_sample_fmts(cmd='ffmpeg'):
@@ -238,7 +245,7 @@ def get_devices(cmd='ffmpeg'):
     Extract the devices of the ffmpeg build.
     """
     stdout = _run([cmd, '-devices'])
-    return _get_line_fields(stdout, 4, MUXER_RE, MUXER_FLAGS)
+    return _get_line_fields(stdout, 4, MUXER['RE'], MUXER['FLAGS'])
 
 
 def get_hw_devices(cmd='ffmpeg'):
@@ -272,7 +279,7 @@ def get_hwaccels(cmd='ffmpeg'):
                 for coder in codec.get(coders_key, []):
                     for synonym in (
                             [hwaccel_name] +
-                            HWACCEL_SYNONYMS.get(hwaccel_name, [])):
+                            HWACCEL['SYNONYMS'].get(hwaccel_name, [])):
                         if (
                                 coder == synonym or
                                 '_' + synonym in coder or

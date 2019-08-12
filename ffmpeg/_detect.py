@@ -43,23 +43,25 @@ parser.add_argument(
 # Separators to divide a range of models within a line
 MODEL_RANGE_SEPARATORS = ['-', '>']
 
-# List `hwaccel` options by order of expected performance when available.
-HWACCELS_BY_PERFORMANCE = [
-    # NVidia
-    'nvdec', 'cuvid', 'cuda',
-    # AMD
-    'amf',
-    # Windows
-    'qsv', 'd3d11va', 'dxva2',
-    # Linux
-    'vaapi', 'vdpau', 'drm']
-HWACCEL_OUTPUT_FORMATS = {
-    'nvdec': 'cuda',
-    'vaapi': 'vaapi'}
+HWACCEL = dict(
+    # List `hwaccel` options by order of expected performance when available.
+    BY_PERFORMANCE=[
+        # NVidia
+        'nvdec', 'cuvid', 'cuda',
+        # AMD
+        'amf',
+        # Windows
+        'qsv', 'd3d11va', 'dxva2',
+        # Linux
+        'vaapi', 'vdpau', 'drm'],
+    OUTPUT_FORMATS={
+        'nvdec': 'cuda',
+        'vaapi': 'vaapi'})
 
-GPU_PRODUCT_RE = re.compile(r'(?P<chip>[^[]+)(\[(?P<board>[^]]+)\]|)')
-GPU_WMI_PROPERTIES = collections.OrderedDict(
-    vendor='AdapterCompatibility', board='VideoProcessor')
+GPU = dict(
+    PRODUCT_RE=re.compile(r'(?P<chip>[^[]+)(\[(?P<board>[^]]+)\]|)'),
+    WMI_PROPERTIES=collections.OrderedDict(
+        vendor='AdapterCompatibility', board='VideoProcessor'))
 
 # Loaded from JSON
 DATA = None
@@ -88,7 +90,7 @@ def detect_gpus():
             # TODO get multiple GPUs from lshw
             gpus.append(gpu)
 
-            product_match = GPU_PRODUCT_RE.search(display_data['product'])
+            product_match = GPU['PRODUCT_RE'].search(display_data['product'])
             if product_match:
                 gpu.update(**product_match.groupdict())
                 if not gpu['board']:
@@ -98,7 +100,7 @@ def detect_gpus():
         import wmi
         for controller in wmi.WMI().Win32_VideoController():
             gpu = collections.OrderedDict()
-            for key, wmi_prop in GPU_WMI_PROPERTIES.items():
+            for key, wmi_prop in GPU['WMI_PROPERTIES'].items():
                 value = controller.wmi_property(wmi_prop).value
                 if value:
                     gpu[key] = value
@@ -192,11 +194,11 @@ def detect_hwaccels(hwaccels=None, cmd='ffmpeg'):
 
     hwaccels.sort(key=lambda hwaccel: (
         # Sort unranked hwaccels last, but in the order given by ffmpeg
-        hwaccel['name'] in HWACCELS_BY_PERFORMANCE and 1 or 0,
+        hwaccel['name'] in HWACCEL['BY_PERFORMANCE'] and 1 or 0,
         (
             # Sort ranked hwaccels per the constant
-            hwaccel['name'] in HWACCELS_BY_PERFORMANCE and
-            HWACCELS_BY_PERFORMANCE.index(hwaccel['name']))))
+            hwaccel['name'] in HWACCEL['BY_PERFORMANCE'] and
+            HWACCEL['BY_PERFORMANCE'].index(hwaccel['name']))))
 
     hwaccels_data['hwaccels'] = hwaccels
     return hwaccels_data
@@ -230,9 +232,9 @@ def detect_codecs(decoder, encoder, hwaccels=None, cmd='ffmpeg'):
                 hwaccel_kwargs = collections.OrderedDict(
                     input=collections.OrderedDict(hwaccel=hwaccel['name']),
                     output=collections.OrderedDict(codec=hwaccel_encoder))
-                if hwaccel['name'] in HWACCEL_OUTPUT_FORMATS:
+                if hwaccel['name'] in HWACCEL['OUTPUT_FORMATS']:
                     hwaccel_kwargs['input']['hwaccel_output_format'] = (
-                        HWACCEL_OUTPUT_FORMATS[hwaccel['name']])
+                        HWACCEL['OUTPUT_FORMATS'][hwaccel['name']])
                 codecs_kwargs.append(hwaccel_kwargs)
                 for hwaccel_decoder in hwaccel['codecs'].get(
                         decoder, {}).get('decoders', []):
