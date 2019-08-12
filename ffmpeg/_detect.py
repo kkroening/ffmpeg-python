@@ -75,9 +75,9 @@ def detect_gpus():
     if plat_sys == 'Linux':
         # TODO: Android and other Linux'es that don't have `lshw`
         display_output = subprocess.check_output(
-            ['lshw', '-class', 'display', '-json'])
+            ['lshw', '-class', 'display', '-json'], universal_newlines=True)
         displays_data = json.loads(
-            display_output.decode().strip().strip(','),
+            display_output.strip().strip(','),
             object_pairs_hook=collections.OrderedDict)
         if not isinstance(displays_data, list):
             # TODO: Confirm this is how `lshw` handles multiple GPUs

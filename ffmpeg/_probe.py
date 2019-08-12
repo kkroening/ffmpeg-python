@@ -22,12 +22,13 @@ def probe(filename, cmd='ffprobe', **kwargs):
     args += convert_kwargs_to_cmd_line_args(kwargs)
     args += [filename]
 
-    p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p = subprocess.Popen(
+        args, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        universal_newlines=True)
     out, err = p.communicate()
     if p.returncode != 0:
         raise Error('ffprobe', out, err)
-    return json.loads(
-        out.decode('utf-8'), object_pairs_hook=collections.OrderedDict)
+    return json.loads(out, object_pairs_hook=collections.OrderedDict)
 
 
 __all__ = ['probe']

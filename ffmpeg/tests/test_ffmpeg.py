@@ -9,6 +9,8 @@ import random
 import re
 import subprocess
 
+import six
+
 try:
     import mock  # python 2
 except ImportError:
@@ -710,7 +712,7 @@ def test__probe__exception():
     with pytest.raises(ffmpeg.Error) as excinfo:
         ffmpeg.probe(BOGUS_INPUT_FILE)
     assert str(excinfo.value) == 'ffprobe error (see stderr output for detail)'
-    assert 'No such file or directory'.encode() in excinfo.value.stderr
+    assert 'No such file or directory' in excinfo.value.stderr
 
 
 def test__probe__extra_args():
@@ -725,11 +727,11 @@ def test__build_data():
         'protocols', 'filters', 'pix_fmts', 'sample_fmts', 'layouts',
         'colors', 'devices', 'hw_devices', 'hwaccels'}
 
-    assert isinstance(data['version'], str)
+    assert isinstance(data['version'], six.string_types)
 
     assert isinstance(data['codecs'], dict)
     for codec, coders in data['codecs'].items():
-        assert isinstance(codec, str)
+        assert isinstance(codec, six.string_types)
         assert isinstance(coders, dict)
     assert isinstance(data['hwaccels'], list)
     for hwaccel in data['hwaccels']:
@@ -766,7 +768,9 @@ def test__detect():
             assert 'output' in codec_kwargs
             assert isinstance(codec_kwargs['output'], dict)
             assert 'codec' in codec_kwargs['output']
-            assert isinstance(codec_kwargs['output']['codec'], str)
+            assert isinstance(
+                codec_kwargs['output']['codec'],
+                six.string_types)
 
 
 def test__detect_parse_models():

@@ -63,13 +63,14 @@ def _run(args):
     Run the command and return stdout but only print stderr on failure.
     """
     process = subprocess.Popen(
-        args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        args, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        universal_newlines=True)
     stdout, stderr = process.communicate()
     if process.returncode != 0:
-        logger.error(stderr.decode())
+        logger.error(stderr)
         raise subprocess.CalledProcessError(
             process.returncode, process.args, output=stdout, stderr=stderr)
-    return stdout.decode()
+    return stdout
 
 
 def _get_line_fields(
