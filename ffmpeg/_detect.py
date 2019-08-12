@@ -210,16 +210,12 @@ def detect_codecs(decoder, encoder, hwaccels=None, cmd='ffmpeg'):
 
     avail_decoders = build_codecs.get(decoder, {}).get('decoders', [])
     avail_encoders = build_codecs.get(encoder, {}).get('encoders', [])
-    if not avail_decoders:
-        raise ValueError(
-            'Could not detect a supported decoder for {0!r}'.format(decoder))
-    if not avail_encoders:
-        raise ValueError(
-            'Could not detect a supported encoder for {0!r}'.format(encoder))
 
     codecs_kwargs = []
     default_kwargs = collections.OrderedDict(
-        output=collections.OrderedDict(codec=avail_encoders[0]))
+        output=collections.OrderedDict())
+    if avail_encoders:
+        default_kwargs['output']['codec'] = avail_encoders[0]
     for hwaccel in hwaccels_data['hwaccels']:
 
         if hwaccel['codecs']:
