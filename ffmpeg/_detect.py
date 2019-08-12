@@ -166,8 +166,10 @@ def detect_hwaccels(hwaccels=None, cmd='ffmpeg'):
     gpus = detect_gpus()
     api_avail = set()
     for gpu in gpus:
-        api_avail.update(
-            data['hwaccels']['api_avail'][plat_sys][gpu['vendor']])
+        vendor_apis = data['hwaccels']['api_avail'][plat_sys].get(
+            gpu['vendor'])
+        if vendor_apis:
+            api_avail.update(vendor_apis)
     hwaccels = [
         hwaccel for hwaccel in hwaccels if hwaccel['name'] in api_avail]
 
