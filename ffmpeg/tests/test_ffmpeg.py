@@ -9,6 +9,8 @@ import random
 import re
 import subprocess
 
+import six
+
 try:
     import mock  # python 2
 except ImportError:
@@ -710,12 +712,87 @@ def test__probe__exception():
     with pytest.raises(ffmpeg.Error) as excinfo:
         ffmpeg.probe(BOGUS_INPUT_FILE)
     assert str(excinfo.value) == 'ffprobe error (see stderr output for detail)'
-    assert 'No such file or directory'.encode() in excinfo.value.stderr
+    assert 'No such file or directory' in excinfo.value.stderr
 
 
 def test__probe__extra_args():
     data = ffmpeg.probe(TEST_INPUT_FILE1, show_frames=None)
     assert set(data.keys()) == {'format', 'streams', 'frames'}
+
+
+def test__build_data():
+    data = ffmpeg.get_build_data()
+    assert set(data.keys()) == {
+        'version', 'formats', 'demuxers', 'muxers', 'codecs', 'bsfs',
+        'protocols', 'filters', 'pix_fmts', 'sample_fmts', 'layouts',
+        'colors', 'devices', 'hw_devices', 'hwaccels'}
+
+    assert isinstance(data['version'], six.string_types)
+
+    assert isinstance(data['codecs'], dict)
+    for codec, coders in data['codecs'].items():
+        assert isinstance(codec, six.string_types)
+        assert isinstance(coders, dict)
+    assert isinstance(data['hwaccels'], list)
+    for hwaccel in data['hwaccels']:
+        assert isinstance(hwaccel, dict)
+        assert 'name' in hwaccel
+
+    for fields_key in {'formats', 'demuxers', 'muxers', 'filters'}:
+        assert isinstance(data[fields_key], dict)
+
+    list_keys = {'bsfs'}
+    for list_key in list_keys:
+        assert isinstance(data[list_key], list)
+
+    assert isinstance(data['protocols'], dict)
+    for protocol_key in {'input', 'output'}:
+        assert protocol_key in data['protocols']
+        assert isinstance(data['protocols'][protocol_key], list)
+
+
+def test__detect():
+    for hwaccels_data in [
+            ffmpeg.detect_hwaccels(),
+            ffmpeg.detect_hwaccels(['foohwaccel'])]:
+        assert isinstance(hwaccels_data['hwaccels'], list)
+        for hwaccel in hwaccels_data['hwaccels']:
+            assert isinstance(hwaccel, dict)
+            assert 'name' in hwaccel
+
+    for codecs_kwargs in [
+            ffmpeg.detect_codecs('h264', 'h264'),
+            ffmpeg.detect_codecs(
+                'h264', 'h264', ['foohwaccel'])]:
+        for codec_kwargs in codecs_kwargs:
+            assert 'output' in codec_kwargs
+            assert isinstance(codec_kwargs['output'], dict)
+            assert 'codec' in codec_kwargs['output']
+            assert isinstance(
+                codec_kwargs['output']['codec'],
+                six.string_types)
+
+
+def test__detect_parse_models():
+    """
+    Parse model lines, sets and ranges.
+    """
+    model_lines = ffmpeg._detect._parse_models(
+        model_lines=['geforce rtx', 'geforce gtx', 'geforce gt', 'geforce'],
+        boards=(
+            'GeForce GT 630 > 640 GeForce GTX 650 / 660 '
+            'GeForce GT 740+750'),
+        model_data={})
+    assert 'geforce gt' in model_lines
+    assert 'models' in model_lines['geforce gt']
+    assert '740' in model_lines['geforce gt']['models']
+    assert '750' in model_lines['geforce gt']['models']
+    assert 'model_ranges' in model_lines['geforce gt']
+    assert '630 > 640' in model_lines['geforce gt']['model_ranges'][0]
+    assert 'geforce gtx' in model_lines
+    assert 'models' in model_lines['geforce gtx']
+    assert '650' in model_lines['geforce gtx']['models']
+    assert '660' in model_lines['geforce gtx']['models']
 
 
 def get_filter_complex_input(flt, name):
