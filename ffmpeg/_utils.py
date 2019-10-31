@@ -3,6 +3,8 @@ from builtins import str
 from past.builtins import basestring
 import hashlib
 import sys
+import collections
+
 
 if sys.version_info.major == 2:
     # noinspection PyUnresolvedReferences,PyShadowingBuiltins
@@ -91,6 +93,12 @@ def convert_kwargs_to_cmd_line_args(kwargs):
     args = []
     for k in sorted(kwargs.keys()):
         v = kwargs[k]
+        if isinstance(v, collections.Iterable) and not isinstance(v, str):
+            for value in v:
+                args.append('-{}'.format(k))
+                if value is not None:
+                    args.append('{}'.format(value))
+            continue
         args.append('-{}'.format(k))
         if v is not None:
             args.append('{}'.format(v))

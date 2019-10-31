@@ -9,6 +9,7 @@ import random
 import re
 import subprocess
 
+
 try:
     import mock  # python 2
 except ImportError:
@@ -113,6 +114,10 @@ def test_stream_repr():
     assert repr(dummy_out) == 'dummy()[{!r}] <{}>'.format(
         dummy_out.label, dummy_out.node.short_hash
     )
+
+def test_repeated_args():
+    out_file = ffmpeg.input('dummy.mp4').output('dummy2.mp4', streamid=['0:0x101', '1:0x102'])
+    assert out_file.get_args() == ['-i', 'dummy.mp4', '-streamid', '0:0x101', '-streamid', '1:0x102', 'dummy2.mp4']
 
 
 def test__get_args__simple():
