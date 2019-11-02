@@ -8,6 +8,7 @@ import pytest
 import random
 import re
 import subprocess
+import sys
 
 try:
     import mock  # python 2
@@ -704,6 +705,13 @@ def test__probe():
     data = ffmpeg.probe(TEST_INPUT_FILE1)
     assert set(data.keys()) == {'format', 'streams'}
     assert data['format']['duration'] == '7.036000'
+
+
+@pytest.mark.skipif(sys.version_info < (3, 3), reason="requires python3.3 or higher")
+def test__probe_timeout():
+    with pytest.raises(subprocess.TimeoutExpired) as excinfo:
+        data = ffmpeg.probe(TEST_INPUT_FILE1, timeout=0)
+    assert 'timed out after 0 seconds' in str(excinfo.value)
 
 
 def test__probe__exception():
