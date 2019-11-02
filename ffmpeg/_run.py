@@ -175,7 +175,7 @@ def get_args(stream_spec, overwrite_output=False):
 def compile(stream_spec, cmd='ffmpeg', overwrite_output=False):
     """Build command-line for invoking ffmpeg.
 
-    The :meth:`run` function uses this to build the commnad line
+    The :meth:`run` function uses this to build the command line
     arguments and should work in most cases, but calling this function
     directly is useful for debugging or if you need to invoke ffmpeg
     manually for whatever reason.
