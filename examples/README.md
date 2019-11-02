@@ -115,6 +115,36 @@ out = ffmpeg.output(v3, a3, 'out.mp4')
 out.run()
 ```
 
+## Mono to stereo with offsets and video
+
+<img src="https://raw.githubusercontent.com/kkroening/ffmpeg-python/master/examples/graphs/mono-to-stereo.png" alt="mono-to-stereo graph" width="80%" />
+
+```python
+audio_left = (
+    ffmpeg
+    .input('audio-left.wav')
+    .filter('atrim', start=5)
+    .filter('asetpts', 'PTS-STARTPTS')
+)
+
+audio_right = (
+    ffmpeg
+    .input('audio-right.wav')
+    .filter('atrim', start=10)
+    .filter('asetpts', 'PTS-STARTPTS')
+)
+
+input_video = ffmpeg.input('input-video.mp4')
+
+(
+    ffmpeg
+    .filter((audio_left, audio_right), 'join', inputs=2, channel_layout='stereo')
+    .output(input_video.video, 'output-video.mp4', shortest=None, vcodec='copy')
+    .overwrite_output()
+    .run()
+)
+```
+
 ## [Jupyter Frame Viewer](https://github.com/kkroening/ffmpeg-python/blob/master/examples/ffmpeg-numpy.ipynb)
 
 <img src="https://raw.githubusercontent.com/kkroening/ffmpeg-python/master/doc/jupyter-screenshot.png" alt="jupyter screenshot" width="75%" />
