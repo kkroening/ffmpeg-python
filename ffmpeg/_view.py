@@ -1,6 +1,4 @@
 from __future__ import unicode_literals
-
-from builtins import str
 from .dag import get_outgoing_edges
 from ._run import topo_sort
 import tempfile

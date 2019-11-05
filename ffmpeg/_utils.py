@@ -1,6 +1,4 @@
 from __future__ import unicode_literals
-from builtins import str
-from past.builtins import basestring
 import hashlib
 import sys
 import collections
@@ -42,8 +40,7 @@ if sys.version_info.major >= 3:
 
 
 else:
-    # noinspection PyUnresolvedReferences,PyCompatibility
-    from builtins import basestring
+    basestring = basestring
 
 
 def _recursive_repr(item):
