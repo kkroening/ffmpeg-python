@@ -9,20 +9,18 @@ before_install:
 matrix:
   include:
     - python: 2.7
-      env:
-      - TOX_ENV=py27
+      env: TOX_ENV=py27
     - python: 3.4
-      env:
-      - TOX_ENV=py34
+      env: TOX_ENV=py34
     - python: 3.5
-      env:
-      - TOX_ENV=py35
+      env: TOX_ENV=py35
     - python: 3.6
-      env:
-      - TOX_ENV=py36
+      env: TOX_ENV=py36
+    - python: 3.7
+      dist: xenial  # required for Python >= 3.7
+      env: TOX_ENV=py37
     - python: pypy
-      env:
-      - TOX_ENV=pypy
+      env: TOX_ENV=pypy
 install:
   - pip install tox
 script:
