@@ -32,7 +32,7 @@ def _get_input_args(input_node):
     if input_node.name == input.__name__:
         kwargs = copy.copy(input_node.kwargs)
         filename = kwargs.pop('filename')
-        fmt = kwargs.pop('format', None)
+        fmt = kwargs.pop('fmt', None)
         video_size = kwargs.pop('video_size', None)
         args = []
         if fmt:
@@ -128,8 +128,8 @@ def _get_output_args(node, stream_name_map):
 
     kwargs = copy.copy(node.kwargs)
     filename = kwargs.pop('filename')
-    if 'format' in kwargs:
-        args += ['-f', kwargs.pop('format')]
+    if 'fmt' in kwargs:
+        args += ['-f', kwargs.pop('fmt')]
     if 'video_bitrate' in kwargs:
         args += ['-b:v', str(kwargs.pop('video_bitrate'))]
     if 'audio_bitrate' in kwargs:
@@ -221,7 +221,7 @@ def run_async(
 
             process = (
                 ffmpeg
-                .input('pipe:', format='rawvideo', pix_fmt='rgb24', s='{}x{}'.format(width, height))
+                .input('pipe:', fmt='rawvideo', pix_fmt='rgb24', s='{}x{}'.format(width, height))
                 .output(out_filename, pix_fmt='yuv420p')
                 .overwrite_output()
                 .run_async(pipe_stdin=True)
@@ -233,7 +233,7 @@ def run_async(
             process = (
                 ffmpeg
                 .input(in_filename)
-                .output('pipe':, format='rawvideo', pix_fmt='rgb24')
+                .output('pipe':, fmt='rawvideo', pix_fmt='rgb24')
                 .run_async(pipe_stdout=True, pipe_stderr=True)
             )
             out, err = process.communicate()
@@ -243,13 +243,13 @@ def run_async(
             process1 = (
                 ffmpeg
                 .input(in_filename)
-                .output('pipe:', format='rawvideo', pix_fmt='rgb24')
+                .output('pipe:', fmt='rawvideo', pix_fmt='rgb24')
                 .run_async(pipe_stdout=True)
             )
 
             process2 = (
                 ffmpeg
-                .input('pipe:', format='rawvideo', pix_fmt='rgb24', s='{}x{}'.format(width, height))
+                .input('pipe:', fmt='rawvideo', pix_fmt='rgb24', s='{}x{}'.format(width, height))
                 .output(out_filename, pix_fmt='yuv420p')
                 .overwrite_output()
                 .run_async(pipe_stdin=True)

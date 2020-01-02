@@ -51,7 +51,7 @@ def get_chunk_times(in_filename, silence_threshold, silence_duration, start_time
         (ffmpeg
             .input(in_filename, **input_kwargs)
             .filter('silencedetect', n='{}dB'.format(silence_threshold), d=silence_duration)
-            .output('-', format='null')
+            .output('-', fmt='null')
             .compile()
         ) + ['-nostats'],  # FIXME: use .nostats() once it's implemented in ffmpeg-python.
         stderr=subprocess.PIPE

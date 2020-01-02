@@ -26,9 +26,9 @@ def input(filename, **kwargs):
     kwargs['filename'] = filename
     fmt = kwargs.pop('f', None)
     if fmt:
-        if 'format' in kwargs:
-            raise ValueError("Can't specify both `format` and `f` kwargs")
-        kwargs['format'] = fmt
+        if 'fmt' in kwargs:
+            raise ValueError("Can't specify both `fmt` and `f` kwargs")
+        kwargs['fmt'] = fmt
     return InputNode(input.__name__, kwargs=kwargs).stream()
 
 
@@ -69,7 +69,7 @@ def output(*streams_and_filename, **kwargs):
     Args:
         video_bitrate: parameter for ``-b:v``, e.g. ``video_bitrate=1000``.
         audio_bitrate: parameter for ``-b:a``, e.g. ``audio_bitrate=200``.
-        format: alias for ``-f`` parameter, e.g. ``format='mp4'``
+        fmt: alias for ``-f`` parameter, e.g. ``fmt='mp4'``
             (equivalent to ``f='mp4'``).
 
     If multiple streams are provided, they are mapped to the same
@@ -88,9 +88,9 @@ def output(*streams_and_filename, **kwargs):
 
     fmt = kwargs.pop('f', None)
     if fmt:
-        if 'format' in kwargs:
-            raise ValueError("Can't specify both `format` and `f` kwargs")
-        kwargs['format'] = fmt
+        if 'fmt' in kwargs:
+            raise ValueError("Can't specify both `fmt` and `f` kwargs")
+        kwargs['fmt'] = fmt
     return OutputNode(streams, output.__name__, kwargs=kwargs).stream()
 
 

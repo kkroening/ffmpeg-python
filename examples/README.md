@@ -31,7 +31,7 @@ height = int(video_stream['height'])
 out, _ = (
     ffmpeg
     .input('in.mp4')
-    .output('pipe:', format='rawvideo', pix_fmt='rgb24')
+    .output('pipe:', fmt='rawvideo', pix_fmt='rgb24')
     .run(capture_stdout=True)
 )
 video = (
@@ -50,7 +50,7 @@ out, _ = (
     ffmpeg
     .input(in_filename)
     .filter('select', 'gte(n,{})'.format(frame_num))
-    .output('pipe:', vframes=1, format='image2', vcodec='mjpeg')
+    .output('pipe:', vframes=1, fmt='image2', vcodec='mjpeg')
     .run(capture_stdout=True)
 )
 ```
@@ -62,7 +62,7 @@ out, _ = (
 ```python
 out, _ = (ffmpeg
     .input(in_filename, **input_kwargs)
-    .output('-', format='s16le', acodec='pcm_s16le', ac=1, ar='16k')
+    .output('-', fmt='s16le', acodec='pcm_s16le', ac=1, ar='16k')
     .overwrite_output()
     .run(capture_stdout=True)
 )
@@ -165,13 +165,13 @@ input_video = ffmpeg.input('input-video.mp4')
 process1 = (
     ffmpeg
     .input(in_filename)
-    .output('pipe:', format='rawvideo', pix_fmt='rgb24', vframes=8)
+    .output('pipe:', fmt='rawvideo', pix_fmt='rgb24', vframes=8)
     .run_async(pipe_stdout=True)
 )
 
 process2 = (
     ffmpeg
-    .input('pipe:', format='rawvideo', pix_fmt='rgb24', s='{}x{}'.format(width, height))
+    .input('pipe:', fmt='rawvideo', pix_fmt='rgb24', s='{}x{}'.format(width, height))
     .output(out_filename, pix_fmt='yuv420p')
     .overwrite_output()
     .run_async(pipe_stdin=True)
@@ -208,7 +208,7 @@ process2.wait()
 ```python
 (
     ffmpeg
-    .input('FaceTime', format='avfoundation', pix_fmt='uyvy422', framerate=30)
+    .input('FaceTime', fmt='avfoundation', pix_fmt='uyvy422', framerate=30)
     .output('out.mp4', pix_fmt='yuv420p', vframes=100)
     .run()
 )
@@ -222,7 +222,7 @@ packet_size = 4096
 process = (
     ffmpeg
     .input('rtsp://%s:8554/default')
-    .output('-', format='h264')
+    .output('-', fmt='h264')
     .run_async(pipe_stdout=True)
 )
 

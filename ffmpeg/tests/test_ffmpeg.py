@@ -659,13 +659,13 @@ def test_pipe():
     out = (
         ffmpeg.input(
             'pipe:0',
-            format='rawvideo',
+            fmt='rawvideo',
             pixel_format='rgb24',
             video_size=(width, height),
             framerate=10,
         )
         .trim(start_frame=start_frame)
-        .output('pipe:1', format='rawvideo')
+        .output('pipe:1', fmt='rawvideo')
     )
 
     args = out.get_args()

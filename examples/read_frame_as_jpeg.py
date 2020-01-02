@@ -16,7 +16,7 @@ def read_frame_as_jpeg(in_filename, frame_num):
         ffmpeg
         .input(in_filename)
         .filter('select', 'gte(n,{})'.format(frame_num))
-        .output('pipe:', vframes=1, format='image2', vcodec='mjpeg')
+        .output('pipe:', vframes=1, fmt='image2', vcodec='mjpeg')
         .run(capture_stdout=True)
     )
     return out

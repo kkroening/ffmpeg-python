@@ -58,7 +58,7 @@ def start_ffmpeg_process1(in_filename):
     args = (
         ffmpeg
         .input(in_filename)
-        .output('pipe:', format='rawvideo', pix_fmt='rgb24')
+        .output('pipe:', fmt='rawvideo', pix_fmt='rgb24')
         .compile()
     )
     return subprocess.Popen(args, stdout=subprocess.PIPE)
@@ -68,7 +68,7 @@ def start_ffmpeg_process2(out_filename, width, height):
     logger.info('Starting ffmpeg process2')
     args = (
         ffmpeg
-        .input('pipe:', format='rawvideo', pix_fmt='rgb24', s='{}x{}'.format(width, height))
+        .input('pipe:', fmt='rawvideo', pix_fmt='rgb24', s='{}x{}'.format(width, height))
         .output(out_filename, pix_fmt='yuv420p')
         .overwrite_output()
         .compile()
