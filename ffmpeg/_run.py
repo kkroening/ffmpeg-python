@@ -329,8 +329,14 @@ def run(
 
 @output_operator()
 async def run_asyncio(
-        stream_spec, cmd='ffmpeg', pipe_stdin=False, pipe_stdout=False, pipe_stderr=False,
-        quiet=False, overwrite_output=False):
+    stream_spec,
+    cmd='ffmpeg',
+    pipe_stdin=False,
+    pipe_stdout=False,
+    pipe_stderr=False,
+    quiet=False,
+    overwrite_output=False,
+):
     """Asynchronously invoke ffmpeg in asyncio sync/await style and return coroutine.
     Have the same possibilities as `run_async` call.
 

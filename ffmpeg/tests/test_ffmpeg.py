@@ -1,7 +1,5 @@
 from __future__ import unicode_literals
 
-import asyncio
-
 from builtins import bytes
 from builtins import range
 from builtins import str
@@ -12,6 +10,7 @@ import random
 import re
 import subprocess
 import sys
+import asyncio
 
 
 try:
