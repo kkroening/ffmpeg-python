@@ -110,7 +110,7 @@ def _get_global_args(node):
     return list(node.args)
 
 
-def _get_output_args(node, stream_name_map):
+def _get_output_args(node, stream_name_map, explicit_maps):
     if node.name != output.__name__:
         raise ValueError('Unsupported output node: {}'.format(node))
     args = []
@@ -123,7 +123,7 @@ def _get_output_args(node, stream_name_map):
         stream_name = _format_input_stream_name(
             stream_name_map, edge, is_final_arg=True
         )
-        if stream_name != '0' or len(node.incoming_edges) > 1:
+        if explicit_maps or stream_name != '0' or len(node.incoming_edges) > 1:
             args += ['-map', stream_name]
 
     kwargs = copy.copy(node.kwargs)
@@ -147,7 +147,7 @@ def _get_output_args(node, stream_name_map):
 
 
 @output_operator()
-def get_args(stream_spec, overwrite_output=False):
+def get_args(stream_spec, overwrite_output=False, explicit_maps=False):
     """Build command-line arguments to be passed to ffmpeg."""
     nodes = get_stream_spec_nodes(stream_spec)
     args = []
@@ -163,7 +163,7 @@ def get_args(stream_spec, overwrite_output=False):
     if filter_arg:
         args += ['-filter_complex', filter_arg]
     args += reduce(
-        operator.add, [_get_output_args(node, stream_name_map) for node in output_nodes]
+        operator.add, [_get_output_args(node, stream_name_map, explicit_maps) for node in output_nodes]
     )
     args += reduce(operator.add, [_get_global_args(node) for node in global_nodes], [])
     if overwrite_output:
@@ -172,7 +172,7 @@ def get_args(stream_spec, overwrite_output=False):
 
 
 @output_operator()
-def compile(stream_spec, cmd='ffmpeg', overwrite_output=False):
+def compile(stream_spec, cmd='ffmpeg', overwrite_output=False, explicit_maps=False):
     """Build command-line for invoking ffmpeg.
 
     The :meth:`run` function uses this to build the command line
@@ -187,7 +187,7 @@ def compile(stream_spec, cmd='ffmpeg', overwrite_output=False):
         cmd = [cmd]
     elif type(cmd) != list:
         cmd = list(cmd)
-    return cmd + get_args(stream_spec, overwrite_output=overwrite_output)
+    return cmd + get_args(stream_spec, overwrite_output=overwrite_output, explicit_maps=explicit_maps)
 
 
 @output_operator()
