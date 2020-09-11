@@ -5,6 +5,7 @@ from .dag import KwargReprNode
 from ._utils import escape_chars, get_hash_int
 from builtins import object
 import os
+import uuid
 
 
 def _is_of_types(obj, types):
@@ -305,6 +306,7 @@ class FilterNode(FilterableNode):
 # noinspection PyMethodOverriding
 class SourceNode(FilterableNode):
     def __init__(self, name, args=[], kwargs={}):
+        self.source_node_id = uuid.uuid4()
         super(SourceNode, self).__init__(
             stream_spec=None,
             name=name,
@@ -315,6 +317,13 @@ class SourceNode(FilterableNode):
             args=args,
             kwargs=kwargs
         )
+
+    def __hash__(self):
+        """Two source nodes with the same options should _not_ be considered
+        the same node. For this reason we create a uuid4 on node instantiation,
+        and use that as our hash.
+        """
+        return self.source_node_id.int
 
 
 # noinspection PyMethodOverriding
