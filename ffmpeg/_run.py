@@ -321,7 +321,7 @@ def run(
         pipe_stderr=capture_stderr,
         quiet=quiet,
         overwrite_output=overwrite_output,
-        cwd
+        cwd=cwd
     )
     out, err = process.communicate(input)
     retcode = process.poll()
