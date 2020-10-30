@@ -282,7 +282,8 @@ def run_async(
     stdout_stream = subprocess.PIPE if pipe_stdout else None
     stderr_stream = subprocess.PIPE if pipe_stderr else None
     if quiet:
-        stdout_stream = stderr_stream = subprocess.DEVNULL
+        stderr_stream = subprocess.STDOUT
+        stdout_stream = subprocess.DEVNULL
     return subprocess.Popen(
         args, stdin=stdin_stream, stdout=stdout_stream, stderr=stderr_stream
     )
