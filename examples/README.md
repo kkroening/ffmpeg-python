@@ -214,6 +214,32 @@ process2.wait()
 )
 ```
 
+## Stream from a local video to HTTP server
+
+```python
+video_format = "flv"
+server_url = "http://localhost:8080"
+
+process = (
+    ffmpeg
+    .input("input.mp4")
+    .output(
+        server_url, 
+        codec = "copy", # use same codecs of the original video
+        listen=1, # enables HTTP server
+        f=video_format)
+    .global_args("-re") # argument to act as a live stream
+    .run()
+)
+
+```
+
+to receive the video you can use ffplay in the terminal:
+
+```
+$ ffplay -f flv http://localhost:8080
+```
+
 ## Stream from RTSP server to TCP socket
 
 ```python
