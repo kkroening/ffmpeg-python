@@ -204,6 +204,10 @@ This dilemma is intrinsic to ffmpeg, and ffmpeg-python tries to stay out of the 
 
 As usual, take a look at the [examples](https://github.com/kkroening/ffmpeg-python/tree/master/examples#audiovideo-pipeline) (*Audio/video pipeline* in particular).
 
+**How can I find out the used command line arguments?**
+
+You can run `stream.get_args()` before `stream.run()` to retrieve the command line arguments that will be passed to `ffmpeg`. You can also run `stream.compile()` that also includes the `ffmpeg` executable as the first argument.
+
 **How do I do XYZ?**
 
 Take a look at each of the links in the [Additional Resources](https://kkroening.github.io/ffmpeg-python/) section at the end of this README.  If you look everywhere and can't find what you're looking for and have a question that may be relevant to other users, you may open an issue asking how to do it, while providing a thorough explanation of what you're trying to do and what you've tried so far.
