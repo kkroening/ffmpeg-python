@@ -255,6 +255,7 @@ pytest
 - [FFmpeg Homepage](https://ffmpeg.org/)
 - [FFmpeg Documentation](https://ffmpeg.org/ffmpeg.html)
 - [FFmpeg Filters Documentation](https://ffmpeg.org/ffmpeg-filters.html)
+- [golang port of ffmpeg-python: ffmpeg-go](https://github.com/u2takey/ffmpeg-go)
 - [Test cases](https://github.com/kkroening/ffmpeg-python/blob/master/ffmpeg/tests/test_ffmpeg.py)
 - [Issue tracker](https://github.com/kkroening/ffmpeg-python/issues)
 - Matrix Chat: [#ffmpeg-python:matrix.org](https://riot.im/app/#/room/#ffmpeg-python:matrix.org)
