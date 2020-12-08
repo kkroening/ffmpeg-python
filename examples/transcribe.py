@@ -22,7 +22,7 @@ def decode_audio(in_filename, **input_kwargs):
     try:
         out, err = (ffmpeg
             .input(in_filename, **input_kwargs)
-            .output('-', format='s16le', acodec='pcm_s16le', ac=1, ar='16k')
+            .output('-', fmt='s16le', acodec='pcm_s16le', ac=1, ar='16k')
             .overwrite_output()
             .run(capture_stdout=True, capture_stderr=True)
         )
