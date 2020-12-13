@@ -233,7 +233,7 @@ def run_async(
             process = (
                 ffmpeg
                 .input(in_filename)
-                .output('pipe':, format='rawvideo', pix_fmt='rgb24')
+                .output('pipe:', format='rawvideo', pix_fmt='rgb24')
                 .run_async(pipe_stdout=True, pipe_stderr=True)
             )
             out, err = process.communicate()
