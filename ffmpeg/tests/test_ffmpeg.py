@@ -441,14 +441,12 @@ def test__compile():
 @pytest.mark.parametrize('pipe_stdin', [True, False])
 @pytest.mark.parametrize('pipe_stdout', [True, False])
 @pytest.mark.parametrize('pipe_stderr', [True, False])
-@pytest.mark.parametrize('cwd', [None, '/tmp'])
-def test__run_async(mocker, pipe_stdin, pipe_stdout, pipe_stderr, cwd):
+def test__run_async(mocker, pipe_stdin, pipe_stdout, pipe_stderr):
     process__mock = mock.Mock()
     popen__mock = mocker.patch.object(subprocess, 'Popen', return_value=process__mock)
     stream = _get_simple_example()
     process = ffmpeg.run_async(
-        stream, pipe_stdin=pipe_stdin, pipe_stdout=pipe_stdout,
-        pipe_stderr=pipe_stderr, cwd=cwd
+        stream, pipe_stdin=pipe_stdin, pipe_stdout=pipe_stdout, pipe_stderr=pipe_stderr
     )
     assert process is process__mock
 
@@ -458,8 +456,7 @@ def test__run_async(mocker, pipe_stdin, pipe_stdout, pipe_stderr, cwd):
     (args,), kwargs = popen__mock.call_args
     assert args == ffmpeg.compile(stream)
     assert kwargs == dict(
-        stdin=expected_stdin, stdout=expected_stdout, stderr=expected_stderr,
-        cwd=cwd
+        stdin=expected_stdin, stdout=expected_stdout, stderr=expected_stderr
     )
 
 
