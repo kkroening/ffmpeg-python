@@ -78,6 +78,15 @@ Real-world signal graphs can get a heck of a lot more complex, but `ffmpeg-pytho
 
 ## Installation
 
+Before using ffmpeg-python, you need to have ffmpeg installed and in your PATH environment. You can install ffmpeg through the official website [here](https://ffmpeg.org/download.html). Once you have it installed, make sure the folder ffmpeg is located is set in your environment path. You can check if your environment path is set correctly by opening up a command window and typing this
+
+```
+$ ffmpeg
+ffmpeg version 4.2.4-1ubuntu0.1 Copyright (c) 2000-2020 the FFmpeg developers
+  built with gcc 9 (Ubuntu 9.3.0-10ubuntu2)
+
+```
+
 The latest version of `ffmpeg-python` can be acquired via a typical pip install:
 
 ```
