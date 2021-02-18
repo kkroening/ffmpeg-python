@@ -17,8 +17,9 @@ matrix:
     - python: 3.6
       env: TOX_ENV=py36
     - python: 3.7
-      dist: xenial  # required for Python >= 3.7
       env: TOX_ENV=py37
+    - python: 3.8
+      env: TOX_ENV=py38
     - python: pypy
       env: TOX_ENV=pypy
 install:
