@@ -97,6 +97,25 @@ With additional filtering:
 )
 ```
 
+From a sequence of frames stored in memory (e.g. NumPy):
+
+```python
+# You need to know the frame size (h, w) and pixel format (e.g. OpenCV uses 8-bit BGR, so 'bgr24').
+# For a complete list of pixel format codes run ffmpeg in terminal directly: 'ffmpeg -pix_fmts'
+stream = (
+    ffmpeg
+    .input('pipe:', format='rawvideo', pix_fmt='bgr24', s='{}x{}'.format(h, w))
+    .output('movie.mp4', pix_fmt='yuv420p', r=60.0)
+    .run_async(pipe_stdin=True)
+)
+# Example below assumes each frame is stored as a NumPy array
+for frame in frames:
+  data = frame.astype('uint8').tobytes()  # whatever your source is - you need to convert data to bytes
+  stream.stdin.write(data)
+stream.stdin.close()
+stream.wait()
+```
+
 ## Audio/video pipeline
 
 <img src="https://raw.githubusercontent.com/kkroening/ffmpeg-python/master/examples/graphs/av-pipeline.png" alt="av-pipeline graph" width="80%" />
