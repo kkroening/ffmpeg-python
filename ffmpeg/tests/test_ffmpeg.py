@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+
 from builtins import bytes
 from builtins import range
 from builtins import str
@@ -785,3 +786,7 @@ def test__multi_output_edge_label_order():
     out1, out2 = get_filter_complex_outputs(flt_cmpl, 'scale2ref')
     assert out1 == get_filter_complex_input(flt_cmpl, 'scale')
     assert out2 == get_filter_complex_input(flt_cmpl, 'hflip')
+
+
+if sys.version_info >= (3, 4):
+    from ._test_asyncio import test_run_asyncio

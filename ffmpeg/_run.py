@@ -334,3 +334,11 @@ def run(
 
 
 __all__ = ['compile', 'Error', 'get_args', 'run', 'run_async']
+
+try:
+    from ._run_asyncio import *
+except (SyntaxError, ImportError):
+    pass
+else:
+    from . import _run_asyncio
+    __all__ += _run_asyncio.__all__
