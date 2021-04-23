@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # Use ffmpeg-python with api.video. Api.video lets you create your own live streams. 
 # Complete tutorial for using ffmpeg-python with api.video here: https://api.video/blog/tutorials/live-stream-to-the-browser-with-ffmpeg-cli-and-python
 # You need to get your api.video stream key and replace 'apivideo_stream_key.'
