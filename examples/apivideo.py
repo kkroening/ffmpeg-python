@@ -2,9 +2,10 @@
 # Complete tutorial for using ffmpeg-python with api.video here: https://api.video/blog/tutorials/live-stream-to-the-browser-with-ffmpeg-cli-and-python
 # You need to get your api.video stream key and replace 'apivideo_stream_key.'
 # You can probably use this for other tools as well. 
+
 import ffmpeg
 
-rtmp_url = "rtmp://broadcast.api.video/s/" + apivideo_stream_key
+rtmp_url = 'rtmp://broadcast.api.video/s/' + 'apivideo_stream_key'
 
 (
   ffmpeg
