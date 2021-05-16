@@ -24,7 +24,7 @@ def input(filename, **kwargs):
 
     Official documentation: `Main options <https://ffmpeg.org/ffmpeg.html#Main-options>`__
     """
-    if isinstance(filename, os.PathLike):
+    if getattr(os, "PathLike", None) and isinstance(filename, os.PathLike):
         filename = str(filename)
     kwargs['filename'] = filename
     fmt = kwargs.pop('f', None)
