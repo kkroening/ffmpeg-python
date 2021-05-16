@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from past.builtins import basestring
 from ._utils import basestring
+import os
 
 from .nodes import (
     filter_operator,
@@ -23,6 +24,8 @@ def input(filename, **kwargs):
 
     Official documentation: `Main options <https://ffmpeg.org/ffmpeg.html#Main-options>`__
     """
+    if isinstance(filename, os.PathLike):
+        filename = str(filename)
     kwargs['filename'] = filename
     fmt = kwargs.pop('f', None)
     if fmt:
