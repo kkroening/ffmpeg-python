@@ -1,7 +1,7 @@
 alabaster==0.7.12
 atomicwrites==1.3.0
 attrs==19.1.0
-Babel==2.7.0
+Babel==2.9.1
 certifi==2019.3.9
 chardet==3.0.4
 docutils==0.14
