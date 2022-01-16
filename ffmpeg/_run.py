@@ -137,7 +137,7 @@ def _get_output_args(node, stream_name_map):
     if 'video_size' in kwargs:
         video_size = kwargs.pop('video_size')
         if not isinstance(video_size, basestring) and isinstance(
-            video_size, collections.Iterable
+            video_size, collections.abc.Iterable
         ):
             video_size = '{}x{}'.format(video_size[0], video_size[1])
         args += ['-video_size', video_size]
