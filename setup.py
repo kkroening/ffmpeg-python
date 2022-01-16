@@ -1,4 +1,3 @@
-from tabnanny import verbose
 from setuptools import setup
 from textwrap import dedent
 
