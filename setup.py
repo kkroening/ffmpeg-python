@@ -1,7 +1,12 @@
+from tabnanny import verbose
 from setuptools import setup
 from textwrap import dedent
 
-version = '0.2.0'
+
+import ffmpeg
+
+
+version = ffmpeg.__version__
 download_url = 'https://github.com/kkroening/ffmpeg-python/archive/v{}.zip'.format(
     version
 )
