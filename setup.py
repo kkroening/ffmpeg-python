@@ -60,8 +60,6 @@ keywords = misc_keywords + file_formats
 setup(
     name='ffmpeg-python',
     packages=['ffmpeg'],
-    setup_requires=['pytest-runner'],
-    tests_require=['pytest', 'pytest-mock'],
     version=version,
     description='Python bindings for FFmpeg - with complex filtering support',
     author='Karl Kroening',

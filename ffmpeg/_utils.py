@@ -40,7 +40,6 @@ if sys.version_info.major >= 3:
     class basestring(with_metaclass(BaseBaseString)):
         pass
 
-
 else:
     # noinspection PyUnresolvedReferences,PyCompatibility
     from builtins import basestring
