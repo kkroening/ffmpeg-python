@@ -35,8 +35,8 @@ def view(stream_spec, detail=False, filename=None, pipe=False, **kwargs):
         import graphviz
     except ImportError:
         raise ImportError(
-            'failed to import graphviz; please make sure graphviz is installed (e.g. `pip install '
-            'graphviz`)'
+            'failed to import graphviz; please make sure graphviz is installed (e.g. '
+            '`pip install graphviz`)'
         )
 
     show_labels = kwargs.pop('show_labels', True)
