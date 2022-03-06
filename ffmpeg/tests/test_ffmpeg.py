@@ -116,9 +116,20 @@ def test_stream_repr():
         dummy_out.label, dummy_out.node.short_hash
     )
 
+
 def test_repeated_args():
-    out_file = ffmpeg.input('dummy.mp4').output('dummy2.mp4', streamid=['0:0x101', '1:0x102'])
-    assert out_file.get_args() == ['-i', 'dummy.mp4', '-streamid', '0:0x101', '-streamid', '1:0x102', 'dummy2.mp4']
+    out_file = ffmpeg.input('dummy.mp4').output(
+        'dummy2.mp4', streamid=['0:0x101', '1:0x102']
+    )
+    assert out_file.get_args() == [
+        '-i',
+        'dummy.mp4',
+        '-streamid',
+        '0:0x101',
+        '-streamid',
+        '1:0x102',
+        'dummy2.mp4',
+    ]
 
 
 def test__get_args__simple():
@@ -332,8 +343,13 @@ def test_filter_asplit():
         '-i',
         TEST_INPUT_FILE1,
         '-filter_complex',
-        '[0]vflip[s0];[s0]asplit=2[s1][s2];[s1]atrim=end=20:start=10[s3];[s2]atrim=end=40:start=30[s4];[s3]'
-        '[s4]concat=n=2[s5]',
+        (
+            '[0]vflip[s0];'
+            '[s0]asplit=2[s1][s2];'
+            '[s1]atrim=end=20:start=10[s3];'
+            '[s2]atrim=end=40:start=30[s4];'
+            '[s3][s4]concat=n=2[s5]'
+        ),
         '-map',
         '[s5]',
         TEST_OUTPUT_FILE1,
@@ -357,10 +373,14 @@ def test__output__video_size(video_size):
 
 
 def test_filter_normal_arg_escape():
-    """Test string escaping of normal filter args (e.g. ``font`` param of ``drawtext`` filter)."""
+    """Test string escaping of normal filter args (e.g. ``font`` param of ``drawtext``
+    filter).
+    """
 
     def _get_drawtext_font_repr(font):
-        """Build a command-line arg using drawtext ``font`` param and extract the ``-filter_complex`` arg."""
+        """Build a command-line arg using drawtext ``font`` param and extract the
+        ``-filter_complex`` arg.
+        """
         args = (
             ffmpeg.input('in')
             .drawtext('test', font='a{}b'.format(font))
@@ -370,7 +390,9 @@ def test_filter_normal_arg_escape():
         assert args[:3] == ['-i', 'in', '-filter_complex']
         assert args[4:] == ['-map', '[s0]', 'out']
         match = re.match(
-            r'\[0\]drawtext=font=a((.|\n)*)b:text=test\[s0\]', args[3], re.MULTILINE
+            r'\[0\]drawtext=font=a((.|\n)*)b:text=test\[s0\]',
+            args[3],
+            re.MULTILINE,
         )
         assert match is not None, 'Invalid -filter_complex arg: {!r}'.format(args[3])
         return match.group(1)
@@ -394,10 +416,14 @@ def test_filter_normal_arg_escape():
 
 
 def test_filter_text_arg_str_escape():
-    """Test string escaping of normal filter args (e.g. ``text`` param of ``drawtext`` filter)."""
+    """Test string escaping of normal filter args (e.g. ``text`` param of ``drawtext``
+    filter).
+    """
 
     def _get_drawtext_text_repr(text):
-        """Build a command-line arg using drawtext ``text`` param and extract the ``-filter_complex`` arg."""
+        """Build a command-line arg using drawtext ``text`` param and extract the
+        ``-filter_complex`` arg.
+        """
         args = ffmpeg.input('in').drawtext('a{}b'.format(text)).output('out').get_args()
         assert args[:3] == ['-i', 'in', '-filter_complex']
         assert args[4:] == ['-map', '[s0]', 'out']
@@ -447,8 +473,11 @@ def test__run_async(mocker, pipe_stdin, pipe_stdout, pipe_stderr, cwd):
     popen__mock = mocker.patch.object(subprocess, 'Popen', return_value=process__mock)
     stream = _get_simple_example()
     process = ffmpeg.run_async(
-        stream, pipe_stdin=pipe_stdin, pipe_stdout=pipe_stdout,
-        pipe_stderr=pipe_stderr, cwd=cwd
+        stream,
+        pipe_stdin=pipe_stdin,
+        pipe_stdout=pipe_stdout,
+        pipe_stderr=pipe_stderr,
+        cwd=cwd,
     )
     assert process is process__mock
 
@@ -458,8 +487,10 @@ def test__run_async(mocker, pipe_stdin, pipe_stdout, pipe_stderr, cwd):
     (args,), kwargs = popen__mock.call_args
     assert args == ffmpeg.compile(stream)
     assert kwargs == dict(
-        stdin=expected_stdin, stdout=expected_stdout, stderr=expected_stderr,
-        cwd=cwd
+        stdin=expected_stdin,
+        stdout=expected_stdout,
+        stderr=expected_stderr,
+        cwd=cwd,
     )
 
 
@@ -695,7 +726,10 @@ def test_pipe():
 
     cmd = ['ffmpeg'] + args
     p = subprocess.Popen(
-        cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        cmd,
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
     )
 
     in_data = bytes(
@@ -715,10 +749,10 @@ def test__probe():
     assert data['format']['duration'] == '7.036000'
 
 
-@pytest.mark.skipif(sys.version_info < (3, 3), reason="requires python3.3 or higher")
+@pytest.mark.skipif(sys.version_info < (3, 3), reason='requires python3.3 or higher')
 def test__probe_timeout():
     with pytest.raises(subprocess.TimeoutExpired) as excinfo:
-        data = ffmpeg.probe(TEST_INPUT_FILE1, timeout=0)
+        ffmpeg.probe(TEST_INPUT_FILE1, timeout=0)
     assert 'timed out after 0 seconds' in str(excinfo.value)
 
 
@@ -751,24 +785,24 @@ def get_filter_complex_outputs(flt, name):
 
 
 def test__get_filter_complex_input():
-    assert get_filter_complex_input("", "scale") is None
-    assert get_filter_complex_input("scale", "scale") is None
-    assert get_filter_complex_input("scale[s3][s4];etc", "scale") is None
-    assert get_filter_complex_input("[s2]scale", "scale") == "s2"
-    assert get_filter_complex_input("[s2]scale;etc", "scale") == "s2"
-    assert get_filter_complex_input("[s2]scale[s3][s4];etc", "scale") == "s2"
+    assert get_filter_complex_input('', 'scale') is None
+    assert get_filter_complex_input('scale', 'scale') is None
+    assert get_filter_complex_input('scale[s3][s4];etc', 'scale') is None
+    assert get_filter_complex_input('[s2]scale', 'scale') == 's2'
+    assert get_filter_complex_input('[s2]scale;etc', 'scale') == 's2'
+    assert get_filter_complex_input('[s2]scale[s3][s4];etc', 'scale') == 's2'
 
 
 def test__get_filter_complex_outputs():
-    assert get_filter_complex_outputs("", "scale") is None
-    assert get_filter_complex_outputs("scale", "scale") is None
-    assert get_filter_complex_outputs("scalex[s0][s1]", "scale") is None
-    assert get_filter_complex_outputs("scale[s0][s1]", "scale") == ['s0', 's1']
-    assert get_filter_complex_outputs("[s5]scale[s0][s1]", "scale") == ['s0', 's1']
-    assert get_filter_complex_outputs("[s5]scale[s1][s0]", "scale") == ['s1', 's0']
-    assert get_filter_complex_outputs("[s5]scale[s1]", "scale") == ['s1']
-    assert get_filter_complex_outputs("[s5]scale[s1];x", "scale") == ['s1']
-    assert get_filter_complex_outputs("y;[s5]scale[s1];x", "scale") == ['s1']
+    assert get_filter_complex_outputs('', 'scale') is None
+    assert get_filter_complex_outputs('scale', 'scale') is None
+    assert get_filter_complex_outputs('scalex[s0][s1]', 'scale') is None
+    assert get_filter_complex_outputs('scale[s0][s1]', 'scale') == ['s0', 's1']
+    assert get_filter_complex_outputs('[s5]scale[s0][s1]', 'scale') == ['s0', 's1']
+    assert get_filter_complex_outputs('[s5]scale[s1][s0]', 'scale') == ['s1', 's0']
+    assert get_filter_complex_outputs('[s5]scale[s1]', 'scale') == ['s1']
+    assert get_filter_complex_outputs('[s5]scale[s1];x', 'scale') == ['s1']
+    assert get_filter_complex_outputs('y;[s5]scale[s1];x', 'scale') == ['s1']
 
 
 def test__multi_output_edge_label_order():

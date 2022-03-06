@@ -49,8 +49,8 @@ else:
 def _recursive_repr(item):
     """Hack around python `repr` to deterministically represent dictionaries.
 
-    This is able to represent more things than json.dumps, since it does not require things to be JSON serializable
-    (e.g. datetimes).
+    This is able to represent more things than json.dumps, since it does not require
+    things to be JSON serializable (e.g. datetimes).
     """
     if isinstance(item, basestring):
         result = str(item)

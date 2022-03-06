@@ -34,8 +34,7 @@ def input(filename, **kwargs):
 
 @output_operator()
 def global_args(stream, *args):
-    """Add extra global command-line argument(s), e.g. ``-progress``.
-    """
+    """Add extra global command-line argument(s), e.g. ``-progress``."""
     return GlobalNode(stream, global_args.__name__, args).stream()
 
 
@@ -50,8 +49,7 @@ def overwrite_output(stream):
 
 @output_operator()
 def merge_outputs(*streams):
-    """Include all given outputs in one ffmpeg command line
-    """
+    """Include all given outputs in one ffmpeg command line"""
     return MergeOutputsNode(streams, merge_outputs.__name__).stream()
 
 
