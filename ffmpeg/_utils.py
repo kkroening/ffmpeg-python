@@ -3,12 +3,16 @@ from builtins import str
 from past.builtins import basestring
 import hashlib
 import sys
-import collections
 
 
 if sys.version_info.major == 2:
     # noinspection PyUnresolvedReferences,PyShadowingBuiltins
     str = str
+
+try:
+    from collections.abc import Iterable
+except ImportError:
+    from collections import Iterable
 
 
 # `past.builtins.basestring` module can't be imported on Python3 in some environments (Ubuntu).
@@ -92,7 +96,7 @@ def convert_kwargs_to_cmd_line_args(kwargs):
     args = []
     for k in sorted(kwargs.keys()):
         v = kwargs[k]
-        if isinstance(v, collections.Iterable) and not isinstance(v, str):
+        if isinstance(v, Iterable) and not isinstance(v, str):
             for value in v:
                 args.append('-{}'.format(k))
                 if value is not None:

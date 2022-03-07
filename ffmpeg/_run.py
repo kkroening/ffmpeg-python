@@ -3,7 +3,6 @@ from .dag import get_outgoing_edges, topo_sort
 from ._utils import basestring, convert_kwargs_to_cmd_line_args
 from builtins import str
 from functools import reduce
-import collections
 import copy
 import operator
 import subprocess
@@ -17,6 +16,11 @@ from .nodes import (
     OutputNode,
     output_operator,
 )
+
+try:
+    from collections.abc import Iterable
+except ImportError:
+    from collections import Iterable
 
 
 class Error(Exception):
@@ -136,9 +140,7 @@ def _get_output_args(node, stream_name_map):
         args += ['-b:a', str(kwargs.pop('audio_bitrate'))]
     if 'video_size' in kwargs:
         video_size = kwargs.pop('video_size')
-        if not isinstance(video_size, basestring) and isinstance(
-            video_size, collections.Iterable
-        ):
+        if not isinstance(video_size, basestring) and isinstance(video_size, Iterable):
             video_size = '{}x{}'.format(video_size[0], video_size[1])
         args += ['-video_size', video_size]
     args += convert_kwargs_to_cmd_line_args(kwargs)

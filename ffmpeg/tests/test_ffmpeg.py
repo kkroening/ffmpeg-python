@@ -30,7 +30,7 @@ subprocess.check_call(['ffmpeg', '-version'])
 
 
 def test_escape_chars():
-    assert ffmpeg._utils.escape_chars('a:b', ':') == 'a\:b'
+    assert ffmpeg._utils.escape_chars('a:b', ':') == r'a\:b'
     assert ffmpeg._utils.escape_chars('a\\:b', ':\\') == 'a\\\\\\:b'
     assert (
         ffmpeg._utils.escape_chars('a:b,c[d]e%{}f\'g\'h\\i', '\\\':,[]%')
