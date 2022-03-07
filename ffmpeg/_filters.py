@@ -193,7 +193,7 @@ def crop(stream, x, y, width, height, **kwargs):
         y: The vertical position, in the input video, of the top edge of the
            output video.
         width: The width of the output video. Must be greater than 0.
-        heigth: The height of the output video. Must be greater than 0.
+        height: The height of the output video. Must be greater than 0.
 
     Official documentation: `crop <https://ffmpeg.org/ffmpeg-filters.html#crop>`__
     """
@@ -213,7 +213,7 @@ def drawbox(stream, x, y, width, height, color, thickness=None, **kwargs):
             It defaults to 0.
         width: Specify the width of the box; if 0 interpreted as the input width. It
             defaults to 0.
-        heigth: Specify the height of the box; if 0 interpreted as the input height. It
+        height: Specify the height of the box; if 0 interpreted as the input height. It
             defaults to 0.
         color: Specify the color of the box to write. For the general syntax of this
             option, check the "Color" section in the ffmpeg-utils manual. If the
