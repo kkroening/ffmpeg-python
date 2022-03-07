@@ -22,6 +22,7 @@ try:
 except ImportError:
     from collections import Iterable
 
+
 class Error(Exception):
     def __init__(self, cmd, stdout, stderr):
         super(Error, self).__init__(
@@ -139,9 +140,7 @@ def _get_output_args(node, stream_name_map):
         args += ['-b:a', str(kwargs.pop('audio_bitrate'))]
     if 'video_size' in kwargs:
         video_size = kwargs.pop('video_size')
-        if not isinstance(video_size, basestring) and isinstance(
-            video_size, Iterable
-        ):
+        if not isinstance(video_size, basestring) and isinstance(video_size, Iterable):
             video_size = '{}x{}'.format(video_size[0], video_size[1])
         args += ['-video_size', video_size]
     args += convert_kwargs_to_cmd_line_args(kwargs)
