@@ -3,7 +3,6 @@ from .dag import get_outgoing_edges, topo_sort
 from ._utils import basestring, convert_kwargs_to_cmd_line_args
 from builtins import str
 from functools import reduce
-import collections
 import copy
 import operator
 import subprocess
@@ -17,6 +16,11 @@ from .nodes import (
     OutputNode,
     output_operator,
 )
+
+try:
+    from collections.abc import Iterable
+except ImportError:
+    from collections import Iterable
 
 
 class Error(Exception):
@@ -88,8 +92,8 @@ def _allocate_filter_stream_names(filter_nodes, outgoing_edge_maps, stream_name_
             if len(downstreams) > 1:
                 # TODO: automatically insert `splits` ahead of time via graph transformation.
                 raise ValueError(
-                    'Encountered {} with multiple outgoing edges with same upstream label {!r}; a '
-                    '`split` filter is probably required'.format(
+                    'Encountered {} with multiple outgoing edges with same upstream '
+                    'label {!r}; a `split` filter is probably required'.format(
                         upstream_node, upstream_label
                     )
                 )
@@ -136,9 +140,7 @@ def _get_output_args(node, stream_name_map):
         args += ['-b:a', str(kwargs.pop('audio_bitrate'))]
     if 'video_size' in kwargs:
         video_size = kwargs.pop('video_size')
-        if not isinstance(video_size, basestring) and isinstance(
-            video_size, collections.Iterable
-        ):
+        if not isinstance(video_size, basestring) and isinstance(video_size, Iterable):
             video_size = '{}x{}'.format(video_size[0], video_size[1])
         args += ['-video_size', video_size]
     args += convert_kwargs_to_cmd_line_args(kwargs)
@@ -199,7 +201,7 @@ def run_async(
     pipe_stderr=False,
     quiet=False,
     overwrite_output=False,
-    cwd=None
+    cwd=None,
 ):
     """Asynchronously invoke ffmpeg for the supplied node graph.
 
@@ -286,8 +288,11 @@ def run_async(
         stderr_stream = subprocess.STDOUT
         stdout_stream = subprocess.DEVNULL
     return subprocess.Popen(
-        args, stdin=stdin_stream, stdout=stdout_stream, stderr=stderr_stream,
-        cwd=cwd
+        args,
+        stdin=stdin_stream,
+        stdout=stdout_stream,
+        stderr=stderr_stream,
+        cwd=cwd,
     )
 
 
@@ -300,7 +305,7 @@ def run(
     input=None,
     quiet=False,
     overwrite_output=False,
-    cwd=None
+    cwd=None,
 ):
     """Invoke ffmpeg for the supplied node graph.
 
@@ -324,7 +329,7 @@ def run(
         pipe_stderr=capture_stderr,
         quiet=quiet,
         overwrite_output=overwrite_output,
-        cwd=cwd
+        cwd=cwd,
     )
     out, err = process.communicate(input)
     retcode = process.poll()
@@ -333,4 +338,10 @@ def run(
     return out, err
 
 
-__all__ = ['compile', 'Error', 'get_args', 'run', 'run_async']
+__all__ = [
+    'compile',
+    'Error',
+    'get_args',
+    'run',
+    'run_async',
+]
