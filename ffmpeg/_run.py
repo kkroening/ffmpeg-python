@@ -91,8 +91,8 @@ def _allocate_filter_stream_names(filter_nodes, outgoing_edge_maps, stream_name_
             if len(downstreams) > 1:
                 # TODO: automatically insert `splits` ahead of time via graph transformation.
                 raise ValueError(
-                    'Encountered {} with multiple outgoing edges with same upstream label {!r}; a '
-                    '`split` filter is probably required'.format(
+                    'Encountered {} with multiple outgoing edges with same upstream '
+                    'label {!r}; a `split` filter is probably required'.format(
                         upstream_node, upstream_label
                     )
                 )
@@ -202,6 +202,7 @@ def run_async(
     pipe_stderr=False,
     quiet=False,
     overwrite_output=False,
+    cwd=None,
 ):
     """Asynchronously invoke ffmpeg for the supplied node graph.
 
@@ -236,7 +237,7 @@ def run_async(
             process = (
                 ffmpeg
                 .input(in_filename)
-                .output('pipe':, format='rawvideo', pix_fmt='rgb24')
+                .output('pipe:', format='rawvideo', pix_fmt='rgb24')
                 .run_async(pipe_stdout=True, pipe_stderr=True)
             )
             out, err = process.communicate()
@@ -282,10 +283,17 @@ def run_async(
     """
     args = compile(stream_spec, cmd, overwrite_output=overwrite_output)
     stdin_stream = subprocess.PIPE if pipe_stdin else None
-    stdout_stream = subprocess.PIPE if pipe_stdout or quiet else None
-    stderr_stream = subprocess.PIPE if pipe_stderr or quiet else None
+    stdout_stream = subprocess.PIPE if pipe_stdout else None
+    stderr_stream = subprocess.PIPE if pipe_stderr else None
+    if quiet:
+        stderr_stream = subprocess.STDOUT
+        stdout_stream = subprocess.DEVNULL
     return subprocess.Popen(
-        args, stdin=stdin_stream, stdout=stdout_stream, stderr=stderr_stream
+        args,
+        stdin=stdin_stream,
+        stdout=stdout_stream,
+        stderr=stderr_stream,
+        cwd=cwd,
     )
 
 
@@ -298,6 +306,7 @@ def run(
     input=None,
     quiet=False,
     overwrite_output=False,
+    cwd=None,
 ):
     """Invoke ffmpeg for the supplied node graph.
 
@@ -321,6 +330,7 @@ def run(
         pipe_stderr=capture_stderr,
         quiet=quiet,
         overwrite_output=overwrite_output,
+        cwd=cwd,
     )
     out, err = process.communicate(input)
     retcode = process.poll()
@@ -329,4 +339,10 @@ def run(
     return out, err
 
 
-__all__ = ['compile', 'Error', 'get_args', 'run', 'run_async']
+__all__ = [
+    'compile',
+    'Error',
+    'get_args',
+    'run',
+    'run_async',
+]
