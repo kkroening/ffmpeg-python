@@ -1,6 +1,9 @@
 # ffmpeg-python: Python bindings for FFmpeg
 
-[![Build status](https://travis-ci.org/kkroening/ffmpeg-python.svg?branch=master)](https://travis-ci.org/kkroening/ffmpeg-python)
+[![CI][ci-badge]][ci]
+
+[ci-badge]: https://github.com/kkroening/ffmpeg-python/actions/workflows/ci.yml/badge.svg
+[ci]: https://github.com/kkroening/ffmpeg-python/actions/workflows/ci.yml
 
 <img src="https://raw.githubusercontent.com/kkroening/ffmpeg-python/master/doc/formula.png" alt="ffmpeg-python logo" width="60%" />
 
