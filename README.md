@@ -81,9 +81,11 @@ Real-world signal graphs can get a heck of a lot more complex, but `ffmpeg-pytho
 
 ## Installation
 
+### Installing `ffmpeg-python`
+
 The latest version of `ffmpeg-python` can be acquired via a typical pip install:
 
-```
+```bash
 pip install ffmpeg-python
 ```
 
@@ -92,6 +94,24 @@ Or the source can be cloned and installed from locally:
 git clone git@github.com:kkroening/ffmpeg-python.git
 pip install -e ./ffmpeg-python
 ```
+
+> **Note**: `ffmpeg-python` makes no attempt to download/install FFmpeg, as `ffmpeg-python` is merely a pure-Python wrapper - whereas FFmpeg installation is platform-dependent/environment-specific, and is thus the responsibility of the user, as described below.
+
+### Installing FFmpeg
+
+Before using `ffmpeg-python`, FFmpeg must be installed and accessible via the `$PATH` environment variable.
+
+There are a variety of ways to install FFmpeg, such as the [official download links](https://ffmpeg.org/download.html), or using your package manager of choice (e.g. `sudo apt install ffmpeg` on Debian/Ubuntu, `brew install ffmpeg` on OS X, etc.).
+
+Regardless of how FFmpeg is installed, you can check if your environment path is set correctly by running the `ffmpeg` command from the terminal, in which case the version information should appear, as in the following example (truncated for brevity):
+
+```
+$ ffmpeg
+ffmpeg version 4.2.4-1ubuntu0.1 Copyright (c) 2000-2020 the FFmpeg developers
+  built with gcc 9 (Ubuntu 9.3.0-10ubuntu2)
+```
+
+> **Note**: The actual version information displayed here may vary from one system to another; but if a message such as `ffmpeg: command not found` appears instead of the version information, FFmpeg is not properly installed.
 
 ## [Examples](https://github.com/kkroening/ffmpeg-python/tree/master/examples)
 
@@ -197,7 +217,7 @@ When in doubt, refer to the [existing filters](https://github.com/kkroening/ffmp
 
 **Why do I get an import/attribute/etc. error from `import ffmpeg`?**
 
-Make sure you ran `pip install ffmpeg-python` and not `pip install ffmpeg` or `pip install python-ffmpeg`.
+Make sure you ran `pip install ffmpeg-python` and _**not**_ `pip install ffmpeg` (wrong) or `pip install python-ffmpeg` (also wrong).
 
 **Why did my audio stream get dropped?**
 
