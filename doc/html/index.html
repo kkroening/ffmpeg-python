@@ -168,7 +168,7 @@ output.</p>
 <dt id="ffmpeg.compile">
 <code class="sig-prename descclassname">ffmpeg.</code><code class="sig-name descname">compile</code><span class="sig-paren">(</span><em class="sig-param">stream_spec</em>, <em class="sig-param">cmd='ffmpeg'</em>, <em class="sig-param">overwrite_output=False</em><span class="sig-paren">)</span><a class="headerlink" href="#ffmpeg.compile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build command-line for invoking ffmpeg.</p>
-<p>The <a class="reference internal" href="#ffmpeg.run" title="ffmpeg.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a> function uses this to build the commnad line
+<p>The <a class="reference internal" href="#ffmpeg.run" title="ffmpeg.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a> function uses this to build the command line
 arguments and should work in most cases, but calling this function
 directly is useful for debugging or if you need to invoke ffmpeg
 manually for whatever reason.</p>
@@ -340,7 +340,7 @@ the output video.</p></li>
 <li><p><strong>y</strong> – The vertical position, in the input video, of the top edge of the
 output video.</p></li>
 <li><p><strong>width</strong> – The width of the output video. Must be greater than 0.</p></li>
-<li><p><strong>heigth</strong> – The height of the output video. Must be greater than 0.</p></li>
+<li><p><strong>height</strong> – The height of the output video. Must be greater than 0.</p></li>
 </ul>
 </dd>
 </dl>
@@ -357,7 +357,7 @@ output video.</p></li>
 <li><p><strong>x</strong> – The expression which specifies the top left corner x coordinate of the box. It defaults to 0.</p></li>
 <li><p><strong>y</strong> – The expression which specifies the top left corner y coordinate of the box. It defaults to 0.</p></li>
 <li><p><strong>width</strong> – Specify the width of the box; if 0 interpreted as the input width. It defaults to 0.</p></li>
-<li><p><strong>heigth</strong> – Specify the height of the box; if 0 interpreted as the input height. It defaults to 0.</p></li>
+<li><p><strong>height</strong> – Specify the height of the box; if 0 interpreted as the input height. It defaults to 0.</p></li>
 <li><p><strong>color</strong> – Specify the color of the box to write. For the general syntax of this option, check the “Color” section
 in the ffmpeg-utils manual. If the special value invert is used, the box edge color is the same as the
 video with inverted luma.</p></li>

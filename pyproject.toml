@@ -1,0 +1,15 @@
+[tool.black]
+skip-string-normalization = true
+target_version = ['py27']  # TODO: drop Python 2 support (... "Soon").
+include = '\.pyi?$'
+exclude = '''
+(
+  /(
+      \.eggs
+    | \.git
+    | \.tox
+    | \venv
+    | dist
+  )/
+)
+'''

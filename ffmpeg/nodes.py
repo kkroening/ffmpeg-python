@@ -21,7 +21,9 @@ def _get_types_str(types):
 
 
 class Stream(object):
-    """Represents the outgoing edge of an upstream node; may be used to create more downstream nodes."""
+    """Represents the outgoing edge of an upstream node; may be used to create more
+    downstream nodes.
+    """
 
     def __init__(
         self, upstream_node, upstream_label, node_types, upstream_selector=None
@@ -214,9 +216,10 @@ class Node(KwargReprNode):
         return self.__outgoing_stream_type(self, label, upstream_selector=selector)
 
     def __getitem__(self, item):
-        """Create an outgoing stream originating from this node; syntactic sugar for ``self.stream(label)``.
-        It can also be used to apply a selector: e.g. ``node[0:'a']`` returns a stream with label 0 and
-        selector ``'a'``, which is the same as ``node.stream(label=0, selector='a')``.
+        """Create an outgoing stream originating from this node; syntactic sugar for
+        ``self.stream(label)``.  It can also be used to apply a selector: e.g.
+        ``node[0:'a']`` returns a stream with label 0 and selector ``'a'``, which is
+        the same as ``node.stream(label=0, selector='a')``.
 
         Example:
             Process the audio and video portions of a stream independently::
