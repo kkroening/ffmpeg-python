@@ -74,7 +74,7 @@ class DagNode(object):
         """Provides information about all incoming edges that connect to this node.
 
         The edge map is a dictionary that maps an ``incoming_label`` to
-        ``(outgoing_node, outgoing_label)``.  Note that implicity, ``incoming_node`` is
+        ``(outgoing_node, outgoing_label)``.  Note that implicitly, ``incoming_node`` is
         ``self``.  See "Edges" section above.
         """
         raise NotImplementedError()
