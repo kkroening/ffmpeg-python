@@ -4,7 +4,7 @@ from ._run import Error
 from ._utils import convert_kwargs_to_cmd_line_args
 
 
-def probe(filename, cmd='ffprobe', timeout=None, **kwargs):
+def probe(filename, cmd='ffprobe', input=None, timeout=None, **kwargs):
     """Run ffprobe on the specified file and return a JSON representation of the output.
 
     Raises:
@@ -17,11 +17,10 @@ def probe(filename, cmd='ffprobe', timeout=None, **kwargs):
     args += convert_kwargs_to_cmd_line_args(kwargs)
     args += [filename]
 
-    p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    communicate_kwargs = {}
-    if timeout is not None:
-        communicate_kwargs['timeout'] = timeout
-    out, err = p.communicate(**communicate_kwargs)
+    p = subprocess.Popen(
+        args, stdin=None if input is None else subprocess.PIPE,
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = p.communicate(input=input, timeout=timeout)
     if p.returncode != 0:
         raise Error('ffprobe', out, err)
     return json.loads(out.decode('utf-8'))
