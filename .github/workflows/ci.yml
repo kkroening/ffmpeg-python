@@ -38,7 +38,8 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
-      - uses: psf/black@21.12b0 # TODO: upgrade after dropping Python 2 support.
-        with:
-          src: ffmpeg  # TODO: also format `examples`.
-          version: 21.12b0
+      - name: Black
+        run: |
+          # TODO: use standard `psf/black` action after dropping Python 2 support.
+          pip install black==21.12b0 click==8.0.2  # https://stackoverflow.com/questions/71673404
+          black ffmpeg --check --color --diff
