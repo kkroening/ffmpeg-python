@@ -37,7 +37,7 @@ jobs:
   black:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: psf/black@21.12b0 # TODO: upgrade after dropping Python 2 support.
         with:
           src: ffmpeg  # TODO: also format `examples`.
