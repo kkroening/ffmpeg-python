@@ -10,7 +10,7 @@ from .nodes import (
     MergeOutputsNode,
     OutputNode,
     output_operator,
-)
+    SourceNode)
 
 
 def input(filename, **kwargs):
@@ -30,6 +30,27 @@ def input(filename, **kwargs):
             raise ValueError("Can't specify both `format` and `f` kwargs")
         kwargs['format'] = fmt
     return InputNode(input.__name__, kwargs=kwargs).stream()
+
+
+
+def source_multi_output(filter_name, *args, **kwargs):
+    """Source filter with one or more outputs.
+
+    This is the same as ``source`` except that the filter can produce more than one output.
+
+    To reference an output stream, use either the ``.stream`` operator or bracket shorthand.
+    """
+    return SourceNode(filter_name, args=args, kwargs=kwargs)
+
+
+def source(filter_name, *args, **kwargs):
+    """Source filter.
+
+    It works like `input`, but takes a source filter name instead of a file URL as the first argument.
+
+    Official documentation: `Sources <https://ffmpeg.org/ffmpeg-filters.html#Video-Sources>`__
+    """
+    return source_multi_output(filter_name, *args, **kwargs).stream()
 
 
 @output_operator()
@@ -92,4 +113,11 @@ def output(*streams_and_filename, **kwargs):
     return OutputNode(streams, output.__name__, kwargs=kwargs).stream()
 
 
-__all__ = ['input', 'merge_outputs', 'output', 'overwrite_output']
+__all__ = [
+    'input',
+    'source_multi_output',
+    'source',
+    'merge_outputs',
+    'output',
+    'overwrite_output',
+]

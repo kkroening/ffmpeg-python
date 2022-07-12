@@ -5,6 +5,7 @@ from .dag import KwargReprNode
 from ._utils import escape_chars, get_hash_int
 from builtins import object
 import os
+import uuid
 
 
 def _is_of_types(obj, types):
@@ -237,9 +238,7 @@ class Node(KwargReprNode):
 
 class FilterableStream(Stream):
     def __init__(self, upstream_node, upstream_label, upstream_selector=None):
-        super(FilterableStream, self).__init__(
-            upstream_node, upstream_label, {InputNode, FilterNode}, upstream_selector
-        )
+        super(FilterableStream, self).__init__(upstream_node, upstream_label, {InputNode, FilterNode, SourceNode}, upstream_selector)
 
 
 # noinspection PyMethodOverriding
@@ -264,20 +263,8 @@ class InputNode(Node):
 
 
 # noinspection PyMethodOverriding
-class FilterNode(Node):
-    def __init__(self, stream_spec, name, max_inputs=1, args=[], kwargs={}):
-        super(FilterNode, self).__init__(
-            stream_spec=stream_spec,
-            name=name,
-            incoming_stream_types={FilterableStream},
-            outgoing_stream_type=FilterableStream,
-            min_inputs=1,
-            max_inputs=max_inputs,
-            args=args,
-            kwargs=kwargs,
-        )
-
-    """FilterNode"""
+class FilterableNode(Node):
+    """FilterableNode"""
 
     def _get_filter(self, outgoing_edges):
         args = self.args
@@ -301,6 +288,45 @@ class FilterNode(Node):
         if params:
             params_text += '={}'.format(':'.join(params))
         return escape_chars(params_text, '\\\'[],;')
+
+
+# noinspection PyMethodOverriding
+class FilterNode(FilterableNode):
+    """FilterNode"""
+    def __init__(self, stream_spec, name, max_inputs=1, args=[], kwargs={}):
+        super(FilterNode, self).__init__(
+            stream_spec=stream_spec,
+            name=name,
+            incoming_stream_types={FilterableStream},
+            outgoing_stream_type=FilterableStream,
+            min_inputs=1,
+            max_inputs=max_inputs,
+            args=args,
+            kwargs=kwargs,
+        )
+
+
+# noinspection PyMethodOverriding
+class SourceNode(FilterableNode):
+    def __init__(self, name, args=[], kwargs={}):
+        self.source_node_id = uuid.uuid4()
+        super(SourceNode, self).__init__(
+            stream_spec=None,
+            name=name,
+            incoming_stream_types={},
+            outgoing_stream_type=FilterableStream,
+            min_inputs=0,
+            max_inputs=0,
+            args=args,
+            kwargs=kwargs
+        )
+
+    def __hash__(self):
+        """Two source nodes with the same options should _not_ be considered
+        the same node. For this reason we create a uuid4 on node instantiation,
+        and use that as our hash.
+        """
+        return self.source_node_id.int
 
 
 # noinspection PyMethodOverriding

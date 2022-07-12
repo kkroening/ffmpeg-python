@@ -684,6 +684,50 @@ def test_mixed_passthrough_selectors():
     ]
 
 
+def test_sources():
+    out = (ffmpeg
+        .overlay(
+            ffmpeg.source("testsrc"),
+            ffmpeg.source("color", color="red@.3"),
+        )
+        .trim(end=5)
+        .output(TEST_OUTPUT_FILE1)
+    )
+
+    assert out.get_args() == [
+        '-filter_complex',
+        'testsrc[s0];'
+        'color=color=red@.3[s1];'
+        '[s0][s1]overlay=eof_action=repeat[s2];'
+        '[s2]trim=end=5[s3]',
+        '-map',
+        '[s3]',
+        TEST_OUTPUT_FILE1
+    ]
+
+
+
+def test_same_source_multiple_times():
+    out = (ffmpeg
+        .concat(
+            ffmpeg.source("testsrc").trim(end=5),
+            ffmpeg.source("testsrc").trim(start=10, end=14).filter(
+                "setpts", "PTS-STARTPTS"
+            ),
+        )
+        .output(TEST_OUTPUT_FILE1)
+    )
+
+    assert out.get_args() == [
+        '-filter_complex',
+        'testsrc[s0];[s0]trim=end=5[s1];testsrc[s2];[s2]trim=end=14:start=10[s3];[s3]setpts=PTS-STARTPTS[s4];[s1][s4]concat=n=2[s5]',
+        '-map',
+        '[s5]',
+        TEST_OUTPUT_FILE1
+    ]
+
+
+
 def test_pipe():
     width = 32
     height = 32
