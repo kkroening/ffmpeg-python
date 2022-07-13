@@ -491,6 +491,50 @@ def colorchannelmixer(stream, *args, **kwargs):
     return FilterNode(stream, colorchannelmixer.__name__, kwargs=kwargs).stream()
 
 
+@filter_operator()
+def vstack(main_parent_node, second_parent_node, shortest='1', **kwargs):
+    """Stack input videos vertically.
+
+    All streams must be of same pixel format and of same width.
+
+    Note that this filter is faster than using overlay and pad filter to create same output.
+
+    The filter accept the following option:
+
+    inputs
+    Set number of input streams. Default is 2.
+
+    shortest
+    If set to 1, force the output to terminate when the shortest input terminates. Default value is 0.
+
+    Official documentation: `vstack <https://ffmpeg.org/ffmpeg-filters.html#vstack>`__
+    """
+    kwargs['shortest'] = shortest
+    return FilterNode([main_parent_node, second_parent_node], vstack.__name__, kwargs=kwargs,max_inputs=2).stream()
+    
+    
+@filter_operator()
+def hstack(main_parent_node, second_parent_node, shortest='1', **kwargs):
+    """Stack input videos vertically.
+
+    All streams must be of same pixel format and of same width.
+
+    Note that this filter is faster than using overlay and pad filter to create same output.
+
+    The filter accept the following option:
+
+    inputs
+    Set number of input streams. Default is 2.
+
+    shortest
+    If set to 1, force the output to terminate when the shortest input terminates. Default value is 0.
+
+    Official documentation: `hstack <https://ffmpeg.org/ffmpeg-filters.html#hstack>`__
+    """
+    kwargs['shortest'] = shortest
+    return FilterNode([main_parent_node, second_parent_node], hstack.__name__, kwargs=kwargs,max_inputs=2).stream()
+
+
 __all__ = [
     'colorchannelmixer',
     'concat',
@@ -507,4 +551,6 @@ __all__ = [
     'trim',
     'vflip',
     'zoompan',
+    'vstack',
+    'hstack',
 ]
