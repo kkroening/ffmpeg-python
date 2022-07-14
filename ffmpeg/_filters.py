@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
-from .nodes import FilterNode, filter_operator
 from ._utils import escape_chars
+from .nodes import FilterNode, filter_operator
 
 
 @filter_operator()
@@ -105,6 +105,28 @@ def trim(stream, **kwargs):
     Official documentation: `trim <https://ffmpeg.org/ffmpeg-filters.html#trim>`__
     """
     return FilterNode(stream, trim.__name__, kwargs=kwargs).stream()
+
+
+@filter_operator()
+def atrim(stream, **kwargs):
+    """Trim the audio input so that the output contains one continuous subpart of the input.
+
+    Args:
+        start: Specify the time of the start of the kept section, i.e. the sample with the timestamp start will be the
+            first frame in the output.
+        end: Specify the time of the first sample that will be dropped, i.e. the sample immediately preceding the one
+            with the timestamp end will be the last frame in the output.
+        start_pts: This is the same as start, except this option sets the start timestamp in timebase units instead of
+            seconds.
+        end_pts: This is the same as end, except this option sets the end timestamp in timebase units instead of
+            seconds.
+        duration: The maximum duration of the output in seconds.
+        start_sample: The number of the first frame that should be passed to the output.
+        end_sample: The number of the first frame that should be dropped.
+
+    Official documentation: `trim <https://ffmpeg.org/ffmpeg-filters.html#trim>`__
+    """
+    return FilterNode(stream, atrim.__name__, kwargs=kwargs).stream()
 
 
 @filter_operator()
