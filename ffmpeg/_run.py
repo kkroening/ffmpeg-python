@@ -52,7 +52,7 @@ def _get_input_args(input_node):
 
 def _format_input_stream_name(stream_name_map, edge, is_final_arg=False):
     prefix = stream_name_map[edge.upstream_node, edge.upstream_label]
-    if not edge.upstream_selector:
+    if edge.upstream_selector is None:
         suffix = ''
     else:
         suffix = ':{}'.format(edge.upstream_selector)
