@@ -611,6 +611,32 @@ def test__merge_outputs():
     assert ffmpeg.get_args([out1, out2]) == ['-i', 'in.mp4', 'out2.mp4', 'out1.mp4']
 
 
+def test__explicit_maps():
+    in_ = ffmpeg.input('in.mp4')
+    out1 = in_.output('out1.mp4')
+    out2 = in_.output('out2.mp4')
+    assert ffmpeg.merge_outputs(out1, out2).get_args(explicit_maps=True) == [
+        '-i',
+        'in.mp4',
+        '-map',
+        '0',
+        'out1.mp4',
+        '-map',
+        '0',
+        'out2.mp4',
+    ]
+    assert ffmpeg.get_args([out1, out2], explicit_maps=True) == [
+        '-i',
+        'in.mp4',
+        '-map',
+        '0',
+        'out2.mp4',
+        '-map',
+        '0',
+        'out1.mp4'
+    ]
+
+
 def test__input__start_time():
     assert ffmpeg.input('in', ss=10.5).output('out').get_args() == [
         '-ss',
