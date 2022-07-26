@@ -138,6 +138,10 @@ def _get_output_args(node, stream_name_map):
         args += ['-b:v', str(kwargs.pop('video_bitrate'))]
     if 'audio_bitrate' in kwargs:
         args += ['-b:a', str(kwargs.pop('audio_bitrate'))]
+    if 'video_sync' in kwargs:
+        args += ['-vsync', str(kwargs.pop('video_sync'))]
+    if 'audio_sync' in kwargs:
+        args += ['-async', str(kwargs.pop('audio_sync'))]
     if 'video_size' in kwargs:
         video_size = kwargs.pop('video_size')
         if not isinstance(video_size, basestring) and isinstance(video_size, Iterable):
