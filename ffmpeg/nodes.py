@@ -289,7 +289,13 @@ class FilterNode(Node):
         out_kwargs = {}
         for k, v in list(kwargs.items()):
             k = escape_chars(k, '\\\'=:')
-            v = escape_chars(v, '\\\'=:')
+            if isinstance(v, dict):
+                v = ','.join(['{}={}'.format(
+                    escape_chars(vk, '\\\'=:'),
+                    escape_chars(v[vk], '\\\'=:')
+                ) for vk in sorted(v)])
+            else:
+                v = escape_chars(v, '\\\'=:')
             out_kwargs[k] = v
 
         arg_params = [escape_chars(v, '\\\'=:') for v in out_args]
