@@ -164,10 +164,10 @@ def get_args(stream_spec, overwrite_output=False):
     args += reduce(operator.add, [_get_input_args(node) for node in input_nodes])
     if filter_arg:
         args += ['-filter_complex', filter_arg]
+    args += reduce(operator.add, [_get_global_args(node) for node in global_nodes], [])
     args += reduce(
         operator.add, [_get_output_args(node, stream_name_map) for node in output_nodes]
     )
-    args += reduce(operator.add, [_get_global_args(node) for node in global_nodes], [])
     if overwrite_output:
         args += ['-y']
     return args
