@@ -72,7 +72,7 @@ setup(
     extras_require={
         'dev': [
             'future==0.17.1',
-            'numpy==1.16.4',
+            'numpy==1.21.0',
             'pytest-mock==1.10.4',
             'pytest==4.6.1',
             'Sphinx==2.1.0',
