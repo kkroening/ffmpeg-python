@@ -79,6 +79,14 @@ def test_fluent_complex_filter():
     ).output('dummy2.mp4')
 
 
+@pytest.mark.skipif(sys.version_info < (3, 6), reason='requires python3.6 or higher')
+def test_pathlike_input_output():
+    from pathlib import Path
+    base = ffmpeg.input(Path("dummy.mp4"))
+    base.output(filename=Path("dummy2.mp4"))
+    base.output(Path("dummy3.mp4"))
+
+
 def test_node_repr():
     in_file = ffmpeg.input('dummy.mp4')
     trim1 = ffmpeg.trim(in_file, start_frame=10, end_frame=20)
