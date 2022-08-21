@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from past.builtins import basestring
-from ._utils import basestring
+from ._utils import basestring, fspath
 
 from .nodes import (
     filter_operator,
@@ -23,7 +23,7 @@ def input(filename, **kwargs):
 
     Official documentation: `Main options <https://ffmpeg.org/ffmpeg.html#Main-options>`__
     """
-    kwargs['filename'] = filename
+    kwargs['filename'] = fspath(filename)
     fmt = kwargs.pop('f', None)
     if fmt:
         if 'format' in kwargs:
@@ -79,9 +79,12 @@ def output(*streams_and_filename, **kwargs):
     """
     streams_and_filename = list(streams_and_filename)
     if 'filename' not in kwargs:
-        if not isinstance(streams_and_filename[-1], basestring):
+        # Raise any errors without destructively modifying streams_and_filenames
+        try:
+            fspath(streams_and_filename[-1])
+        except TypeError:
             raise ValueError('A filename must be provided')
-        kwargs['filename'] = streams_and_filename.pop(-1)
+        kwargs['filename'] = fspath(streams_and_filename.pop(-1))
     streams = streams_and_filename
 
     fmt = kwargs.pop('f', None)
