@@ -149,7 +149,7 @@ def _get_output_args(node, stream_name_map):
 
 
 @output_operator()
-def get_args(stream_spec, overwrite_output=False):
+def get_args(stream_spec, overwrite_output=False, script_filename=None):
     """Build command-line arguments to be passed to ffmpeg."""
     nodes = get_stream_spec_nodes(stream_spec)
     args = []
@@ -163,7 +163,11 @@ def get_args(stream_spec, overwrite_output=False):
     filter_arg = _get_filter_arg(filter_nodes, outgoing_edge_maps, stream_name_map)
     args += reduce(operator.add, [_get_input_args(node) for node in input_nodes])
     if filter_arg:
-        args += ['-filter_complex', filter_arg]
+        if script_filename:
+            with open(script_filename, "w") as f: f.write(filter_arg)
+            args += ['-filter_complex_script', script_filename]
+        else:
+            args += ['-filter_complex', filter_arg]
     args += reduce(
         operator.add, [_get_output_args(node, stream_name_map) for node in output_nodes]
     )
@@ -174,7 +178,7 @@ def get_args(stream_spec, overwrite_output=False):
 
 
 @output_operator()
-def compile(stream_spec, cmd='ffmpeg', overwrite_output=False):
+def compile(stream_spec, cmd='ffmpeg', overwrite_output=False, script_filename=None):
     """Build command-line for invoking ffmpeg.
 
     The :meth:`run` function uses this to build the command line
@@ -189,7 +193,7 @@ def compile(stream_spec, cmd='ffmpeg', overwrite_output=False):
         cmd = [cmd]
     elif type(cmd) != list:
         cmd = list(cmd)
-    return cmd + get_args(stream_spec, overwrite_output=overwrite_output)
+    return cmd + get_args(stream_spec, overwrite_output=overwrite_output, script_filename=script_filename)
 
 
 @output_operator()
