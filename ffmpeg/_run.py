@@ -3,6 +3,7 @@ from .dag import get_outgoing_edges, topo_sort
 from ._utils import basestring, convert_kwargs_to_cmd_line_args
 from builtins import str
 from functools import reduce
+from shlex import quote
 import copy
 import operator
 import subprocess
@@ -44,7 +45,7 @@ def _get_input_args(input_node):
         if video_size:
             args += ['-video_size', '{}x{}'.format(video_size[0], video_size[1])]
         args += convert_kwargs_to_cmd_line_args(kwargs)
-        args += ['-i', filename]
+        args += ['-i', quote(filename)]
     else:
         raise ValueError('Unsupported input node: {}'.format(input_node))
     return args
@@ -144,7 +145,7 @@ def _get_output_args(node, stream_name_map):
             video_size = '{}x{}'.format(video_size[0], video_size[1])
         args += ['-video_size', video_size]
     args += convert_kwargs_to_cmd_line_args(kwargs)
-    args += [filename]
+    args += [quote(filename)]
     return args
 
 
