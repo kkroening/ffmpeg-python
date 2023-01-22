@@ -688,8 +688,8 @@ def test_pipe():
     width = 32
     height = 32
     frame_size = width * height * 3  # 3 bytes for rgb24
-    frame_count = 10
-    start_frame = 2
+    frame_count = 15
+    start_frame = 3
 
     out = (
         ffmpeg.input(
@@ -700,6 +700,7 @@ def test_pipe():
             framerate=10,
         )
         .trim(start_frame=start_frame)
+        .setpts('N-{}+1'.format(start_frame))
         .output('pipe:1', format='rawvideo')
     )
 
@@ -716,9 +717,9 @@ def test_pipe():
         '-i',
         'pipe:0',
         '-filter_complex',
-        '[0]trim=start_frame=2[s0]',
+        '[0]trim=start_frame={}[s0];[s0]setpts=N-{}+1[s1]'.format(start_frame, start_frame),
         '-map',
-        '[s0]',
+        '[s1]',
         '-f',
         'rawvideo',
         'pipe:1',
@@ -739,8 +740,24 @@ def test_pipe():
     p.stdin.close()
 
     out_data = p.stdout.read()
+
     assert len(out_data) == frame_size * (frame_count - start_frame)
     assert out_data == in_data[start_frame * frame_size :]
+
+    return
+
+    if start_frame > 0 and len(out_data) < len (in_data):
+        # ffmpeg 4.x removes trimmed frames
+        assert len(out_data) == frame_size * (frame_count - start_frame)
+        assert out_data == in_data[start_frame * frame_size :]
+    else:
+        # ffmpeg 5.x duplicates trimmed frames
+        assert len(out_data) == len(in_data)
+
+        for fn in range(0, start_frame):
+            assert out_data[fn*frame_size] == in_data[start_frame * frame_size]
+
+        assert out_data[start_frame * frame_size :] == in_data[start_frame * frame_size :]
 
 
 def test__probe():
