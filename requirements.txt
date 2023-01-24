@@ -6,7 +6,7 @@ certifi==2019.3.9
 chardet==3.0.4
 docutils==0.14
 filelock==3.0.12
-future==0.17.1
+future==0.18.3
 idna==2.8
 imagesize==1.1.0
 importlib-metadata==0.17
