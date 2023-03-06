@@ -2,8 +2,9 @@ from __future__ import unicode_literals
 from builtins import str
 from past.builtins import basestring
 import hashlib
-import sys
-
+import sys, os
+import subprocess
+import shlex
 
 if sys.version_info.major == 2:
     # noinspection PyUnresolvedReferences,PyShadowingBuiltins
@@ -106,3 +107,11 @@ def convert_kwargs_to_cmd_line_args(kwargs):
         if v is not None:
             args.append('{}'.format(v))
     return args
+
+
+def convert_cmd_line_args_to_cmd_line_str(args):
+    """Helper function to build command line string from command line args."""
+    if os.name == "nt": # Windows system
+        return subprocess.list2cmdline(args)
+    # Non-windows systems
+    return shlex.join(args)
