@@ -125,6 +125,6 @@ if __name__ == '__main__':
                 .run(capture_stdout=True, capture_stderr=True)
             )
         except ffmpeg.Error as e:
-            print(e.stderr, file=sys.stderr)
+            print(f"$ {e.cmdline}\n{e.stderr.decode()}", file=sys.stderr)
             sys.exit(1)
 
