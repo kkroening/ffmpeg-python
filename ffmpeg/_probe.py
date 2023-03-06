@@ -1,7 +1,7 @@
 import json
 import subprocess
 from ._run import Error
-from ._utils import convert_kwargs_to_cmd_line_args
+from ._utils import convert_kwargs_to_cmd_line_args, convert_cmd_line_args_to_cmd_line_str
 
 
 def probe(filename, cmd='ffprobe', timeout=None, **kwargs):
@@ -23,7 +23,8 @@ def probe(filename, cmd='ffprobe', timeout=None, **kwargs):
         communicate_kwargs['timeout'] = timeout
     out, err = p.communicate(**communicate_kwargs)
     if p.returncode != 0:
-        raise Error('ffprobe', out, err)
+        cmdline = convert_cmd_line_args_to_cmd_line_str(args)
+        raise Error('ffprobe', out, err, cmdline)
     return json.loads(out.decode('utf-8'))
 
 

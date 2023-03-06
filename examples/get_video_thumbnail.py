@@ -26,7 +26,7 @@ def generate_thumbnail(in_filename, out_filename, time, width):
             .run(capture_stdout=True, capture_stderr=True)
         )
     except ffmpeg.Error as e:
-        print(e.stderr.decode(), file=sys.stderr)
+        print(f"$ {e.cmdline}\n{e.stderr.decode()}", file=sys.stderr)
         sys.exit(1)
 
 

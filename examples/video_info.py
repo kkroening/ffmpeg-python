@@ -15,7 +15,7 @@ if __name__ == '__main__':
     try:
         probe = ffmpeg.probe(args.in_filename)
     except ffmpeg.Error as e:
-        print(e.stderr, file=sys.stderr)
+        print(f"$ {e.cmdline}\n{e.stderr.decode()}", file=sys.stderr)
         sys.exit(1)
 
     video_stream = next((stream for stream in probe['streams'] if stream['codec_type'] == 'video'), None)

@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 from .dag import get_outgoing_edges, topo_sort
-from ._utils import basestring, convert_kwargs_to_cmd_line_args
+from ._utils import basestring, convert_kwargs_to_cmd_line_args, convert_cmd_line_args_to_cmd_line_str
 from builtins import str
 from functools import reduce
 import copy
@@ -24,12 +24,13 @@ except ImportError:
 
 
 class Error(Exception):
-    def __init__(self, cmd, stdout, stderr):
+    def __init__(self, cmd, stdout, stderr, cmdline):
         super(Error, self).__init__(
             '{} error (see stderr output for detail)'.format(cmd)
         )
         self.stdout = stdout
         self.stderr = stderr
+        self.cmdline = cmdline
 
 
 def _get_input_args(input_node):
@@ -334,7 +335,9 @@ def run(
     out, err = process.communicate(input)
     retcode = process.poll()
     if retcode:
-        raise Error('ffmpeg', out, err)
+        args = compile(stream_spec, cmd, overwrite_output=overwrite_output)
+        cmdline = convert_cmd_line_args_to_cmd_line_str(args)
+        raise Error('ffmpeg', out, err, cmdline)
     return out, err
 
 
