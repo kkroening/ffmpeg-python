@@ -5,7 +5,7 @@ from .dag import get_outgoing_edges
 from ._run import topo_sort
 import tempfile
 
-from ffmpeg.nodes import (
+from .nodes import (
     FilterNode,
     get_stream_spec_nodes,
     InputNode,
