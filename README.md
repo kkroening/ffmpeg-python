@@ -205,7 +205,7 @@ Expressions to be interpreted by ffmpeg can be included as string parameters and
     ffmpeg
     .input('in.mp4')
     .filter('crop', 'in_w-2*10', 'in_h-2*20')
-    .input('out.mp4')
+    .output('out.mp4')
 )
 ```
 
