@@ -39,12 +39,12 @@ def global_args(stream, *args):
 
 
 @output_operator()
-def overwrite_output(stream):
+def overwrite_output(stream, **kwargs):
     """Overwrite output files without asking (ffmpeg ``-y`` option)
 
     Official documentation: `Main options <https://ffmpeg.org/ffmpeg.html#Main-options>`__
     """
-    return GlobalNode(stream, overwrite_output.__name__, ['-y']).stream()
+    return GlobalNode(stream, overwrite_output.__name__, ['-y'], kwargs=kwargs).stream()
 
 
 @output_operator()
