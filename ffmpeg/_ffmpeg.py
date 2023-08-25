@@ -13,6 +13,20 @@ from .nodes import (
 )
 
 
+def sanitize_args(streams_and_filename, kwargs):
+    streams_and_filename = list(streams_and_filename)
+    if 'filename' not in kwargs:
+        if not isinstance(streams_and_filename[-1], basestring):
+            raise ValueError('A filename must be provided')
+        kwargs['filename'] = streams_and_filename.pop(-1)
+
+    fmt = kwargs.pop('f', None)
+    if fmt:
+        if 'format' in kwargs:
+            raise ValueError("Can't specify both `format` and `f` kwargs")
+        kwargs['format'] = fmt
+    return (streams_and_filename, kwargs)
+
 def input(filename, **kwargs):
     """Input file URL (ffmpeg ``-i`` option)
 
@@ -39,19 +53,9 @@ def global_args(stream, *args):
 
 
 @output_operator()
-def overwrite_output(stream, **kwargs):
-    """Overwrite output files without asking (ffmpeg ``-y`` option)
-
-    Official documentation: `Main options <https://ffmpeg.org/ffmpeg.html#Main-options>`__
-    """
-    return GlobalNode(stream, overwrite_output.__name__, ['-y'], kwargs=kwargs).stream()
-
-
-@output_operator()
 def merge_outputs(*streams):
     """Include all given outputs in one ffmpeg command line"""
     return MergeOutputsNode(streams, merge_outputs.__name__).stream()
-
 
 @filter_operator()
 def output(*streams_and_filename, **kwargs):
@@ -77,19 +81,18 @@ def output(*streams_and_filename, **kwargs):
 
     Official documentation: `Synopsis <https://ffmpeg.org/ffmpeg.html#Synopsis>`__
     """
-    streams_and_filename = list(streams_and_filename)
-    if 'filename' not in kwargs:
-        if not isinstance(streams_and_filename[-1], basestring):
-            raise ValueError('A filename must be provided')
-        kwargs['filename'] = streams_and_filename.pop(-1)
-    streams = streams_and_filename
+    streams_and_filename, kwargs = sanitize_args(streams_and_filename, kwargs)
+    return OutputNode(streams_and_filename, output.__name__, kwargs=kwargs).stream()
 
-    fmt = kwargs.pop('f', None)
-    if fmt:
-        if 'format' in kwargs:
-            raise ValueError("Can't specify both `format` and `f` kwargs")
-        kwargs['format'] = fmt
-    return OutputNode(streams, output.__name__, kwargs=kwargs).stream()
+
+@output_operator()
+def overwrite_output(*streams_and_filename, **kwargs):
+    """Overwrite output files without asking (ffmpeg ``-y`` option)
+
+    Official documentation: `Main options <https://ffmpeg.org/ffmpeg.html#Main-options>`__
+    """
+    streams_and_filename, kwargs = sanitize_args(streams_and_filename, kwargs)
+    return GlobalNode(streams_and_filename, overwrite_output.__name__, ['-y'], kwargs=kwargs).stream()
 
 
 __all__ = ['input', 'merge_outputs', 'output', 'overwrite_output']
