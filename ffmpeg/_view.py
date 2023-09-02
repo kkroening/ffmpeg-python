@@ -43,7 +43,7 @@ def view(stream_spec, detail=False, filename=None, pipe=False, **kwargs):
     if pipe and filename is not None:
         raise ValueError('Can\'t specify both `filename` and `pipe`')
     elif not pipe and filename is None:
-        filename = tempfile.mktemp()
+        filename = tempfile.mkstemp()[1]
 
     nodes = get_stream_spec_nodes(stream_spec)
 
