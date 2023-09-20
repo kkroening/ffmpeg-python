@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-from past.builtins import basestring
 from .dag import KwargReprNode
 from ._utils import escape_chars, get_hash_int
 from builtins import object
@@ -68,7 +67,7 @@ class Stream(object):
         """
         if self.selector is not None:
             raise ValueError('Stream already has a selector: {}'.format(self))
-        elif not isinstance(index, basestring):
+        elif not isinstance(index, str):
             raise TypeError("Expected string index (e.g. 'a'); got {!r}".format(index))
         return self.node.stream(label=self.label, selector=index)
 

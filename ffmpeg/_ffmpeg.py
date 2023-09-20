@@ -1,8 +1,5 @@
 from __future__ import unicode_literals
 
-from past.builtins import basestring
-from ._utils import basestring
-
 from .nodes import (
     filter_operator,
     GlobalNode,
@@ -79,7 +76,7 @@ def output(*streams_and_filename, **kwargs):
     """
     streams_and_filename = list(streams_and_filename)
     if 'filename' not in kwargs:
-        if not isinstance(streams_and_filename[-1], basestring):
+        if not isinstance(streams_and_filename[-1], str):
             raise ValueError('A filename must be provided')
         kwargs['filename'] = streams_and_filename.pop(-1)
     streams = streams_and_filename
