@@ -117,20 +117,22 @@ def _get_global_args(node):
 def _get_output_args(node, stream_name_map):
     if node.name != output.__name__:
         raise ValueError('Unsupported output node: {}'.format(node))
-    args = []
 
     if len(node.incoming_edges) == 0:
         raise ValueError('Output node {} has no mapped streams'.format(node))
 
+    args = []
+    kwargs = copy.copy(node.kwargs)
     for edge in node.incoming_edges:
         # edge = node.incoming_edges[0]
         stream_name = _format_input_stream_name(
             stream_name_map, edge, is_final_arg=True
         )
         if stream_name != '0' or len(node.incoming_edges) > 1:
-            args += ['-map', stream_name]
+            is_metadata_stream = str(kwargs.get("map_metadata")) == str(stream_name)
+            if not is_metadata_stream:
+                args += ['-map', stream_name]
 
-    kwargs = copy.copy(node.kwargs)
     filename = kwargs.pop('filename')
     if 'format' in kwargs:
         args += ['-f', kwargs.pop('format')]
