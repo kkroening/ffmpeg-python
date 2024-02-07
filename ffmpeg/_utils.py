@@ -1,29 +1,13 @@
 from __future__ import unicode_literals
 from builtins import str
-from past.builtins import basestring
 import hashlib
 import sys
 
-
-if sys.version_info.major == 2:
-    # noinspection PyUnresolvedReferences,PyShadowingBuiltins
-    str = str
 
 try:
     from collections.abc import Iterable
 except ImportError:
     from collections import Iterable
-
-
-# `past.builtins.basestring` module can't be imported on Python3 in some environments (Ubuntu).
-# This code is copy-pasted from it to avoid crashes.
-class BaseBaseString(type):
-    def __instancecheck__(cls, instance):
-        return isinstance(instance, (bytes, str))
-
-    def __subclasshook__(cls, thing):
-        # TODO: What should go here?
-        raise NotImplemented
 
 
 def with_metaclass(meta, *bases):
@@ -39,25 +23,13 @@ def with_metaclass(meta, *bases):
     return metaclass('temporary_class', None, {})
 
 
-if sys.version_info.major >= 3:
-
-    class basestring(with_metaclass(BaseBaseString)):
-        pass
-
-else:
-    # noinspection PyUnresolvedReferences,PyCompatibility
-    from builtins import basestring
-
-
 def _recursive_repr(item):
     """Hack around python `repr` to deterministically represent dictionaries.
 
     This is able to represent more things than json.dumps, since it does not require
     things to be JSON serializable (e.g. datetimes).
     """
-    if isinstance(item, basestring):
-        result = str(item)
-    elif isinstance(item, list):
+    if isinstance(item, list):
         result = '[{}]'.format(', '.join([_recursive_repr(x) for x in item]))
     elif isinstance(item, dict):
         kv_pairs = [
