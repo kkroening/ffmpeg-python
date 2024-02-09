@@ -1,4 +1,5 @@
 import json
+import sys
 import subprocess
 from ._run import Error
 from ._utils import convert_kwargs_to_cmd_line_args
@@ -17,7 +18,11 @@ def probe(filename, cmd='ffprobe', timeout=None, **kwargs):
     args += convert_kwargs_to_cmd_line_args(kwargs)
     args += [filename]
 
-    p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    creation_flags = 0
+    if sys.platform == "win32":
+        creation_flags = subprocess.CREATE_NO_WINDOW
+
+    p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, creationflags=creation_flags)
     communicate_kwargs = {}
     if timeout is not None:
         communicate_kwargs['timeout'] = timeout
