@@ -6,6 +6,7 @@ from functools import reduce
 import copy
 import operator
 import subprocess
+import sys
 
 from ._ffmpeg import input, output
 from .nodes import (
@@ -284,6 +285,11 @@ def run_async(
     stdin_stream = subprocess.PIPE if pipe_stdin else None
     stdout_stream = subprocess.PIPE if pipe_stdout else None
     stderr_stream = subprocess.PIPE if pipe_stderr else None
+
+    creation_flags = 0
+    if sys.platform == "win32":
+        creation_flags = subprocess.CREATE_NO_WINDOW
+
     if quiet:
         stderr_stream = subprocess.STDOUT
         stdout_stream = subprocess.DEVNULL
@@ -293,6 +299,7 @@ def run_async(
         stdout=stdout_stream,
         stderr=stderr_stream,
         cwd=cwd,
+        creationflags=creation_flags,
     )
 
 
