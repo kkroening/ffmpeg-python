@@ -5,7 +5,7 @@ import argparse
 import contextlib
 import ffmpeg
 import gevent
-import gevent.monkey; gevent.monkey.patch_all(thread=False)
+import gevent.monkey
 import os
 import shutil
 import socket
@@ -62,6 +62,16 @@ def _do_watch_progress(filename, sock, handler):
         connection.close()
 
 
+class PatchSelectors():
+    def __enter__(self):
+        gevent.monkey.patch_selectors(aggressive=False)
+
+    def __exit__(self, *args, **kwargs):
+        import importlib
+        import selectors
+        importlib.reload(selectors)
+
+
 @contextlib.contextmanager
 def _watch_progress(handler):
     """Context manager for creating a unix-domain socket and listen for
@@ -78,7 +88,7 @@ def _watch_progress(handler):
     Yields:
         socket_filename: the name of the socket file.
     """
-    with _tmpdir_scope() as tmpdir:
+    with _tmpdir_scope() as tmpdir, PatchSelectors():
         socket_filename = os.path.join(tmpdir, 'sock')
         sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         with contextlib.closing(sock):
@@ -108,7 +118,7 @@ def show_progress(total_duration):
             yield socket_filename
 
 
-if __name__ == '__main__':
+def main():
     args = parser.parse_args()
     total_duration = float(ffmpeg.probe(args.in_filename)['format']['duration'])
 
@@ -127,4 +137,7 @@ if __name__ == '__main__':
         except ffmpeg.Error as e:
             print(e.stderr, file=sys.stderr)
             sys.exit(1)
+
+if __name__ == '__main__':
+    main()
 
