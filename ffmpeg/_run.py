@@ -269,7 +269,7 @@ def run_async(
                 )
                 out_frame = in_frame * 0.3
                 process2.stdin.write(
-                    frame
+                    out_frame
                     .astype(np.uint8)
                     .tobytes()
                 )
