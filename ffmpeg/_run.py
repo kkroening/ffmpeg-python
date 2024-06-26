@@ -189,7 +189,7 @@ def compile(stream_spec, cmd='ffmpeg', overwrite_output=False):
         cmd = [cmd]
     elif type(cmd) != list:
         cmd = list(cmd)
-    return cmd + get_args(stream_spec, overwrite_output=overwrite_output)
+    return cmd + list(filter(lambda x: x != '', get_args(stream_spec, overwrite_output=overwrite_output)))
 
 
 @output_operator()
