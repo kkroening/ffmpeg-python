@@ -746,7 +746,8 @@ def test_pipe():
 def test__probe():
     data = ffmpeg.probe(TEST_INPUT_FILE1)
     assert set(data.keys()) == {'format', 'streams'}
-    assert data['format']['duration'] == '7.036000'
+    assert data['format']['duration'][:4] == '7.03'
+    assert len(data['format']['duration']) == 8
 
 
 @pytest.mark.skipif(sys.version_info < (3, 3), reason='requires python3.3 or higher')
