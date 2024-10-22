@@ -14,14 +14,12 @@ def filter_multi_output(stream_spec, filter_name, *args, **kwargs):
     To reference an output stream, use either the ``.stream`` operator or bracket
     shorthand:
 
-    Example:
+    Example::
 
-        ```
         split = ffmpeg.input('in.mp4').filter_multi_output('split')
         split0 = split.stream(0)
         split1 = split[1]
         ffmpeg.concat(split0, split1).output('out.mp4').run()
-        ```
     """
     return FilterNode(
         stream_spec, filter_name, args=args, kwargs=kwargs, max_inputs=None
