@@ -47,17 +47,24 @@ def get_chunk_times(in_filename, silence_threshold, silence_duration, start_time
     if end_time is not None:
         input_kwargs['t'] = end_time - start_time
 
-    p = _logged_popen(
+    p1 = _logged_popen(
         (ffmpeg
             .input(in_filename, **input_kwargs)
             .filter('silencedetect', n='{}dB'.format(silence_threshold), d=silence_duration)
             .output('-', format='null')
             .compile()
         ) + ['-nostats'],  # FIXME: use .nostats() once it's implemented in ffmpeg-python.
-        stderr=subprocess.PIPE
+        stderr=subprocess.PIPE, stdout=subprocess.PIPE
     )
-    output = p.communicate()[1].decode('utf-8')
-    if p.returncode != 0:
+
+    # NOTE: 
+    # adds below line to resolve a bug in decoding bad and not pritable metadata on communicate
+    # in Linux OS. To resolve this problem, your OS must have sed command.
+    p2 = subprocess.Popen(['sed', '1,/silencedetect/{/silencedetect/!d}'], stdin=p1.stdout,
+                             stdout=subprocess.PIPE)
+    p1.stdout.close()
+    output = p2.communicate()[0].decode('utf-8')
+    if p2.returncode != 0:
         sys.stderr.write(output)
         sys.exit(1)
     logger.debug(output)
