@@ -38,6 +38,11 @@ def _logged_popen(cmd_line, *args, **kwargs):
     return subprocess.Popen(cmd_line, *args, **kwargs)
 
 
+def remove_non_ascii(raw_data):
+    # Keep only ASCII printable and common whitespace characters (tab, newline, carriage return)
+    return bytes(b for b in raw_data if 32 <= b <= 126 or b in {9, 10, 13})
+    
+
 def get_chunk_times(in_filename, silence_threshold, silence_duration, start_time=None, end_time=None):
     input_kwargs = {}
     if start_time is not None:
@@ -56,7 +61,7 @@ def get_chunk_times(in_filename, silence_threshold, silence_duration, start_time
         ) + ['-nostats'],  # FIXME: use .nostats() once it's implemented in ffmpeg-python.
         stderr=subprocess.PIPE
     )
-    output = p.communicate()[1].decode('utf-8')
+    output = remove_non_ascii(p.communicate()[1]).decode('utf-8')
     if p.returncode != 0:
         sys.stderr.write(output)
         sys.exit(1)
