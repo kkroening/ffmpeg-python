@@ -222,13 +222,12 @@ server_url = "http://127.0.0.1:8080"
 
 process = (
     ffmpeg
-    .input("input.mp4")
+    .input("input.mp4", re=None) # argument to act as a live stream
     .output(
         server_url, 
         codec = "copy", # use same codecs of the original video
         listen=1, # enables HTTP server
         f=video_format)
-    .global_args("-re") # argument to act as a live stream
     .run()
 )
 
