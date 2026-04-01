@@ -131,6 +131,19 @@ def test_repeated_args():
         'dummy2.mp4',
     ]
 
+def test_filter_sub_options():
+    subtitle_filter = ffmpeg.input('dummy.mp4').filter('subtitles', force_style={
+        'Alignement': '6', 'Fontsize': '48'}).output('dummy2.mp4')
+    assert subtitle_filter.get_args() == [
+        '-i',
+        'dummy.mp4',
+        '-filter_complex',
+        r'[0]subtitles=force_style=Alignement=6\,Fontsize=48[s0]',
+        '-map',
+        '[s0]',
+        'dummy2.mp4'
+    ]
+
 
 def test__get_args__simple():
     out_file = ffmpeg.input('dummy.mp4').output('dummy2.mp4')
