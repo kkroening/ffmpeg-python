@@ -113,6 +113,36 @@ ffmpeg version 4.2.4-1ubuntu0.1 Copyright (c) 2000-2020 the FFmpeg developers
 
 > **Note**: The actual version information displayed here may vary from one system to another; but if a message such as `ffmpeg: command not found` appears instead of the version information, FFmpeg is not properly installed.
 
+## Quick Start
+
+After installation, here's a minimal example to get started:
+
+```python
+import ffmpeg
+
+# Simple transcode
+ffmpeg.input('input.mp4').output('output.mp4').run()
+
+# With options
+(
+    ffmpeg
+    .input('input.mp4')
+    .output('output.mp4', **{'qscale:v': 3})
+    .run()
+)
+
+# With filters
+(
+    ffmpeg
+    .input('input.mp4')
+    .filter('fps', fps=25, round='up')
+    .output('output.mp4')
+    .run()
+)
+```
+
+> **Important**: Always import the package as `import ffmpeg`, then call `ffmpeg.input()`, `ffmpeg.output()`, and `ffmpeg.run()` as shown above. The module-level functions (`ffmpeg.input`, `ffmpeg.output`, `ffmpeg.run`) are the correct API - not instance methods on individual objects.
+
 ## [Examples](https://github.com/kkroening/ffmpeg-python/tree/master/examples)
 
 When in doubt, take a look at the [examples](https://github.com/kkroening/ffmpeg-python/tree/master/examples) to see if there's something that's close to whatever you're trying to do.
