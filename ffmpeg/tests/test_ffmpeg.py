@@ -372,6 +372,21 @@ def test__output__video_size(video_size):
     assert args == ['-i', 'in', '-video_size', '320x240', 'out']
 
 
+@pytest.mark.parametrize(
+    'video_size,expected',
+    [
+        ((320, 240), '320x240'),
+        ([320, 240], '320x240'),
+        ('320x240', '320x240'),
+        ('1920x1080', '1920x1080'),
+        ('hd720', 'hd720'),
+    ],
+)
+def test__input__video_size(video_size, expected):
+    args = ffmpeg.input('in', video_size=video_size).output('out').get_args()
+    assert args == ['-video_size', expected, '-i', 'in', 'out']
+
+
 def test_filter_normal_arg_escape():
     """Test string escaping of normal filter args (e.g. ``font`` param of ``drawtext``
     filter).

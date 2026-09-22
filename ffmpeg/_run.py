@@ -42,7 +42,9 @@ def _get_input_args(input_node):
         if fmt:
             args += ['-f', fmt]
         if video_size:
-            args += ['-video_size', '{}x{}'.format(video_size[0], video_size[1])]
+            if not isinstance(video_size, basestring):
+                video_size = '{}x{}'.format(video_size[0], video_size[1])
+            args += ['-video_size', video_size]
         args += convert_kwargs_to_cmd_line_args(kwargs)
         args += ['-i', filename]
     else:
